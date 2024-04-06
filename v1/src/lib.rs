@@ -8,7 +8,7 @@ mod vga_buffer;
 use core::{arch::asm, panic::PanicInfo};
 
 #[no_mangle]
-pub extern "C" fn kernel_main(_ultiboot_information_address: usize) {
+pub extern "C" fn kernel_main(_multiboot_information_address: usize) {
     vga_buffer::clear_screen();
     println!("ooga {}", 6 * 7);
     println!("{}", {
