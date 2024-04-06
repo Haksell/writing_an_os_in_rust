@@ -11,7 +11,10 @@ use core::{arch::asm, panic::PanicInfo};
 pub extern "C" fn kernel_main() {
     vga_buffer::clear_screen();
     println!("ooga {}", 6 * 7);
-    panic!("ohno");
+    println!("{}", {
+        println!("inner");
+        "outer"
+    });
     println!("ooga {}", 6 * 7);
     hlt_loop()
 }
