@@ -2,19 +2,22 @@
 #![allow(internal_features)]
 #![feature(ptr_internals)]
 
+#[macro_use]
 mod vga_buffer;
 
 use core::{arch::asm, panic::PanicInfo};
 
 #[no_mangle]
 pub extern "C" fn kernel_main() {
-    vga_buffer::print_something();
-
+    vga_buffer::clear_screen();
+    println!("ooga {}", 6 * 7);
+    println!("ooga {}", 6 * 7);
     hlt_loop()
 }
 
 #[panic_handler]
 fn panic(_info: &PanicInfo) -> ! {
+    // TODO: println
     let hello = b"Panic Panic!";
     let color_byte = 0xe0;
     let mut hello_colored = [color_byte; 24];

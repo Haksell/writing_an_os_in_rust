@@ -1,4 +1,5 @@
 use core::{fmt, ptr::Unique};
+use spin::Mutex;
 use volatile::Volatile;
 
 #[allow(dead_code)]
@@ -38,6 +39,15 @@ impl ColorCode {
 struct ScreenChar {
     ascii_character: u8,
     color_code: ColorCode,
+}
+
+impl ScreenChar {
+    pub fn white_space() -> Self {
+        Self {
+            ascii_character: b' ',
+            color_code: ColorCode::new(Color::White, Color::Black),
+        }
+    }
 }
 
 const VGA_HEIGHT: usize = 25;
@@ -84,6 +94,9 @@ impl Writer {
                 buffer.chars[row - 1][col].write(buffer.chars[row][col].read());
             }
         }
+        for col in 0..VGA_WIDTH {
+            buffer.chars[VGA_HEIGHT - 1][col].write(ScreenChar::white_space());
+        }
         self.column_position = 0;
     }
 }
@@ -97,16 +110,27 @@ impl fmt::Write for Writer {
     }
 }
 
-pub fn print_something() {
-    use core::fmt::Write;
-    let mut writer = Writer {
-        column_position: 0,
-        color_code: ColorCode::new(Color::LightGreen, Color::Black),
-        buffer: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
-    };
-    for _ in 0..10 {
-        writer.write_byte(b'H');
-        writer.write_byte(b'o');
+pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
+    column_position: 0,
+    color_code: ColorCode::new(Color::LightGreen, Color::Black),
+    buffer: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
+});
+
+macro_rules! println {
+    ($fmt:expr) => (print!(concat!($fmt, "\n")));
+    ($fmt:expr, $($arg:tt)*) => (print!(concat!($fmt, "\n"), $($arg)*));
+}
+
+macro_rules! print {
+    ($($arg:tt)*) => ({
+        use core::fmt::Write;
+        let mut writer = $crate::vga_buffer::WRITER.lock();
+        writer.write_fmt(format_args!($($arg)*)).unwrap();
+    });
+}
+
+pub fn clear_screen() {
+    for _ in 0..VGA_HEIGHT {
+        println!("");
     }
-    let _ = write!(writer, " ooga booga {}", 6 * 7);
 }
