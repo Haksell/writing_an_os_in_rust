@@ -1,0 +1,5 @@
+build
+target
+.vagrant
+output.log
+*VBox*.log
