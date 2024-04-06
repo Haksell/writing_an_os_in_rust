@@ -116,59 +116,12 @@ impl Writer {
         self.set_cursor(self.column_position);
     }
 
-    pub fn set_foreground_color(&mut self, foreground_code: Color) {
-        // TODO: keep old background color
-        self.color_code = ColorCode::new(foreground_code, Color::Black);
-    }
-
-    pub fn reset_foreground_color(&mut self) {
-        self.set_foreground_color(Color::White);
-    }
-
-    // TODO: with_foreground_color similar to without_interrupts
-
     pub fn set_cursor(&mut self, col: usize) {
         self.column_position = col;
         if self.screens[self.screen_idx].scroll_up == 0 {
             update_cursor(VGA_HEIGHT - 1, self.column_position);
         } else {
             hide_cursor();
-        }
-    }
-
-    pub fn switch_screen(&mut self, screen_idx: usize, cursor: usize) {
-        if screen_idx != self.screen_idx && screen_idx < VGA_SCREENS && cursor < VGA_WIDTH {
-            self.screen_idx = screen_idx;
-            self.set_cursor(cursor);
-            self.redraw();
-        }
-    }
-
-    pub fn move_up(&mut self) {
-        if self.screens[self.screen_idx].scroll_up < self.screens[self.screen_idx].history {
-            self.screens[self.screen_idx].scroll_up += 1;
-            self.redraw();
-        }
-    }
-
-    pub fn move_down(&mut self) {
-        if self.screens[self.screen_idx].scroll_up > 0 {
-            self.screens[self.screen_idx].scroll_up -= 1;
-            self.redraw();
-        }
-    }
-
-    pub fn move_all_the_way_up(&mut self) {
-        if self.screens[self.screen_idx].scroll_up < self.screens[self.screen_idx].history {
-            self.screens[self.screen_idx].scroll_up = self.screens[self.screen_idx].history;
-            self.redraw();
-        }
-    }
-
-    pub fn move_all_the_way_down(&mut self) {
-        if self.screens[self.screen_idx].scroll_up > 0 {
-            self.screens[self.screen_idx].scroll_up = 0;
-            self.redraw();
         }
     }
 
