@@ -1,14 +1,4 @@
-ARCH ?= i386
-DEBUG ?= false
-
-ifeq ($(ARCH), i386)
-LD_FLAGS := -m elf_i386
-ELF_FORMAT := elf32
-else ifeq ($(ARCH), x86_64)
-ELF_FORMAT := elf64
-else
-$(error ARCH must be either i386 or x86_64)
-endif
+DEBUG ?= true
 
 ifeq ($(DEBUG),true)
 BUILD_MODE := debug
@@ -20,6 +10,7 @@ else
 $(error DEBUG must be either true or false)
 endif
 
+ARCH := x86_64
 BUILD := build/$(ARCH)/$(BUILD_MODE)
 ISOFILES := $(BUILD)/isofiles
 KERNEL := $(BUILD)/kernel-$(ARCH).bin
@@ -66,7 +57,7 @@ $(RUST_OS):
 
 $(ASM_OBJS): $(BUILD)/arch/$(ARCH)/%.o: arch/$(ARCH)/%.asm
 	@mkdir -p $(shell dirname $@)
-	@nasm -f $(ELF_FORMAT) $< -o $@
+	@nasm -f elf64 $< -o $@
 
 loc:
 	@find src -name '*.rs' | sort | xargs wc -l
