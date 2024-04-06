@@ -11,22 +11,14 @@ use core::{arch::asm, panic::PanicInfo};
 pub extern "C" fn kernel_main() {
     vga_buffer::clear_screen();
     println!("ooga {}", 6 * 7);
+    panic!("ohno");
     println!("ooga {}", 6 * 7);
     hlt_loop()
 }
 
 #[panic_handler]
-fn panic(_info: &PanicInfo) -> ! {
-    // TODO: println
-    let hello = b"Panic Panic!";
-    let color_byte = 0xe0;
-    let mut hello_colored = [color_byte; 24];
-    for (i, char_byte) in hello.into_iter().enumerate() {
-        hello_colored[i * 2] = *char_byte;
-    }
-    let buffer_ptr = (0xb8000 + 2308) as *mut _;
-    unsafe { *buffer_ptr = hello_colored };
-
+fn panic(panic_info: &PanicInfo) -> ! {
+    println!("{:?}", panic_info);
     hlt_loop()
 }
 
