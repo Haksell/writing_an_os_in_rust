@@ -59,7 +59,4 @@ $(ASM_OBJS): $(BUILD)/arch/$(ARCH)/%.o: arch/$(ARCH)/%.asm
 	@mkdir -p $(shell dirname $@)
 	@nasm -f elf64 $< -o $@
 
-loc:
-	@find src -name '*.rs' | sort | xargs wc -l
-
-.PHONY: all re run rerun clean $(RUST_OS) vm loc
+.PHONY: all re run rerun clean $(RUST_OS) vm
