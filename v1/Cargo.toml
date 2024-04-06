@@ -7,7 +7,6 @@ edition = "2021"
 crate-type = ["staticlib"]
 
 [dependencies]
-spin = "0.5.2"
 volatile = "0.2.6"
 
 [dependencies.lazy_static]
