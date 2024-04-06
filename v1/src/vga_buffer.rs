@@ -116,14 +116,6 @@ impl Writer {
         self.set_cursor(self.column_position);
     }
 
-    // TODO: write_bytes that accepts a &[u8] and only moves the cursor once
-
-    pub fn write_bytes(&mut self, byte: u8, repeat: usize) {
-        for _ in 0..repeat {
-            self.write_byte(byte);
-        }
-    }
-
     pub fn set_foreground_color(&mut self, foreground_code: Color) {
         // TODO: keep old background color
         self.color_code = ColorCode::new(foreground_code, Color::Black);
@@ -149,15 +141,6 @@ impl Writer {
             self.screen_idx = screen_idx;
             self.set_cursor(cursor);
             self.redraw();
-        }
-    }
-
-    pub fn clear_vga_buffer(&mut self) {
-        let blank = ScreenChar::empty();
-        for y in 0..VGA_HEIGHT {
-            for x in 0..VGA_WIDTH {
-                self.buffer.chars[y][x].write(blank);
-            }
         }
     }
 
@@ -187,10 +170,6 @@ impl Writer {
             self.screens[self.screen_idx].scroll_up = 0;
             self.redraw();
         }
-    }
-
-    pub fn reset_history(&mut self) {
-        self.screens[self.screen_idx].history = 0;
     }
 
     fn redraw(&mut self) {

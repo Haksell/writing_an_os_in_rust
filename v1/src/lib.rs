@@ -7,18 +7,13 @@ use core::{arch::asm, panic::PanicInfo};
 mod entry;
 mod idt;
 mod interrupts;
-mod keyboard;
 mod pic;
 mod port;
-mod shell;
 mod vga_buffer;
 
 #[no_mangle]
 pub extern "C" fn kernel_main() {
-    interrupts::init();
-    vga_buffer::WRITER.lock().clear_vga_buffer();
-    shell::SHELL.lock().init();
-    interrupts::enable();
+    println!("KERNEL");
     hlt_loop()
 }
 
