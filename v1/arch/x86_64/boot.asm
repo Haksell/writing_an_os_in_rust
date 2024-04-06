@@ -11,6 +11,8 @@ start:
     call check_long_mode
     call set_up_page_tables
     call enable_paging
+    mov dword [0xb8000], 0x2f4b2f4f
+    hlt
     lgdt [gdt64.pointer]
     jmp gdt64.code:long_mode_start
 
@@ -59,11 +61,11 @@ check_long_mode:
 set_up_page_tables:
     ; P4[0] = P3
     mov eax, p3_table
-    or eax, 0b11
+    or eax, 0b11 ; present + writable
     mov [p4_table], eax
     ; P3[0] = P2
     mov eax, p2_table
-    or eax, 0b11
+    or eax, 0b11 ; present + writable
     mov [p3_table], eax
     ; map each P2 entry to a huge 2MiB page
     mov ecx, 0
@@ -112,7 +114,7 @@ p3_table:
 p2_table:
     resb 4096
 stack_bottom:
-    resb 4096 * 128
+    resb 4096 * 128 ; TODO: 64
 stack_top:
 
 section .rodata
