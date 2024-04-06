@@ -11,8 +11,6 @@ start:
     call check_long_mode
     call set_up_page_tables
     call enable_paging
-    mov dword [0xb8000], 0x2f4b2f4f
-    hlt
     lgdt [gdt64.pointer]
     jmp gdt64.code:long_mode_start
 
