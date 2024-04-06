@@ -77,7 +77,15 @@ impl Writer {
         unsafe { self.buffer.as_mut() }
     }
 
-    fn new_line(&mut self) {}
+    fn new_line(&mut self) {
+        let buffer = self.buffer();
+        for row in 1..VGA_HEIGHT {
+            for col in 0..VGA_WIDTH {
+                buffer.chars[row - 1][col].write(buffer.chars[row][col].read());
+            }
+        }
+        self.column_position = 0;
+    }
 }
 
 impl fmt::Write for Writer {
