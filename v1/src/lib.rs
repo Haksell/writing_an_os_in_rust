@@ -7,16 +7,20 @@ mod vga_buffer;
 
 use core::{arch::asm, panic::PanicInfo};
 
+use multiboot2::BootInformationHeader;
+
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_information_address: usize) {
     vga_buffer::clear_screen();
+
     println!("{:#X}", multiboot_information_address);
-    println!("ooga {}", 6 * 7);
-    println!("{}", {
-        println!("inner");
-        "outer"
-    });
-    println!("ooga {}", 6 * 7);
+    let boot_info = unsafe {
+        multiboot2::BootInformation::load(
+            multiboot_information_address as *const BootInformationHeader,
+        )
+    };
+    println!("{:?}", boot_info);
+
     hlt_loop()
 }
 
