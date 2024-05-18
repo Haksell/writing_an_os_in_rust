@@ -7,19 +7,17 @@ mod vga_buffer;
 
 use core::{arch::asm, panic::PanicInfo};
 
-use multiboot2::BootInformationHeader;
+use multiboot2::{BootInformationHeader, ElfSectionFlags};
 
 #[no_mangle]
-pub extern "C" fn kernel_main(multiboot_information_address: usize) {
+pub extern "C" fn kernel_main(multiboot_start: usize) {
     vga_buffer::clear_screen();
 
-    println!("{:#X}", multiboot_information_address);
+    println!("multiboot_start: {:#X}", multiboot_start);
     let boot_info = unsafe {
-        multiboot2::BootInformation::load(
-            multiboot_information_address as *const BootInformationHeader,
-        )
-        .unwrap()
+        multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
     };
+
     let memory_map_tag = boot_info.memory_map_tag().unwrap();
     println!("memory areas:");
     for area in memory_map_tag.memory_areas() {
@@ -29,6 +27,52 @@ pub extern "C" fn kernel_main(multiboot_information_address: usize) {
             area.size()
         );
     }
+
+    let elf_sections = boot_info.elf_sections().unwrap();
+    println!("kernel sections:");
+    let mut count_sections = 0;
+    let mut hidden_sections = 0;
+    for section in elf_sections {
+        if section.flags() != ElfSectionFlags::empty() {
+            println!(
+                "    addr: 0x{:x}, size: 0x{:x}, flags: 0x{:x}",
+                section.start_address(),
+                section.size(),
+                section.flags()
+            );
+        } else {
+            hidden_sections += 1;
+        }
+        count_sections += 1;
+    }
+    println!(
+        "{} total sections ({} hidden).",
+        count_sections, hidden_sections
+    );
+
+    let kernel_start = boot_info
+        .elf_sections()
+        .unwrap()
+        .map(|s| s.start_address())
+        .min()
+        .unwrap();
+    let kernel_end = boot_info
+        .elf_sections()
+        .unwrap()
+        .map(|s| s.start_address() + s.size())
+        .max()
+        .unwrap();
+    let multiboot_end = multiboot_start + boot_info.total_size();
+
+    println!(
+        "kernel_start: {:#x}, kernel_end: {:#x}",
+        kernel_start, kernel_end
+    );
+    println!(
+        "multiboot_start: {:#x}, multiboot_end: {:#x}",
+        multiboot_start, multiboot_end
+    );
+
     hlt_loop()
 }
 
