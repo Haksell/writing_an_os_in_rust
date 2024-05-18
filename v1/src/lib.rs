@@ -18,9 +18,17 @@ pub extern "C" fn kernel_main(multiboot_information_address: usize) {
         multiboot2::BootInformation::load(
             multiboot_information_address as *const BootInformationHeader,
         )
+        .unwrap()
     };
-    println!("{:?}", boot_info);
-
+    let memory_map_tag = boot_info.memory_map_tag().unwrap();
+    println!("memory areas:");
+    for area in memory_map_tag.memory_areas() {
+        println!(
+            "    start: 0x{:x}, length: 0x{:x}",
+            area.start_address(),
+            area.size()
+        );
+    }
     hlt_loop()
 }
 
