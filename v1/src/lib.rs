@@ -2,11 +2,11 @@
 #![allow(internal_features)]
 #![feature(ptr_internals)]
 
+mod memory;
 #[macro_use]
 mod vga_buffer;
 
 use core::{arch::asm, panic::PanicInfo};
-
 use multiboot2::{BootInformationHeader, ElfSectionFlags};
 
 #[no_mangle]
