@@ -4,10 +4,12 @@
 
 #[macro_use]
 mod vga_buffer;
+mod memory;
 
 use core::{arch::asm, panic::PanicInfo};
-
 use multiboot2::{BootInformationHeader, ElfSectionFlags};
+
+use crate::memory::FrameAllocator;
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
@@ -72,6 +74,20 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
         "multiboot_start: {:#x}, multiboot_end: {:#x}",
         multiboot_start, multiboot_end
     );
+
+    let mut frame_allocator = memory::AreaFrameAllocator::new(
+        kernel_start as usize,
+        kernel_end as usize,
+        multiboot_start,
+        multiboot_end,
+        memory_map_tag.memory_areas(),
+    );
+    for i in 0.. {
+        if let None = frame_allocator.allocate_frame() {
+            println!("allocated {} frames", i);
+            break;
+        }
+    }
 
     hlt_loop()
 }
