@@ -1,15 +1,16 @@
 mod area_frame_allocator;
 
+pub use area_frame_allocator::AreaFrameAllocator;
+
+pub const PAGE_SIZE: usize = 4096;
+
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
     number: usize,
 }
 
-pub const PAGE_SIZE: usize = 4096;
-
 impl Frame {
     fn containing_address(address: usize) -> Frame {
-        assert!(address % PAGE_SIZE == 0); // really?
         Frame {
             number: address / PAGE_SIZE,
         }
