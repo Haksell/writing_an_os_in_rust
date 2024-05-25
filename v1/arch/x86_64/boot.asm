@@ -58,6 +58,10 @@ check_long_mode:
         jmp error
 
 set_up_page_tables:
+    ; map P4 table recursively
+    mov eax, p4_table
+    or eax, 0b11
+    mov [p4_table + 511 * 8], eax
     ; P4[0] = P3
     mov eax, p3_table
     or eax, 0b11 ; present + writable
