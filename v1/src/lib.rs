@@ -82,6 +82,7 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
         multiboot_end,
         memory_map_tag.memory_areas(),
     );
+    memory::test_paging(&mut frame_allocator);
     for i in 0.. {
         if let None = frame_allocator.allocate_frame() {
             println!("allocated {} frames", i);
