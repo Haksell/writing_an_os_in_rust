@@ -1,17 +1,20 @@
 mod entry;
 mod table;
+mod temporary_page;
 
 use self::entry::Entry;
 use self::table::{Level4, Table, P4};
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use core::ptr::Unique;
 use entry::EntryFlags;
+use temporary_page::TemporaryPage;
 
 const ENTRY_COUNT: usize = 512;
 
 pub type PhysicalAddress = usize;
 pub type VirtualAddress = usize;
 
+#[derive(Debug, Clone, Copy)]
 pub struct Page {
     number: usize,
 }
@@ -175,4 +178,24 @@ pub fn test_paging<A: FrameAllocator>(allocator: &mut A) {
     });
     page_table.unmap(Page::containing_address(addr), allocator);
     println!("None = {:?}", page_table.translate(addr));
+}
+
+pub struct InactivePageTable {
+    p4_frame: Frame,
+}
+
+impl InactivePageTable {
+    pub fn new(
+        frame: Frame,
+        active_table: &mut ActivePageTable,
+        temporary_page: &mut TemporaryPage,
+    ) -> Self {
+        {
+            let table = temporary_page.map_table_frame(frame.clone(), active_table);
+            table.zero();
+            table[511].set(frame.clone(), EntryFlags::PRESENT | EntryFlags::WRITABLE);
+        }
+        temporary_page.unmap(active_table);
+        Self { p4_frame: frame }
+    }
 }
