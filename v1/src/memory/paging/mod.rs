@@ -3,6 +3,8 @@ mod mapper;
 mod table;
 mod temporary_page;
 
+use crate::vga_buffer;
+
 use self::entry::EntryFlags;
 pub use self::mapper::Mapper;
 use self::temporary_page::TemporaryPage;
@@ -75,6 +77,22 @@ impl DerefMut for ActivePageTable {
     }
 }
 
+// TODO: check cr3 functions
+fn cr3_read() -> usize {
+    let cr3: usize;
+    unsafe {
+        asm!("mov {}, cr3", out(reg) cr3, options(nomem, nostack, preserves_flags));
+    }
+    cr3
+}
+
+pub unsafe fn cr3_write(addr: PhysicalAddress) {
+    let value = addr as u64;
+    unsafe {
+        asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
+    }
+}
+
 impl ActivePageTable {
     unsafe fn new() -> Self {
         Self {
@@ -89,12 +107,7 @@ impl ActivePageTable {
         f: F,
     ) {
         {
-            // TODO: check cr3 asm
-            let cr3: usize;
-            unsafe {
-                asm!("mov {}, cr3", out(reg) cr3, options(nomem, nostack, preserves_flags));
-            }
-            let backup = Frame::containing_address(cr3);
+            let backup = Frame::containing_address(cr3_read());
             let p4_table = temporary_page.map_table_frame(backup.clone(), self);
             self.p4_mut()[511].set(
                 table.p4_frame.clone(),
@@ -106,6 +119,14 @@ impl ActivePageTable {
             tlb::flush_all();
         }
         temporary_page.unmap(self);
+    }
+
+    pub fn switch(&mut self, new_table: InactivePageTable) -> InactivePageTable {
+        let old_table = InactivePageTable {
+            p4_frame: Frame::containing_address(cr3_read()),
+        };
+        unsafe { cr3_write(new_table.p4_frame.start_address()) }
+        old_table
     }
 }
 
@@ -158,5 +179,9 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
                 mapper.identity_map(frame, flags, allocator);
             }
         }
-    })
+        let vga_buffer_frame = Frame::containing_address(0xb8000);
+        mapper.identity_map(vga_buffer_frame, EntryFlags::WRITABLE, allocator);
+    });
+    let old_table = active_table.switch(new_table);
+    println!("NEW TABLE!!!");
 }
