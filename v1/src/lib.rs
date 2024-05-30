@@ -8,6 +8,7 @@ mod memory;
 
 use core::{arch::asm, panic::PanicInfo};
 use multiboot2::{BootInformationHeader, ElfSectionFlags};
+use x86_64::structures::paging::frame;
 
 use crate::memory::FrameAllocator;
 
@@ -51,6 +52,7 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
         boot_info.memory_map_tag().unwrap().memory_areas(),
     );
     memory::remap_the_kernel(&mut frame_allocator, &boot_info);
+    frame_allocator.allocate_frame();
     println!("kernel remapped! whatever that means.");
 
     hlt_loop()

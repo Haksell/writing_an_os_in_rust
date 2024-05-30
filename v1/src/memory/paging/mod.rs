@@ -158,8 +158,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
         InactivePageTable::new(frame, &mut active_table, &mut temporary_page)
     };
     active_table.with(&mut new_table, &mut temporary_page, |mapper| {
-        let elf_sections = boot_info.elf_sections().expect("Memory map tag required");
-        for section in elf_sections {
+        for section in boot_info.elf_sections().expect("Memory map tag required") {
             if !section.is_allocated() {
                 continue;
             }
@@ -179,8 +178,15 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
                 mapper.identity_map(frame, flags, allocator);
             }
         }
+
         let vga_buffer_frame = Frame::containing_address(0xb8000);
         mapper.identity_map(vga_buffer_frame, EntryFlags::WRITABLE, allocator);
+
+        let multiboot_start = Frame::containing_address(boot_info.start_address());
+        let multiboot_end = Frame::containing_address(boot_info.end_address() - 1);
+        for frame in Frame::range_inclusive(multiboot_start, multiboot_end) {
+            mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
+        }
     });
     let old_table = active_table.switch(new_table);
     println!("NEW TABLE!!!");
