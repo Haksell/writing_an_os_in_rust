@@ -54,9 +54,9 @@ checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
 
 [[package]]
 name = "multiboot2"
-version = "0.20.0"
+version = "0.20.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3d67e1b461b49127f2226c78a2b4090f72212c44fa27342bcfef93dd39bd6b86"
+checksum = "ad7ef048d4783355163fd0c874aac3db54b919dc6a86dc29bb13f67308b114b0"
 dependencies = [
  "bitflags",
  "derive_more",
@@ -67,9 +67,9 @@ dependencies = [
 
 [[package]]
 name = "proc-macro2"
-version = "1.0.82"
+version = "1.0.85"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ad3d49ab951a01fbaafe34f2ec74122942fe18a3f9814c3268f1bb72042131b"
+checksum = "22244ce15aa966053a896d1accb3a6e68469b97c7f33f284b99f0d576879fc23"
 dependencies = [
  "unicode-ident",
 ]
