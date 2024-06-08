@@ -9,8 +9,6 @@ mod memory;
 // remove?
 extern crate alloc;
 
-use crate::memory::FrameAllocator;
-use alloc::boxed::Box;
 use core::{arch::asm, panic::PanicInfo};
 use multiboot2::BootInformationHeader;
 use x86_64::registers::{
@@ -26,46 +24,15 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     let boot_info = unsafe {
         multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
     };
-
-    let kernel_start = boot_info
-        .elf_sections()
-        .unwrap()
-        .map(|s| s.start_address())
-        .min()
-        .unwrap();
-    let kernel_end = boot_info
-        .elf_sections()
-        .unwrap()
-        .map(|s| s.start_address() + s.size())
-        .max()
-        .unwrap();
-    let multiboot_end = multiboot_start + boot_info.total_size();
-
-    println!(
-        "kernel_start: {:#x}, kernel_end: {:#x}",
-        kernel_start, kernel_end
-    );
-    println!(
-        "multiboot_start: {:#x}, multiboot_end: {:#x}",
-        multiboot_start, multiboot_end
-    );
-
-    let mut frame_allocator = memory::AreaFrameAllocator::new(
-        kernel_start as usize,
-        kernel_end as usize,
-        multiboot_start,
-        multiboot_end,
-        boot_info.memory_map_tag().unwrap().memory_areas(),
-    );
     enable_nxe_bit();
     enable_write_protect_bit();
-    memory::remap_the_kernel(&mut frame_allocator, &boot_info);
-    frame_allocator.allocate_frame();
-    println!("kernel remapped! Whatever that means.");
 
-    // let heap_test = Box::new(42);
+    memory::init(&boot_info);
+
+    // let heap_test = alloc::boxed::Box::new(42);
     // println!("This value lives on the heap: {}", *heap_test);
 
+    println!("No crash!");
     hlt_loop()
 }
 

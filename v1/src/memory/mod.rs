@@ -8,6 +8,7 @@ use self::paging::PhysicalAddress;
 pub use area_frame_allocator::AreaFrameAllocator;
 use heap_allocator::BumpAllocator;
 use locked::Locked;
+use multiboot2::BootInformation;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
@@ -17,6 +18,41 @@ pub const PAGE_SIZE: usize = 4096;
 #[global_allocator]
 static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
+
+pub fn init(boot_info: &BootInformation) {
+    let kernel_start = boot_info
+        .elf_sections()
+        .unwrap()
+        .map(|s| s.start_address())
+        .min()
+        .unwrap();
+    let kernel_end = boot_info
+        .elf_sections()
+        .unwrap()
+        .map(|s| s.start_address() + s.size())
+        .max()
+        .unwrap();
+
+    println!(
+        "kernel_start: {:#x}, kernel_end: {:#x}",
+        kernel_start, kernel_end
+    );
+    println!(
+        "multiboot_start: {:#x}, multiboot_end: {:#x}",
+        boot_info.start_address(),
+        boot_info.end_address()
+    );
+
+    let mut frame_allocator = AreaFrameAllocator::new(
+        kernel_start as usize,
+        kernel_end as usize,
+        boot_info.start_address(),
+        boot_info.end_address(),
+        boot_info.memory_map_tag().unwrap().memory_areas(),
+    );
+    remap_the_kernel(&mut frame_allocator, &boot_info);
+    println!("kernel remapped! Whatever that means.");
+}
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
