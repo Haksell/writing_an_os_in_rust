@@ -1,9 +1,11 @@
 #![no_std]
 #![allow(internal_features)]
-#![feature(allocator_api, ptr_internals)]
+#![feature(abi_x86_interrupt, allocator_api, ptr_internals)]
 
 #[macro_use]
 mod vga_buffer;
+
+mod interrupts;
 mod memory;
 
 extern crate alloc;
@@ -32,8 +34,11 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
     println!("This string too: {}", String::from("ooga") + "chaka");
     println!("Fibonacci: {:?}", vec![1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
-    println!("No crash! \x02");
 
+    interrupts::init();
+    x86_64::instructions::interrupts::int3();
+
+    println!("No crash! \x02");
     hlt_loop()
 }
 
