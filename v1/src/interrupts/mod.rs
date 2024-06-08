@@ -1,3 +1,5 @@
+mod gdt;
+
 use crate::memory::MemoryController;
 use lazy_static::lazy_static;
 use x86_64::{
