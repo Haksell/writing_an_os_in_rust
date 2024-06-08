@@ -4,7 +4,9 @@ mod locked;
 mod paging;
 mod stack_allocator;
 
-pub use self::{area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel};
+pub use self::{
+    area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel, stack_allocator::Stack,
+};
 
 use self::{
     heap_allocator::BumpAllocator,
@@ -16,7 +18,6 @@ use self::{
 };
 use multiboot2::BootInformation;
 use paging::ActivePageTable;
-use stack_allocator::Stack;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
