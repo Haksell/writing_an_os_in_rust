@@ -35,10 +35,8 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     println!("This string too: {}", String::from("ooga") + "chaka");
     println!("Fibonacci: {:?}", vec![1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
 
-    interrupts::init();
-    x86_64::instructions::interrupts::int3();
-
     println!("No crash! \x02");
+    interrupts::init();
     hlt_loop()
 }
 

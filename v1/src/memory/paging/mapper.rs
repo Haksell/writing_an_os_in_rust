@@ -96,7 +96,8 @@ impl Mapper {
         )
     }
 
-    pub fn unmap<A: FrameAllocator>(&mut self, page: Page, allocator: &mut A) {
+    // TODO: properly
+    pub fn unmap<A: FrameAllocator>(&mut self, page: Page, _: &mut A) {
         assert!(self.translate(page.start_address()).is_some());
         let p1 = self
             .p4_mut()
@@ -104,7 +105,7 @@ impl Mapper {
             .and_then(|p3| p3.next_table_mut(page.p3_index()))
             .and_then(|p2| p2.next_table_mut(page.p2_index()))
             .expect("mapping code does not support huge pages");
-        let frame = p1[page.p1_index()].pointed_frame().unwrap();
+        // let frame = p1[page.p1_index()].pointed_frame().unwrap();
         p1[page.p1_index()].set_unused();
         x86_64::instructions::tlb::flush(x86_64::VirtAddr::new(page.start_address() as u64));
         // TODO: free p1, p2, p3 tables if empty
