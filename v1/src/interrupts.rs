@@ -1,6 +1,14 @@
 use crate::memory::MemoryController;
 use lazy_static::lazy_static;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use x86_64::{
+    structures::{
+        idt::{InterruptDescriptorTable, InterruptStackFrame},
+        tss::TaskStateSegment,
+    },
+    VirtAddr,
+};
+
+const DOUBLE_FAULT_IST_INDEX: usize = 0;
 
 lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
@@ -15,6 +23,9 @@ pub fn init(memory_controller: &mut MemoryController) {
     let double_fault_stack = memory_controller
         .alloc_stack(1)
         .expect("could not allocate double fault stack");
+    let mut tss = TaskStateSegment::new();
+    tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX] =
+        VirtAddr::new(double_fault_stack.top() as u64);
     IDT.load();
     println!("IDT loaded.");
 }
