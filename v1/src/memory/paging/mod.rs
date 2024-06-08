@@ -3,11 +3,10 @@ mod mapper;
 mod table;
 mod temporary_page;
 
-use crate::vga_buffer;
+use crate::vga_buffer::VGA_ADDRESS;
 
-use self::entry::EntryFlags;
 pub use self::mapper::Mapper;
-use self::temporary_page::TemporaryPage;
+use self::{entry::EntryFlags, temporary_page::TemporaryPage};
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use core::{
     arch::asm,
@@ -86,7 +85,7 @@ fn cr3_read() -> usize {
     cr3
 }
 
-pub unsafe fn cr3_write(addr: PhysicalAddress) {
+unsafe fn cr3_write(addr: PhysicalAddress) {
     let value = addr as u64;
     unsafe {
         asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
@@ -171,7 +170,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
                 section.start_address(),
                 section.size()
             );
-            let flags = EntryFlags::WRITABLE; // TODO: use real section flags
+            let flags = EntryFlags::from_elf_section_flags(&section);
             let start_frame = Frame::containing_address(section.start_address() as usize);
             let end_frame = Frame::containing_address(section.end_address() as usize - 1);
             for frame in Frame::range_inclusive(start_frame, end_frame) {
@@ -179,15 +178,25 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
             }
         }
 
-        let vga_buffer_frame = Frame::containing_address(0xb8000);
-        mapper.identity_map(vga_buffer_frame, EntryFlags::WRITABLE, allocator);
+        mapper.identity_map(
+            Frame::containing_address(VGA_ADDRESS),
+            EntryFlags::WRITABLE,
+            allocator,
+        );
 
-        let multiboot_start = Frame::containing_address(boot_info.start_address());
-        let multiboot_end = Frame::containing_address(boot_info.end_address() - 1);
-        for frame in Frame::range_inclusive(multiboot_start, multiboot_end) {
+        for frame in Frame::range_inclusive(
+            Frame::containing_address(boot_info.start_address()),
+            Frame::containing_address(boot_info.end_address() - 1),
+        ) {
             mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
         }
     });
     let old_table = active_table.switch(new_table);
     println!("NEW TABLE!!!");
+
+    // turn the old p4 page into a guard page
+    // TODO: stack probes
+    let old_p4_page = Page::containing_address(old_table.p4_frame.start_address());
+    active_table.unmap(old_p4_page, allocator);
+    println!("guard page at {:#x}", old_p4_page.start_address());
 }

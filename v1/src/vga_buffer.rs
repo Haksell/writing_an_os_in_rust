@@ -24,6 +24,8 @@ pub enum Color {
     White = 15,
 }
 
+pub const VGA_ADDRESS: usize = 0xb8000;
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 struct ColorCode(u8);
@@ -113,7 +115,7 @@ impl fmt::Write for Writer {
 pub static WRITER: Mutex<Writer> = Mutex::new(Writer {
     column_position: 0,
     color_code: ColorCode::new(Color::LightGreen, Color::Black),
-    buffer: unsafe { Unique::new_unchecked(0xb8000 as *mut _) },
+    buffer: unsafe { Unique::new_unchecked(VGA_ADDRESS as *mut _) },
 });
 
 macro_rules! println {

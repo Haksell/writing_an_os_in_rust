@@ -1,5 +1,6 @@
 use super::super::Frame;
 use bitflags::bitflags;
+use multiboot2::{ElfSection, ElfSectionFlags};
 
 // TODO: u64 -> usize verywhere?
 
@@ -47,5 +48,21 @@ bitflags! {
         const HUGE_PAGE =       1 << 7;
         const GLOBAL =          1 << 8;
         const NO_EXECUTE =      1 << 63;
+    }
+}
+
+impl EntryFlags {
+    pub fn from_elf_section_flags(section: &ElfSection) -> Self {
+        let mut flags = EntryFlags::empty();
+        if section.flags().contains(ElfSectionFlags::ALLOCATED) {
+            flags |= EntryFlags::PRESENT;
+        }
+        if section.flags().contains(ElfSectionFlags::WRITABLE) {
+            flags |= EntryFlags::WRITABLE;
+        }
+        if !section.flags().contains(ElfSectionFlags::EXECUTABLE) {
+            flags |= EntryFlags::NO_EXECUTE;
+        }
+        flags
     }
 }

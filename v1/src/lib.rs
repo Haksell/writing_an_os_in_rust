@@ -6,11 +6,13 @@
 mod vga_buffer;
 mod memory;
 
-use core::{arch::asm, panic::PanicInfo};
-use multiboot2::{BootInformationHeader, ElfSectionFlags};
-use x86_64::structures::paging::frame;
-
 use crate::memory::FrameAllocator;
+use core::{arch::asm, panic::PanicInfo};
+use multiboot2::BootInformationHeader;
+use x86_64::registers::{
+    control::{Cr0, Cr0Flags},
+    model_specific::Msr,
+}; // remove
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
@@ -51,9 +53,11 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
         multiboot_end,
         boot_info.memory_map_tag().unwrap().memory_areas(),
     );
+    enable_nxe_bit();
+    enable_write_protect_bit();
     memory::remap_the_kernel(&mut frame_allocator, &boot_info);
     frame_allocator.allocate_frame();
-    println!("kernel remapped! whatever that means.");
+    println!("kernel remapped! Whatever that means.");
 
     hlt_loop()
 }
@@ -74,5 +78,21 @@ fn hlt_loop() -> ! {
 fn hlt() {
     unsafe {
         asm!("hlt", options(nomem, nostack, preserves_flags));
+    }
+}
+
+const IA32_EFER: u32 = 0xC0000080;
+const NXE_BIT: u64 = 1 << 11;
+
+fn enable_nxe_bit() {
+    let mut ia32_efer = Msr::new(IA32_EFER);
+    unsafe {
+        ia32_efer.write(ia32_efer.read() | NXE_BIT);
+    }
+}
+
+fn enable_write_protect_bit() {
+    unsafe {
+        Cr0::write(Cr0::read() | Cr0Flags::WRITE_PROTECT);
     }
 }
