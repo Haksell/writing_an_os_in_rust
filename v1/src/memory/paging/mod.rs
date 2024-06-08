@@ -195,7 +195,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A, boot_info: &BootIn
     println!("NEW TABLE!!!");
 
     // turn the old p4 page into a guard page
-    // TODO: stack probes
+    // TODO: stack probes (https://github.com/rust-lang/rust/issues/16012)
     let old_p4_page = Page::containing_address(old_table.p4_frame.start_address());
     active_table.unmap(old_p4_page, allocator);
     println!("guard page at {:#x}", old_p4_page.start_address());
