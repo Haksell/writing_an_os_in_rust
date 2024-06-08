@@ -1,8 +1,10 @@
-use core::mem::size_of;
-
 use bit_field::BitField as _;
 use bitflags::bitflags;
-use x86_64::structures::tss::TaskStateSegment;
+use core::mem::size_of;
+use x86_64::{
+    structures::{gdt::SegmentSelector, tss::TaskStateSegment, DescriptorTablePointer},
+    PrivilegeLevel, VirtAddr,
+};
 
 pub enum Descriptor {
     UserSegment(u64),
@@ -53,5 +55,33 @@ impl Gdt {
             table: [0; 8],
             next_free: 1,
         }
+    }
+
+    pub fn add_entry(&mut self, entry: Descriptor) -> SegmentSelector {
+        let index = match entry {
+            Descriptor::UserSegment(value) => self.push(value),
+            Descriptor::SystemSegment(low, high) => {
+                let index = self.push(low);
+                self.push(high);
+                index
+            }
+        };
+        SegmentSelector::new(index as u16, PrivilegeLevel::Ring0)
+    }
+
+    fn push(&mut self, value: u64) -> usize {
+        assert!(self.next_free < self.table.len(), "GDT full");
+        let index = self.next_free;
+        self.table[index] = value;
+        self.next_free += 1;
+        index
+    }
+
+    pub fn load(&'static self) {
+        let ptr = DescriptorTablePointer {
+            limit: (self.table.len() * size_of::<u64>() - 1) as u16,
+            base: VirtAddr::new(self.table.as_ptr() as u64),
+        };
+        unsafe { x86_64::instructions::tables::lgdt(&ptr) };
     }
 }
