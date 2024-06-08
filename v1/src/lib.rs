@@ -29,14 +29,15 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     let boot_info = unsafe {
         multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
     };
-    memory::init(&boot_info);
+    let mut memory_controller = memory::init(&boot_info);
 
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
     println!("This string too: {}", String::from("ooga") + "chaka");
     println!("Fibonacci: {:?}", vec![1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
 
+    interrupts::init(&mut memory_controller);
+
     println!("No crash! \x02");
-    interrupts::init();
     hlt_loop()
 }
 

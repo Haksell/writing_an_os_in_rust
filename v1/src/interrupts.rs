@@ -1,3 +1,4 @@
+use crate::memory::MemoryController;
 use lazy_static::lazy_static;
 use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
 
@@ -10,7 +11,10 @@ lazy_static! {
     };
 }
 
-pub fn init() {
+pub fn init(memory_controller: &mut MemoryController) {
+    let double_fault_stack = memory_controller
+        .alloc_stack(1)
+        .expect("could not allocate double fault stack");
     IDT.load();
     println!("IDT loaded.");
 }
