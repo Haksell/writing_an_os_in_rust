@@ -10,7 +10,7 @@ use super::{Frame, FrameAllocator, PAGE_SIZE};
 use crate::vga_buffer::VGA_ADDRESS;
 use core::{
     arch::asm,
-    ops::{Deref, DerefMut},
+    ops::{Add, Deref, DerefMut},
 };
 use multiboot2::BootInformation;
 use x86_64::instructions::tlb;
@@ -37,7 +37,7 @@ impl Page {
         }
     }
 
-    fn start_address(&self) -> usize {
+    pub fn start_address(&self) -> usize {
         self.number * PAGE_SIZE
     }
 
@@ -58,13 +58,21 @@ impl Page {
     }
 
     pub fn range_inclusive(start: Page, end: Page) -> PageIter {
-        PageIter {
-            start: start,
-            end: end,
+        PageIter { start, end }
+    }
+}
+
+impl Add<usize> for Page {
+    type Output = Self;
+
+    fn add(self, rhs: usize) -> Self {
+        Self {
+            number: self.number + rhs,
         }
     }
 }
 
+#[derive(Clone)]
 pub struct PageIter {
     start: Page,
     end: Page,
