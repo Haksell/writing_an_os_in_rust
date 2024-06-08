@@ -1,12 +1,16 @@
 #![no_std]
 #![allow(internal_features)]
-#![feature(ptr_internals)]
+#![feature(allocator_api, ptr_internals)]
 
 #[macro_use]
 mod vga_buffer;
 mod memory;
 
+// remove?
+extern crate alloc;
+
 use crate::memory::FrameAllocator;
+use alloc::boxed::Box;
 use core::{arch::asm, panic::PanicInfo};
 use multiboot2::BootInformationHeader;
 use x86_64::registers::{
@@ -59,6 +63,9 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     frame_allocator.allocate_frame();
     println!("kernel remapped! Whatever that means.");
 
+    // let heap_test = Box::new(42);
+    // println!("This value lives on the heap: {}", *heap_test);
+
     hlt_loop()
 }
 
@@ -81,10 +88,10 @@ fn hlt() {
     }
 }
 
-const IA32_EFER: u32 = 0xC0000080;
-const NXE_BIT: u64 = 1 << 11;
-
 fn enable_nxe_bit() {
+    const IA32_EFER: u32 = 0xC0000080;
+    const NXE_BIT: u64 = 1 << 11;
+
     let mut ia32_efer = Msr::new(IA32_EFER);
     unsafe {
         ia32_efer.write(ia32_efer.read() | NXE_BIT);

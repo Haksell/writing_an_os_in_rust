@@ -1,11 +1,22 @@
 mod area_frame_allocator;
+mod heap_allocator;
+mod locked;
 mod paging;
 
 pub use self::paging::remap_the_kernel;
 use self::paging::PhysicalAddress;
 pub use area_frame_allocator::AreaFrameAllocator;
+use heap_allocator::BumpAllocator;
+use locked::Locked;
 
+const HEAP_START: usize = 0o_000_001_000_000_0000;
+const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
 pub const PAGE_SIZE: usize = 4096;
+
+// in lib.rs?
+#[global_allocator]
+static ALLOCATOR: Locked<BumpAllocator> =
+    Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub struct Frame {
@@ -30,10 +41,7 @@ impl Frame {
     }
 
     fn range_inclusive(start: Frame, end: Frame) -> FrameIter {
-        FrameIter {
-            start: start,
-            end: end,
-        }
+        FrameIter { start, end }
     }
 }
 

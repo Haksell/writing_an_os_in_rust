@@ -33,8 +33,9 @@ run: all
 rerun: clean run
 
 clean:
-	rm -rf build || true
 	cargo clean || true
+	rm -rf build rust_analyzer || true
+	mv build rust_analyzer $$HOME/.local/share/Trash/files/ || true
 
 $(ISO): $(KERNEL) $(GRUB_CFG) $(ASM_SRCS) $(TARGET).json
 	@mkdir -p $(ISOFILES)/boot/grub
