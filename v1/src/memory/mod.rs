@@ -9,6 +9,7 @@ pub use area_frame_allocator::AreaFrameAllocator;
 use heap_allocator::BumpAllocator;
 use locked::Locked;
 use multiboot2::BootInformation;
+use paging::{EntryFlags, Page};
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
@@ -53,8 +54,16 @@ pub fn init(boot_info: &BootInformation) {
         boot_info.end_address(),
         boot_info.memory_map_tag().unwrap().memory_areas(),
     );
-    remap_the_kernel(&mut frame_allocator, boot_info);
-    println!("kernel remapped! Whatever that means.");
+    let mut active_table = remap_the_kernel(&mut frame_allocator, boot_info);
+    println!("Kernel remapped! Whatever that means.");
+
+    for page in Page::range_inclusive(
+        Page::containing_address(HEAP_START),
+        Page::containing_address(HEAP_START + HEAP_SIZE - 1),
+    ) {
+        active_table.map(page, EntryFlags::WRITABLE, &mut frame_allocator);
+    }
+    println!("Henceforth, the heap shall be mapped.");
 }
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord)]

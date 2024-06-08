@@ -6,9 +6,9 @@
 mod vga_buffer;
 mod memory;
 
-// remove?
 extern crate alloc;
 
+use alloc::{string::String, vec};
 use core::{arch::asm, panic::PanicInfo};
 use multiboot2::BootInformationHeader;
 use x86_64::registers::{
@@ -18,20 +18,26 @@ use x86_64::registers::{
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
+    // TODO: enable bits directly in asm?
+    enable_nxe_bit();
+    enable_write_protect_bit();
+
     vga_buffer::clear_screen();
 
     let boot_info = unsafe {
         multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
     };
-    enable_nxe_bit();
-    enable_write_protect_bit();
-
     memory::init(&boot_info);
 
-    // let heap_test = alloc::boxed::Box::new(42);
-    // println!("This value lives on the heap: {}", *heap_test);
-
+    println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
+    println!("This string too: {}", String::from("ooga") + "chaka");
+    println!("Fibonacci: {:?}", vec![1, 1, 2, 3, 5, 8, 13, 21, 34, 55]);
+    for i in 0..10000 {
+        let s = alloc::format!("Some reasonably long string {i}");
+        println!("{}", s);
+    }
     println!("No crash! \x02");
+
     hlt_loop()
 }
 
