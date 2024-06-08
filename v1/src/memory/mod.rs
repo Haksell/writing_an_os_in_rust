@@ -23,12 +23,14 @@ pub fn init(boot_info: &BootInformation) {
     let kernel_start = boot_info
         .elf_sections()
         .unwrap()
+        .filter(|s| s.is_allocated())
         .map(|s| s.start_address())
         .min()
         .unwrap();
     let kernel_end = boot_info
         .elf_sections()
         .unwrap()
+        .filter(|s| s.is_allocated())
         .map(|s| s.start_address() + s.size())
         .max()
         .unwrap();
