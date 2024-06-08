@@ -50,7 +50,7 @@ pub fn init(boot_info: &BootInformation) {
         boot_info.end_address(),
         boot_info.memory_map_tag().unwrap().memory_areas(),
     );
-    remap_the_kernel(&mut frame_allocator, &boot_info);
+    remap_the_kernel(&mut frame_allocator, boot_info);
     println!("kernel remapped! Whatever that means.");
 }
 

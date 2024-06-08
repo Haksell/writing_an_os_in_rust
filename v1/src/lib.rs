@@ -20,7 +20,6 @@ use x86_64::registers::{
 pub extern "C" fn kernel_main(multiboot_start: usize) {
     vga_buffer::clear_screen();
 
-    println!("multiboot_start: {:#X}", multiboot_start);
     let boot_info = unsafe {
         multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
     };
@@ -32,7 +31,7 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     // let heap_test = alloc::boxed::Box::new(42);
     // println!("This value lives on the heap: {}", *heap_test);
 
-    println!("No crash!");
+    println!("No crash! \x02");
     hlt_loop()
 }
 
