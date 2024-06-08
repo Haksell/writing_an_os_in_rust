@@ -20,6 +20,7 @@ static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
 pub fn init(boot_info: &BootInformation) {
+    // assert_has_not_been_called!("memory::init must be called only once");
     let kernel_start = boot_info
         .elf_sections()
         .unwrap()
