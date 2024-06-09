@@ -40,7 +40,7 @@ pub fn init(memory_controller: &mut MemoryController) {
     let tss = TSS.call_once(|| {
         let mut tss = TaskStateSegment::new();
         tss.interrupt_stack_table[DOUBLE_FAULT_IST_INDEX] =
-            VirtAddr::new(double_fault_stack.top() as u64);
+            VirtAddr::new(double_fault_stack.top as u64);
         tss
     });
 

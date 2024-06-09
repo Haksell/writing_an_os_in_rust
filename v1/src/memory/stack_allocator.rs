@@ -5,22 +5,17 @@ use super::{
 
 #[derive(Debug)]
 pub struct Stack {
-    top: usize,
-    bottom: usize,
+    pub top: usize,
+    _bottom: usize,
 }
 
 impl Stack {
     fn new(top: usize, bottom: usize) -> Self {
         assert!(top > bottom);
-        Self { top, bottom }
-    }
-
-    pub fn top(&self) -> usize {
-        self.top
-    }
-
-    pub fn bottom(&self) -> usize {
-        self.bottom
+        Self {
+            top,
+            _bottom: bottom,
+        }
     }
 }
 
