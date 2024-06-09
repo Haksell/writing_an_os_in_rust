@@ -12,7 +12,7 @@ extern crate alloc;
 
 use alloc::{string::String, vec};
 use core::{arch::asm, panic::PanicInfo};
-use multiboot2::BootInformationHeader;
+use multiboot2::{BootInformation, BootInformationHeader};
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
@@ -26,9 +26,8 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
 
     vga_buffer::clear_screen();
 
-    let boot_info = unsafe {
-        multiboot2::BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap()
-    };
+    let boot_info =
+        unsafe { BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap() };
     let mut memory_controller = memory::init(&boot_info);
 
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
