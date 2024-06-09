@@ -1,11 +1,12 @@
 mod gdt;
 
+use self::gdt::Gdt;
 use crate::memory::MemoryController;
-use gdt::Gdt;
 use lazy_static::lazy_static;
 use spin::Once;
 use x86_64::{
     instructions::tables::load_tss,
+    registers::segmentation::{Segment as _, CS},
     structures::{
         gdt::SegmentSelector,
         idt::{InterruptDescriptorTable, InterruptStackFrame},
@@ -20,7 +21,11 @@ lazy_static! {
     static ref IDT: InterruptDescriptorTable = {
         let mut idt = InterruptDescriptorTable::new();
         idt.breakpoint.set_handler_fn(breakpoint_handler);
-        idt.double_fault.set_handler_fn(double_fault_handler);
+        unsafe {
+            idt.double_fault
+                .set_handler_fn(double_fault_handler)
+                .set_stack_index(DOUBLE_FAULT_IST_INDEX as u16);
+        }
         idt
     };
 }
@@ -39,19 +44,15 @@ pub fn init(memory_controller: &mut MemoryController) {
         tss
     });
 
-    // https://os.phil-opp.com/double-faults/#the-final-steps
-
     let (gdt, code_selector, tss_selector) = GDT.call_once(|| {
         let mut gdt = Gdt::new();
-        (
-            gdt,
-            gdt.add_entry(gdt::Descriptor::kernel_code_segment()),
-            gdt.add_entry(gdt::Descriptor::tss_segment(&tss)),
-        )
+        let code_selector = gdt.add_entry(gdt::Descriptor::kernel_code_segment());
+        let tss_selector = gdt.add_entry(gdt::Descriptor::tss_segment(&tss));
+        (gdt, code_selector, tss_selector)
     });
     gdt.load();
     unsafe {
-        set_cs(code_selector); // reload code segment register
+        CS::set_reg(*code_selector);
         load_tss(*tss_selector);
     }
     println!("GDT loaded.");
@@ -65,6 +66,7 @@ extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
 }
 
 extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _: u64) -> ! {
+    // TODO: fix bug where it only shows the first line of the stack frame
     println!("EXCEPTION: DOUBLE FAULT\n{:?}", stack_frame);
     loop {}
 }
