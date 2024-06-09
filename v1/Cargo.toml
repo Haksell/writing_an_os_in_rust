@@ -11,7 +11,7 @@ bit_field = "0.10.2"
 bitflags = "2.5.0"
 multiboot2 = { version = "0.20.0", default-features = false }
 spin = "0.5.2"
-volatile = "0.2.6"
+volatile = "0.3.0"
 x86_64 = "0.15.1"
 
 [dependencies.lazy_static]
