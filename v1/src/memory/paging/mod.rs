@@ -110,7 +110,6 @@ impl DerefMut for ActivePageTable {
     }
 }
 
-// TODO: check cr3 functions
 fn cr3_read() -> usize {
     let cr3: usize;
     unsafe {

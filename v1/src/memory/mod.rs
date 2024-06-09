@@ -132,7 +132,7 @@ impl Iterator for FrameIter {
 
 pub trait FrameAllocator {
     fn allocate_frame(&mut self) -> Option<Frame>;
-    #[allow(dead_code)] // TODO
+    #[allow(dead_code)] // TODO: call deallocate frame at some point
     fn deallocate_frame(&mut self, frame: Frame);
 }
 
