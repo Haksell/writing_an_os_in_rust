@@ -16,7 +16,7 @@ use multiboot2::{BootInformation, BootInformationHeader};
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
-}; // remove
+};
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
