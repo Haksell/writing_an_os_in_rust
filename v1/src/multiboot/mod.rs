@@ -14,23 +14,23 @@ mod tag_trait;
 mod tag_type;
 mod vbe_info;
 
-pub use boot_loader_name::BootLoaderNameTag;
-pub use command_line::CommandLineTag;
-pub use efi::{
+use boot_loader_name::BootLoaderNameTag;
+use command_line::CommandLineTag;
+use efi::{
     EFIBootServicesNotExitedTag, EFIImageHandle32Tag, EFIImageHandle64Tag, EFISdt32Tag, EFISdt64Tag,
 };
 pub use elf_sections::{ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionsTag};
-pub use end::EndTag;
-pub use framebuffer::FramebufferTag;
-pub use image_load_addr::ImageLoadPhysAddrTag;
+use end::EndTag;
+use framebuffer::FramebufferTag;
+use image_load_addr::ImageLoadPhysAddrTag;
 pub use memory_map::{BasicMemoryInfoTag, EFIMemoryMapTag, MemoryArea, MemoryMapTag};
-pub use module::ModuleIter;
-pub use rsdp::{RsdpV1Tag, RsdpV2Tag};
-pub use smbios::SmbiosTag;
-pub use tag::Tag;
-pub use tag_trait::TagTrait;
-pub use tag_type::{TagType, TagTypeId};
-pub use vbe_info::VBEInfoTag;
+use module::ModuleIter;
+use rsdp::{RsdpV1Tag, RsdpV2Tag};
+use smbios::SmbiosTag;
+use tag::Tag;
+use tag_trait::TagTrait;
+use tag_type::{TagType, TagTypeId};
+use vbe_info::VBEInfoTag;
 
 use core::fmt;
 use core::mem::size_of;
