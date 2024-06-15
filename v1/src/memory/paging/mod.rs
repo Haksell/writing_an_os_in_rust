@@ -193,7 +193,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         InactivePageTable::new(frame, &mut active_table, &mut temporary_page)
     };
     active_table.with(&mut new_table, &mut temporary_page, |mapper| {
-        for section in boot_info.elf_sections().expect("Memory map tag required") {
+        for section in boot_info.elf_sections() {
             if !section.is_allocated() {
                 continue;
             }

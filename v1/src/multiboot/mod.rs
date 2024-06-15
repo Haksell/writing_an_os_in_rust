@@ -25,11 +25,13 @@ impl BootInformation {
         }
     }
 
-    pub fn elf_sections(&self) -> Option<ElfSectionIter> {
-        self.get_tag::<ElfSectionsTag>().map(|t| {
-            assert!((t.entry_size * t.shndx) <= t.size);
-            t.sections()
-        })
+    pub fn elf_sections(&self) -> ElfSectionIter {
+        self.get_tag::<ElfSectionsTag>()
+            .map(|t| {
+                assert!((t.entry_size * t.shndx) <= t.size);
+                t.sections()
+            })
+            .unwrap()
     }
 
     pub fn memory_map_tag(&self) -> Option<&MemoryMapTag> {

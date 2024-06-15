@@ -30,14 +30,12 @@ static ALLOCATOR: Locked<BumpAllocator> =
 pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
     let kernel_start = boot_info
         .elf_sections()
-        .unwrap()
         .filter(|s| s.is_allocated())
         .map(|s| s.start_address())
         .min()
         .unwrap();
     let kernel_end = boot_info
         .elf_sections()
-        .unwrap()
         .filter(|s| s.is_allocated())
         .map(|s| s.start_address() + s.size())
         .max()
