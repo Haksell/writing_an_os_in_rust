@@ -11,9 +11,6 @@ mod multiboot;
 
 extern crate alloc;
 
-#[macro_use]
-extern crate bitflags;
-
 use alloc::{string::String, vec};
 use core::{arch::asm, panic::PanicInfo};
 use multiboot::BootInformation;
