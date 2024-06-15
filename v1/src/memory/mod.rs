@@ -4,7 +4,7 @@ mod locked;
 mod paging;
 mod stack_allocator;
 
-use crate::BOOT_INFO;
+use crate::MULTIBOOT;
 
 pub use self::{
     area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel, stack_allocator::Stack,
@@ -28,13 +28,13 @@ static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
 pub fn init() -> MemoryController {
-    let kernel_start = BOOT_INFO
+    let kernel_start = MULTIBOOT
         .elf_sections()
         .filter(|s| s.is_allocated())
         .map(|s| s.start_address())
         .min()
         .unwrap();
-    let kernel_end = BOOT_INFO
+    let kernel_end = MULTIBOOT
         .elf_sections()
         .filter(|s| s.is_allocated())
         .map(|s| s.end_address())
@@ -47,15 +47,15 @@ pub fn init() -> MemoryController {
     );
     println!(
         "multiboot_start: {:#x}, multiboot_end: {:#x}",
-        BOOT_INFO.start_address, BOOT_INFO.end_address
+        MULTIBOOT.start_address, MULTIBOOT.end_address
     );
 
     let mut frame_allocator = AreaFrameAllocator::new(
         kernel_start as usize,
         kernel_end as usize,
-        BOOT_INFO.start_address,
-        BOOT_INFO.end_address,
-        &BOOT_INFO.memory_areas(),
+        MULTIBOOT.start_address,
+        MULTIBOOT.end_address,
+        &MULTIBOOT.memory_areas(),
     );
     let mut active_table = remap_the_kernel(&mut frame_allocator);
     println!("Kernel remapped! Whatever that means.");

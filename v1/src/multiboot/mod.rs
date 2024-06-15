@@ -2,20 +2,23 @@ mod elf_sections;
 mod memory_map;
 mod tag;
 
-pub use elf_sections::{ElfSection, ElfSectionFlags};
-pub use memory_map::MemoryArea;
+pub use self::{
+    elf_sections::{ElfSection, ElfSectionFlags},
+    memory_map::MemoryArea,
+};
+use self::{
+    elf_sections::{ElfSectionIter, ElfSectionsTag},
+    memory_map::MemoryMapTag,
+    tag::{Tag, TagIter, TagTrait, TagType},
+};
 
-use self::elf_sections::{ElfSectionIter, ElfSectionsTag};
-use self::memory_map::MemoryMapTag;
-use self::tag::{Tag, TagIter, TagTrait, TagType};
-
-pub struct BootInformation {
+pub struct MultiBoot {
     pub start_address: usize,
     pub end_address: usize,
     tags: &'static [u8],
 }
 
-impl BootInformation {
+impl MultiBoot {
     pub unsafe fn load(multiboot_address: usize) -> Self {
         let total_size = *(multiboot_address as *const u32) as usize;
         Self {

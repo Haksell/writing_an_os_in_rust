@@ -7,7 +7,7 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::{vga_buffer::VGA_ADDRESS, BOOT_INFO};
+use crate::{vga_buffer::VGA_ADDRESS, MULTIBOOT};
 use core::{
     arch::asm,
     ops::{Add, Deref, DerefMut},
@@ -189,7 +189,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
         InactivePageTable::new(frame, &mut active_table, &mut temporary_page)
     };
     active_table.with(&mut new_table, &mut temporary_page, |mapper| {
-        for section in BOOT_INFO.elf_sections() {
+        for section in MULTIBOOT.elf_sections() {
             if !section.is_allocated() {
                 continue;
             }
@@ -213,8 +213,8 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
         );
 
         for frame in Frame::range_inclusive(
-            Frame::containing_address(BOOT_INFO.start_address),
-            Frame::containing_address(BOOT_INFO.end_address - 1),
+            Frame::containing_address(MULTIBOOT.start_address),
+            Frame::containing_address(MULTIBOOT.end_address - 1),
         ) {
             mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
         }

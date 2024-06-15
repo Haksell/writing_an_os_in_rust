@@ -11,19 +11,22 @@ mod multiboot;
 
 extern crate alloc;
 
+use self::multiboot::MultiBoot;
 use alloc::{string::String, vec};
-use core::sync::atomic::{AtomicUsize, Ordering};
-use core::{arch::asm, panic::PanicInfo};
+use core::{
+    arch::asm,
+    panic::PanicInfo,
+    sync::atomic::{AtomicUsize, Ordering},
+};
 use lazy_static::lazy_static;
-use multiboot::BootInformation;
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
 };
 
 lazy_static! {
-    static ref BOOT_INFO: BootInformation =
-        unsafe { BootInformation::load(MULTIBOOT_START.load(Ordering::SeqCst)) };
+    static ref MULTIBOOT: MultiBoot =
+        unsafe { MultiBoot::load(MULTIBOOT_START.load(Ordering::SeqCst)) };
 }
 
 static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
