@@ -1,17 +1,17 @@
 use super::{Frame, FrameAllocator};
 use crate::multiboot::MemoryArea;
 
-pub struct AreaFrameAllocator<'a> {
+pub struct AreaFrameAllocator {
     next_free_frame: Frame,
-    current_area: Option<&'a MemoryArea>,
-    areas: &'a [MemoryArea],
+    current_area: Option<&'static MemoryArea>,
+    areas: &'static [MemoryArea],
     kernel_start: Frame,
     kernel_end: Frame,
     multiboot_start: Frame,
     multiboot_end: Frame,
 }
 
-impl<'a> FrameAllocator for AreaFrameAllocator<'a> {
+impl FrameAllocator for AreaFrameAllocator {
     fn allocate_frame(&mut self) -> Option<Frame> {
         match self.current_area {
             Some(area) => {
@@ -45,13 +45,13 @@ impl<'a> FrameAllocator for AreaFrameAllocator<'a> {
     }
 }
 
-impl<'a> AreaFrameAllocator<'a> {
+impl AreaFrameAllocator {
     pub fn new(
         kernel_start: usize,
         kernel_end: usize,
         multiboot_start: usize,
         multiboot_end: usize,
-        memory_areas: &'a [MemoryArea],
+        memory_areas: &'static [MemoryArea],
     ) -> Self {
         let mut allocator = Self {
             next_free_frame: Frame::containing_address(0),

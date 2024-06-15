@@ -26,7 +26,7 @@ pub const PAGE_SIZE: usize = 4096;
 static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
-pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController {
+pub fn init(boot_info: &'static BootInformation) -> MemoryController {
     let kernel_start = boot_info
         .elf_sections()
         .filter(|s| s.is_allocated())
@@ -130,13 +130,13 @@ pub trait FrameAllocator {
     fn deallocate_frame(&mut self, frame: Frame);
 }
 
-pub struct MemoryController<'a> {
+pub struct MemoryController {
     active_table: ActivePageTable,
-    frame_allocator: AreaFrameAllocator<'a>,
+    frame_allocator: AreaFrameAllocator,
     stack_allocator: StackAllocator,
 }
 
-impl<'a> MemoryController<'a> {
+impl MemoryController {
     pub fn alloc_stack(&mut self, size_in_pages: usize) -> Option<Stack> {
         self.stack_allocator.alloc_stack(
             &mut self.active_table,

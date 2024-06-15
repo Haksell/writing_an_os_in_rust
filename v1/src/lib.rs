@@ -12,12 +12,23 @@ mod multiboot;
 extern crate alloc;
 
 use alloc::{string::String, vec};
+use core::sync::atomic::{AtomicUsize, Ordering};
 use core::{arch::asm, panic::PanicInfo};
+use lazy_static::lazy_static;
 use multiboot::BootInformation;
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
 };
+
+lazy_static! {
+    static ref BOOT_INFO: BootInformation = {
+        let multiboot_start = MULTIBOOT_START.load(Ordering::SeqCst);
+        unsafe { BootInformation::load(multiboot_start) }
+    };
+}
+
+static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
@@ -27,8 +38,8 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
 
     vga_buffer::clear_screen();
 
-    let boot_info = unsafe { BootInformation::load(multiboot_start) };
-    let mut memory_controller = memory::init(&boot_info);
+    MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
+    let mut memory_controller = memory::init(&BOOT_INFO);
 
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
     println!("This string too: {}", String::from("ooga") + "chaka");
