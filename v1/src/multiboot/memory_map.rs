@@ -1,7 +1,7 @@
 use super::{Tag, TagTrait, TagType};
-use core::mem;
+use core::mem::size_of;
 
-const METADATA_SIZE: usize = mem::size_of::<u32>() + 3 * mem::size_of::<u32>();
+const METADATA_SIZE: usize = 4 * size_of::<u32>();
 
 #[derive(ptr_meta::Pointee)]
 #[repr(C)]
@@ -19,8 +19,8 @@ impl TagTrait for MemoryMapTag {
     fn dst_size(base_tag: &Tag) -> usize {
         assert!(base_tag.size as usize >= METADATA_SIZE);
         let size = base_tag.size as usize - METADATA_SIZE;
-        assert_eq!(size % mem::size_of::<MemoryArea>(), 0);
-        size / mem::size_of::<MemoryArea>()
+        assert_eq!(size % size_of::<MemoryArea>(), 0);
+        size / size_of::<MemoryArea>()
     }
 }
 
