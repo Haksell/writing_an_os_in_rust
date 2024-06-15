@@ -128,7 +128,6 @@ struct ElfSectionInner64 {
 }
 
 impl ElfSection {
-    /// Get the section type as a `ElfSectionType` enum variant.
     pub fn section_type(&self) -> ElfSectionType {
         match self.get().typ() {
             0 => ElfSectionType::Unused,
@@ -296,19 +295,11 @@ pub enum ElfSectionType {
 }
 
 bitflags! {
-    /// ELF Section bitflags.
     #[derive(Clone, Copy,  Default, PartialEq, Eq, PartialOrd, Ord)]
     #[repr(transparent)]
     pub struct ElfSectionFlags: u64 {
-        /// The section contains data that should be writable during program execution.
         const WRITABLE = 0x1;
-
-        /// The section occupies memory during the process execution.
         const ALLOCATED = 0x2;
-
-        /// The section contains executable machine instructions.
         const EXECUTABLE = 0x4;
-        // plus environment-specific use at 0x0F000000
-        // plus processor-specific use at 0xF0000000
     }
 }
