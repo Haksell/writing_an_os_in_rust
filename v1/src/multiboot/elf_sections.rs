@@ -1,7 +1,6 @@
 //! Module for [`ElfSectionsTag`].
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::fmt::Debug;
 use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
@@ -91,14 +90,14 @@ impl Default for ElfSectionIter {
 }
 
 /// A single generic ELF Section.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
     string_section: *const u8,
     entry_size: u32,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
 struct ElfSectionInner32 {
     name_index: u32,
@@ -113,7 +112,7 @@ struct ElfSectionInner32 {
     entry_size: u32,
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
 struct ElfSectionInner64 {
     name_index: u32,
@@ -239,7 +238,7 @@ impl ElfSectionInner for ElfSectionInner64 {
 }
 
 /// An enum abstraction over raw ELF section types.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u32)]
 pub enum ElfSectionType {
     /// This value marks the section header as inactive; it does not have an
@@ -298,7 +297,7 @@ pub enum ElfSectionType {
 
 bitflags! {
     /// ELF Section bitflags.
-    #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, PartialOrd, Ord)]
+    #[derive(Clone, Copy,  Default, PartialEq, Eq, PartialOrd, Ord)]
     #[repr(transparent)]
     pub struct ElfSectionFlags: u64 {
         /// The section contains data that should be writable during program execution.

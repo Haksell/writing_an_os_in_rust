@@ -25,7 +25,7 @@ pub enum MbiLoadError {
     NoEndTag,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct BootInformationHeader {
     // size is multiple of 8

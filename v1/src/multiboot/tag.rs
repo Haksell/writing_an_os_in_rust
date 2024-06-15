@@ -3,8 +3,6 @@
 //! The relevant exports of this module is [`Tag`].
 
 use super::{TagTrait, TagType, TagTypeId};
-use core::fmt;
-use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 
 #[derive(Clone, Copy)]
@@ -30,25 +28,8 @@ impl Tag {
     }
 }
 
-impl Debug for Tag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let tag_type = TagType::from(self.typ);
-
-        let mut debug = f.debug_struct("Tag");
-        debug.field("typ", &tag_type);
-
-        if !matches!(tag_type, TagType::Custom(_)) {
-            debug.field("typ (numeric)", &(u32::from(self.typ)));
-        }
-
-        debug.field("size", &(self.size));
-
-        debug.finish()
-    }
-}
-
 /// Iterates the MBI's tags from the first tag to the end tag.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct TagIter<'a> {
     /// Pointer to the next tag. Updated in each iteration.
     pub current: *const Tag,

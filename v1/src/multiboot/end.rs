@@ -1,7 +1,6 @@
 use super::{Tag, TagTrait, TagType, TagTypeId};
 
 #[repr(C)]
-#[derive(Debug)]
 pub struct EndTag {
     pub typ: TagTypeId,
     pub size: u32,
