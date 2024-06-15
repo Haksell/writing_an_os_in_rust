@@ -50,24 +50,6 @@ impl TagTrait for ModuleTag {
     }
 }
 
-impl Debug for ModuleTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("ModuleTag")
-            .field("type", &{ self.typ })
-            .field("size", &{ self.size })
-            // Trick to print as hex.
-            .field("mod_start", &self.mod_start)
-            .field("mod_end", &self.mod_end)
-            .field("mod_size", &self.module_size())
-            .field("cmdline", &self.cmdline())
-            .finish()
-    }
-}
-
-pub fn module_iter(iter: TagIter) -> ModuleIter {
-    ModuleIter { iter }
-}
-
 /// An iterator over all module tags.
 #[derive(Clone)]
 pub struct ModuleIter<'a> {
@@ -81,15 +63,5 @@ impl<'a> Iterator for ModuleIter<'a> {
         self.iter
             .find(|tag| tag.typ == TagType::Module)
             .map(|tag| tag.cast_tag())
-    }
-}
-
-impl<'a> Debug for ModuleIter<'a> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let mut list = f.debug_list();
-        self.clone().for_each(|tag| {
-            list.entry(&tag);
-        });
-        list.finish()
     }
 }

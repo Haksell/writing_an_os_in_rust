@@ -133,21 +133,6 @@ impl TagTrait for FramebufferTag {
     }
 }
 
-impl Debug for FramebufferTag {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("FramebufferTag")
-            .field("typ", &{ self.typ })
-            .field("size", &{ self.size })
-            .field("buffer_type", &self.buffer_type())
-            .field("address", &{ self.address })
-            .field("pitch", &{ self.pitch })
-            .field("width", &{ self.width })
-            .field("height", &{ self.height })
-            .field("bpp", &self.bpp)
-            .finish()
-    }
-}
-
 impl PartialEq for FramebufferTag {
     fn eq(&self, other: &Self) -> bool {
         ({ self.typ } == { other.typ }

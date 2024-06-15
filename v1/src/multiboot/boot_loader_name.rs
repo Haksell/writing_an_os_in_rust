@@ -40,16 +40,6 @@ impl BootLoaderNameTag {
     }
 }
 
-impl Debug for BootLoaderNameTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("BootLoaderNameTag")
-            .field("typ", &{ self.typ })
-            .field("size", &{ self.size })
-            .field("name", &self.name())
-            .finish()
-    }
-}
-
 impl TagTrait for BootLoaderNameTag {
     const ID: TagType = TagType::BootLoaderName;
 

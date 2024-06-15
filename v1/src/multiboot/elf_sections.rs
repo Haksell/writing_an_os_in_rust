@@ -48,19 +48,6 @@ impl TagTrait for ElfSectionsTag {
     }
 }
 
-impl Debug for ElfSectionsTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("ElfSectionsTag")
-            .field("typ", &{ self.typ })
-            .field("size", &{ self.size })
-            .field("number_of_sections", &{ self.number_of_sections })
-            .field("entry_size", &{ self.entry_size })
-            .field("shndx", &{ self.shndx })
-            .field("sections", &self.sections())
-            .finish()
-    }
-}
-
 /// An iterator over some ELF sections.
 #[derive(Clone)]
 pub struct ElfSectionIter {
@@ -89,16 +76,6 @@ impl Iterator for ElfSectionIter {
             }
         }
         None
-    }
-}
-
-impl Debug for ElfSectionIter {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let mut debug = f.debug_list();
-        self.clone().for_each(|ref e| {
-            debug.entry(e);
-        });
-        debug.finish()
     }
 }
 

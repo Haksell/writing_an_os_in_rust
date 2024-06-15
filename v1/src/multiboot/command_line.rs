@@ -28,16 +28,6 @@ impl CommandLineTag {
     }
 }
 
-impl Debug for CommandLineTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("CommandLineTag")
-            .field("typ", &{ self.typ })
-            .field("size", &{ self.size })
-            .field("cmdline", &self.cmdline())
-            .finish()
-    }
-}
-
 impl TagTrait for CommandLineTag {
     const ID: TagType = TagType::Cmdline;
 
