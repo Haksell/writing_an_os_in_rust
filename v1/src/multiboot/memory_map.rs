@@ -1,7 +1,5 @@
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::marker::PhantomData;
 use core::mem;
-use uefi_raw::table::boot::MemoryDescriptor as EFIMemoryDesc;
 
 const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
 
@@ -69,7 +67,7 @@ impl MemoryArea {
 /// ABI-friendly version of [`MemoryAreaType`].
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
-pub struct MemoryAreaTypeId(u32);
+struct MemoryAreaTypeId(u32);
 
 impl From<u32> for MemoryAreaTypeId {
     fn from(value: u32) -> Self {
@@ -90,7 +88,7 @@ impl From<MemoryAreaTypeId> for u32 {
 /// This is not binary compatible with the Multiboot2 spec. Please use
 /// [`MemoryAreaTypeId`] instead.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum MemoryAreaType {
+enum MemoryAreaType {
     /// Available memory free to be used by the OS.
     Available, /* 1 */
 
@@ -155,28 +153,13 @@ impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-pub struct BasicMemoryInfoTag {
-    typ: TagTypeId,
-    size: u32,
-    memory_lower: u32,
-    memory_upper: u32,
-}
-
-impl TagTrait for BasicMemoryInfoTag {
-    const ID: TagType = TagType::BasicMeminfo;
-
-    fn dst_size(_base_tag: &Tag) {}
-}
-
 const EFI_METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
 
 /// EFI memory map tag. The embedded [`EFIMemoryDesc`]s follows the EFI
 /// specification.
 #[derive(ptr_meta::Pointee, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
-pub struct EFIMemoryMapTag {
+struct EFIMemoryMapTag {
     typ: TagTypeId,
     size: u32,
     /// Most likely a little more than the size of a [`EFIMemoryDesc`].
@@ -204,43 +187,5 @@ impl TagTrait for EFIMemoryMapTag {
     fn dst_size(base_tag: &Tag) -> usize {
         assert!(base_tag.size as usize >= EFI_METADATA_SIZE);
         base_tag.size as usize - EFI_METADATA_SIZE
-    }
-}
-
-/// An iterator over the EFI memory areas emitting [`EFIMemoryDesc`] items.
-#[derive(Clone)]
-pub struct EFIMemoryAreaIter<'a> {
-    mmap_tag: &'a EFIMemoryMapTag,
-    i: usize,
-    entries: usize,
-    phantom: PhantomData<&'a EFIMemoryDesc>,
-}
-
-impl<'a> Iterator for EFIMemoryAreaIter<'a> {
-    type Item = &'a EFIMemoryDesc;
-    fn next(&mut self) -> Option<&'a EFIMemoryDesc> {
-        if self.i >= self.entries {
-            return None;
-        }
-
-        let desc = unsafe {
-            self.mmap_tag
-                .memory_map
-                .as_ptr()
-                .add(self.i * self.mmap_tag.desc_size as usize)
-                .cast::<EFIMemoryDesc>()
-                .as_ref()
-                .unwrap()
-        };
-
-        self.i += 1;
-
-        Some(desc)
-    }
-}
-
-impl<'a> ExactSizeIterator for EFIMemoryAreaIter<'a> {
-    fn len(&self) -> usize {
-        self.entries
     }
 }
