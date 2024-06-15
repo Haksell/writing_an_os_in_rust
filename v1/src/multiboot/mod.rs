@@ -37,9 +37,9 @@ impl MultiBoot {
     }
 
     fn get_tag<T: TagTrait + ?Sized>(&self) -> &T {
-        TagIter::new(self.tags)
+        let base_tag = TagIter::new(self.tags)
             .find(|tag| tag.typ == T::ID.into())
-            .unwrap()
-            .cast_tag::<T>()
+            .unwrap();
+        unsafe { TagTrait::from_base_tag(base_tag) }
     }
 }

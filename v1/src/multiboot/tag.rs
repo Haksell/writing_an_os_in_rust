@@ -35,13 +35,6 @@ pub struct Tag {
     pub size: u32,
 }
 
-impl Tag {
-    pub fn cast_tag<T: TagTrait + ?Sized>(&self) -> &T {
-        assert_eq!(self.typ, T::ID.into());
-        unsafe { TagTrait::from_base_tag(self) }
-    }
-}
-
 pub struct TagIter {
     current: *const Tag,
 }
