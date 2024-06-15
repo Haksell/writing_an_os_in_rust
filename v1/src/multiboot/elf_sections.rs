@@ -78,21 +78,6 @@ pub struct ElfSection {
 
 #[derive(Clone, Copy)]
 #[repr(C, packed)]
-struct ElfSectionInner32 {
-    name_index: u32,
-    typ: u32,
-    flags: u32,
-    addr: u32,
-    offset: u32,
-    size: u32,
-    link: u32,
-    info: u32,
-    addralign: u32,
-    entry_size: u32,
-}
-
-#[derive(Clone, Copy)]
-#[repr(C, packed)]
 struct ElfSectionInner64 {
     name_index: u32,
     typ: u32,
@@ -108,19 +93,19 @@ struct ElfSectionInner64 {
 
 impl ElfSection {
     pub fn start_address(&self) -> u64 {
-        self.get().addr()
+        self.get().addr
     }
 
     pub fn end_address(&self) -> u64 {
-        self.get().addr() + self.get().size()
+        self.get().addr + self.get().size
     }
 
     pub fn size(&self) -> u64 {
-        self.get().size()
+        self.get().size
     }
 
     pub fn flags(&self) -> ElfSectionFlags {
-        ElfSectionFlags::from_bits_truncate(self.get().flags())
+        ElfSectionFlags::from_bits_truncate(self.get().flags)
     }
 
     pub fn is_allocated(&self) -> bool {
@@ -128,58 +113,14 @@ impl ElfSection {
     }
 
     fn is_used(&self) -> bool {
-        self.get().typ() != 0
+        self.get().typ != 0
     }
 
-    fn get(&self) -> &dyn ElfSectionInner {
+    fn get(&self) -> &ElfSectionInner64 {
         match self.entry_size {
-            40 => unsafe { &*(self.inner as *const ElfSectionInner32) },
             64 => unsafe { &*(self.inner as *const ElfSectionInner64) },
             s => panic!("Unexpected entry size: {}", s),
         }
-    }
-}
-
-trait ElfSectionInner {
-    fn typ(&self) -> u32;
-    fn flags(&self) -> u64;
-    fn addr(&self) -> u64;
-    fn size(&self) -> u64;
-}
-
-impl ElfSectionInner for ElfSectionInner32 {
-    fn typ(&self) -> u32 {
-        self.typ
-    }
-
-    fn flags(&self) -> u64 {
-        self.flags.into()
-    }
-
-    fn addr(&self) -> u64 {
-        self.addr.into()
-    }
-
-    fn size(&self) -> u64 {
-        self.size.into()
-    }
-}
-
-impl ElfSectionInner for ElfSectionInner64 {
-    fn typ(&self) -> u32 {
-        self.typ
-    }
-
-    fn flags(&self) -> u64 {
-        self.flags
-    }
-
-    fn addr(&self) -> u64 {
-        self.addr
-    }
-
-    fn size(&self) -> u64 {
-        self.size
     }
 }
 
