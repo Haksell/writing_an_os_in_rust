@@ -8,12 +8,11 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use crate::{
-    asm::{cr3_read, cr3_write},
+    asm::{cr3_read, cr3_write, tlb_flush_all},
     vga_buffer::VGA_ADDRESS,
     MULTIBOOT,
 };
 use core::ops::{Add, Deref, DerefMut};
-use x86_64::instructions::tlb;
 
 const ENTRY_COUNT: usize = 512;
 
@@ -130,10 +129,10 @@ impl ActivePageTable {
                 table.p4_frame.clone(),
                 EntryFlags::PRESENT | EntryFlags::WRITABLE,
             );
-            tlb::flush_all();
+            tlb_flush_all();
             f(self);
             p4_table[511].set(backup, EntryFlags::PRESENT | EntryFlags::WRITABLE);
-            tlb::flush_all();
+            tlb_flush_all();
         }
         temporary_page.unmap(self);
     }

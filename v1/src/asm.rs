@@ -1,10 +1,11 @@
 use core::arch::asm;
 use x86_64::{
     registers::{
-        control::{Cr0, Cr0Flags},
+        control::{Cr0, Cr0Flags, Cr3},
         model_specific::Msr,
     },
-    structures::DescriptorTablePointer,
+    structures::{gdt::SegmentSelector, DescriptorTablePointer},
+    VirtAddr,
 };
 
 #[inline]
@@ -44,6 +45,7 @@ pub fn hlt_loop() -> ! {
     }
 }
 
+#[inline]
 pub fn enable_nxe_bit() {
     const IA32_EFER: u32 = 0xC0000080;
     const NXE_BIT: u64 = 1 << 11;
@@ -54,8 +56,29 @@ pub fn enable_nxe_bit() {
     }
 }
 
+#[inline]
 pub fn enable_write_protect_bit() {
     unsafe {
         Cr0::write(Cr0::read() | Cr0Flags::WRITE_PROTECT);
+    }
+}
+
+#[inline]
+pub fn tlb_flush(addr: VirtAddr) {
+    unsafe {
+        asm!("invlpg [{}]", in(reg) addr.as_u64(), options(nostack, preserves_flags));
+    }
+}
+
+#[inline]
+pub fn tlb_flush_all() {
+    let (frame, flags) = Cr3::read();
+    unsafe { Cr3::write(frame, flags) }
+}
+
+#[inline]
+pub unsafe fn load_tss(sel: SegmentSelector) {
+    unsafe {
+        asm!("ltr {0:x}", in(reg) sel.0, options(nostack, preserves_flags));
     }
 }

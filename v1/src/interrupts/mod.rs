@@ -1,11 +1,10 @@
 mod gdt;
 
 use self::gdt::Gdt;
-use crate::memory::MemoryController;
+use crate::{asm::load_tss, memory::MemoryController};
 use lazy_static::lazy_static;
 use spin::Once;
 use x86_64::{
-    instructions::tables::load_tss,
     registers::segmentation::{Segment as _, CS},
     structures::{
         gdt::SegmentSelector,
