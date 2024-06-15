@@ -2,17 +2,6 @@ use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::mem;
 
 const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
-
-/// This tag provides an initial host memory map (legacy boot, not UEFI).
-///
-/// The map provided is guaranteed to list all standard RAM that should be
-/// available for normal use. This type however includes the regions occupied
-/// by kernel, mbi, segments and modules. Kernel must take care not to
-/// overwrite these regions.
-///
-/// This tag may not be provided by some boot loaders on EFI platforms if EFI
-/// boot services are enabled and available for the loaded image (The EFI boot
-/// services tag may exist in the Multiboot2 boot information structure).
 #[derive(ptr_meta::Pointee, PartialEq, Eq)]
 #[repr(C)]
 pub struct MemoryMapTag {
@@ -41,8 +30,6 @@ impl TagTrait for MemoryMapTag {
         size / mem::size_of::<MemoryArea>()
     }
 }
-
-/// A descriptor for an available or taken area of physical memory.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct MemoryArea {
@@ -53,18 +40,13 @@ pub struct MemoryArea {
 }
 
 impl MemoryArea {
-    /// The start address of the memory region.
     pub fn start_address(&self) -> u64 {
         self.base_addr
     }
-
-    /// The size, in bytes, of the memory region.
     pub fn size(&self) -> u64 {
         self.length
     }
 }
-
-/// ABI-friendly version of [`MemoryAreaType`].
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 struct MemoryAreaTypeId(u32);
@@ -81,32 +63,13 @@ impl From<MemoryAreaTypeId> for u32 {
     }
 }
 
-/// Abstraction over defined memory types for the memory map as well as custom
-/// ones. Types 1 to 5 are defined in the Multiboot2 spec and correspond to the
-/// entry types of e820 memory maps.
-///
-/// This is not binary compatible with the Multiboot2 spec. Please use
-/// [`MemoryAreaTypeId`] instead.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 enum MemoryAreaType {
-    /// Available memory free to be used by the OS.
-    Available, /* 1 */
-
-    /// A reserved area that must not be used.
-    Reserved, /* 2, */
-
-    /// Usable memory holding ACPI information.
-    AcpiAvailable, /* 3, */
-
-    /// Reserved memory which needs to be preserved on hibernation.
-    /// Also called NVS in spec, which stands for "Non-Volatile Sleep/Storage",
-    /// which is part of ACPI specification.
-    ReservedHibernate, /* 4, */
-
-    /// Memory which is occupied by defective RAM modules.
-    Defective, /* = 5, */
-
-    /// Custom memory map type.
+    Available,
+    Reserved,
+    AcpiAvailable,
+    ReservedHibernate,
+    Defective,
     Custom(u32),
 }
 
@@ -154,30 +117,13 @@ impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
 }
 
 const EFI_METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
-
-/// EFI memory map tag. The embedded [`EFIMemoryDesc`]s follows the EFI
-/// specification.
 #[derive(ptr_meta::Pointee, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 struct EFIMemoryMapTag {
     typ: TagTypeId,
     size: u32,
-    /// Most likely a little more than the size of a [`EFIMemoryDesc`].
-    /// This is always the reference, and `size_of` never.
-    /// See <https://github.com/tianocore/edk2/blob/7142e648416ff5d3eac6c6d607874805f5de0ca8/MdeModulePkg/Core/PiSmmCore/Page.c#L1059>.
     desc_size: u32,
-    /// Version of the tag. The spec leaves it open to extend the memory
-    /// descriptor in the future. However, this never happened so far.
-    /// At the moment, only version "1" is supported.
     desc_version: u32,
-    /// Contains the UEFI memory map.
-    ///
-    /// To follow the UEFI spec and to allow extendability for future UEFI
-    /// revisions, the length is a multiple of `desc_size` and not a multiple
-    /// of `size_of::<EfiMemoryDescriptor>()`.
-    ///
-    /// This tag is properly `align_of::<EFIMemoryDesc>` aligned, if the tag
-    /// itself is also 8 byte aligned, which every sane MBI guarantees.
     memory_map: [u8],
 }
 

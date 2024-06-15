@@ -1,13 +1,8 @@
-//! Module for [`ElfSectionsTag`].
-
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
 
-/// This tag contains the section header table from an ELF binary.
-// The sections iterator is provided via the [`ElfSectionsTag::sections`]
-// method.
 #[derive(ptr_meta::Pointee, PartialEq, Eq)]
 #[repr(C)]
 pub struct ElfSectionsTag {
@@ -20,7 +15,6 @@ pub struct ElfSectionsTag {
 }
 
 impl ElfSectionsTag {
-    /// Get an iterator of loaded ELF sections.
     pub fn sections(&self) -> ElfSectionIter {
         let string_section_offset = (self.shndx * self.entry_size) as isize;
         let string_section_ptr =
@@ -46,8 +40,6 @@ impl TagTrait for ElfSectionsTag {
         base_tag.size as usize - METADATA_SIZE
     }
 }
-
-/// An iterator over some ELF sections.
 #[derive(Clone)]
 pub struct ElfSectionIter {
     current_section: *const u8,
@@ -88,8 +80,6 @@ impl Default for ElfSectionIter {
         }
     }
 }
-
-/// A single generic ELF Section.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
@@ -128,7 +118,7 @@ struct ElfSectionInner64 {
 }
 
 impl ElfSection {
-    pub fn section_type(&self) -> ElfSectionType {
+    fn section_type(&self) -> ElfSectionType {
         match self.get().typ() {
             0 => ElfSectionType::Unused,
             1 => ElfSectionType::ProgramSection,
@@ -153,30 +143,18 @@ impl ElfSection {
             }
         }
     }
-
-    /// Get the physical start address of the section.
     pub fn start_address(&self) -> u64 {
         self.get().addr()
     }
-
-    /// Get the physical end address of the section.
-    ///
-    /// This is the same as doing `section.start_address() + section.size()`
     pub fn end_address(&self) -> u64 {
         self.get().addr() + self.get().size()
     }
-
-    /// Get the section's size in bytes.
     pub fn size(&self) -> u64 {
         self.get().size()
     }
-
-    /// Get the section's flags.
     pub fn flags(&self) -> ElfSectionFlags {
         ElfSectionFlags::from_bits_truncate(self.get().flags())
     }
-
-    /// Check if the `ALLOCATED` flag is set in the section flags.
     pub fn is_allocated(&self) -> bool {
         self.flags().contains(ElfSectionFlags::ALLOCATED)
     }
@@ -235,62 +213,22 @@ impl ElfSectionInner for ElfSectionInner64 {
         self.size
     }
 }
-
-/// An enum abstraction over raw ELF section types.
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u32)]
 pub enum ElfSectionType {
-    /// This value marks the section header as inactive; it does not have an
-    /// associated section. Other members of the section header have undefined
-    /// values.
     Unused = 0,
-
-    /// The section holds information defined by the program, whose format and
-    /// meaning are determined solely by the program.
     ProgramSection = 1,
-
-    /// This section holds a linker symbol table.
     LinkerSymbolTable = 2,
-
-    /// The section holds a string table.
     StringTable = 3,
-
-    /// The section holds relocation entries with explicit addends, such as type
-    /// Elf32_Rela for the 32-bit class of object files. An object file may have
-    /// multiple relocation sections.
     RelaRelocation = 4,
-
-    /// The section holds a symbol hash table.
     SymbolHashTable = 5,
-
-    /// The section holds dynamic linking tables.
     DynamicLinkingTable = 6,
-
-    /// This section holds information that marks the file in some way.
     Note = 7,
-
-    /// A section of this type occupies no space in the file but otherwise resembles
-    /// `ProgramSection`. Although this section contains no bytes, the
-    /// sh_offset member contains the conceptual file offset.
     Uninitialized = 8,
-
-    /// The section holds relocation entries without explicit addends, such as type
-    /// Elf32_Rel for the 32-bit class of object files. An object file may have
-    /// multiple relocation sections.
     RelRelocation = 9,
-
-    /// This section type is reserved but has unspecified semantics.
     Reserved = 10,
-
-    /// This section holds a dynamic loader symbol table.
     DynamicLoaderSymbolTable = 11,
-
-    /// Values in this inclusive range (`[0x6000_0000, 0x6FFF_FFFF)`) are
-    /// reserved for environment-specific semantics.
     EnvironmentSpecific = 0x6000_0000,
-
-    /// Values in this inclusive range (`[0x7000_0000, 0x7FFF_FFFF)`) are
-    /// reserved for processor-specific semantics.
     ProcessorSpecific = 0x7000_0000,
 }
 
