@@ -40,6 +40,7 @@ impl TagTrait for ElfSectionsTag {
         base_tag.size as usize - METADATA_SIZE
     }
 }
+
 #[derive(Clone)]
 pub struct ElfSectionIter {
     current_section: *const u8,
