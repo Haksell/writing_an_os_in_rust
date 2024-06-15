@@ -50,36 +50,3 @@ impl MemoryArea {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 struct MemoryAreaTypeId(u32);
-
-impl From<u32> for MemoryAreaTypeId {
-    fn from(value: u32) -> Self {
-        Self(value)
-    }
-}
-
-impl From<MemoryAreaTypeId> for u32 {
-    fn from(value: MemoryAreaTypeId) -> Self {
-        value.0
-    }
-}
-
-const EFI_METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
-
-#[derive(ptr_meta::Pointee, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-struct EFIMemoryMapTag {
-    typ: TagTypeId,
-    size: u32,
-    desc_size: u32,
-    desc_version: u32,
-    memory_map: [u8],
-}
-
-impl TagTrait for EFIMemoryMapTag {
-    const ID: TagType = TagType::EfiMmap;
-
-    fn dst_size(base_tag: &Tag) -> usize {
-        assert!(base_tag.size as usize >= EFI_METADATA_SIZE);
-        base_tag.size as usize - EFI_METADATA_SIZE
-    }
-}

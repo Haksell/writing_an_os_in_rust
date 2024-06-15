@@ -58,10 +58,8 @@ impl Iterator for ElfSectionIter {
                 string_section: self.string_section,
                 entry_size: self.entry_size,
             };
-
             self.current_section = unsafe { self.current_section.offset(self.entry_size as isize) };
             self.remaining_sections -= 1;
-
             if section.is_used() {
                 return Some(section);
             }
@@ -70,16 +68,6 @@ impl Iterator for ElfSectionIter {
     }
 }
 
-impl Default for ElfSectionIter {
-    fn default() -> Self {
-        Self {
-            current_section: core::ptr::null(),
-            remaining_sections: 0,
-            entry_size: 0,
-            string_section: core::ptr::null(),
-        }
-    }
-}
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
