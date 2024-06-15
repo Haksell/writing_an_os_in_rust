@@ -3,7 +3,7 @@ use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<u32>() + 4 * size_of::<u32>();
 
-#[derive(ptr_meta::Pointee, PartialEq, Eq)]
+#[derive(ptr_meta::Pointee)]
 #[repr(C)]
 pub struct ElfSectionsTag {
     typ: u32,
@@ -32,7 +32,6 @@ impl TagTrait for ElfSectionsTag {
     }
 }
 
-#[derive(Clone)]
 pub struct ElfSectionIter {
     current_section: *const u8,
     remaining_sections: u32,
@@ -56,12 +55,10 @@ impl Iterator for ElfSectionIter {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
 }
 
-#[derive(Clone, Copy)]
 #[repr(C, packed)]
 struct ElfSectionInner64 {
     name_index: u32,

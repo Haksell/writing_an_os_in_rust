@@ -29,7 +29,6 @@ impl From<TagType> for u32 {
     }
 }
 
-#[derive(Clone, Copy)]
 #[repr(C)]
 pub struct Tag {
     pub typ: u32,
@@ -48,7 +47,6 @@ impl Tag {
     }
 }
 
-#[derive(Clone)]
 pub struct TagIter {
     current: *const Tag,
 }

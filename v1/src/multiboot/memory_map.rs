@@ -3,7 +3,7 @@ use core::mem;
 
 const METADATA_SIZE: usize = mem::size_of::<u32>() + 3 * mem::size_of::<u32>();
 
-#[derive(ptr_meta::Pointee, PartialEq, Eq)]
+#[derive(ptr_meta::Pointee)]
 #[repr(C)]
 pub struct MemoryMapTag {
     typ: u32,
@@ -24,7 +24,6 @@ impl TagTrait for MemoryMapTag {
     }
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct MemoryArea {
     pub start_address: u64,
