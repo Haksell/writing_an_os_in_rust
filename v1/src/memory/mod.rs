@@ -36,7 +36,7 @@ pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
     let kernel_end = boot_info
         .elf_sections()
         .filter(|s| s.is_allocated())
-        .map(|s| s.start_address() + s.size())
+        .map(|s| s.end_address())
         .max()
         .unwrap();
 

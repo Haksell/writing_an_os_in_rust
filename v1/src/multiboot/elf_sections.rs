@@ -43,11 +43,11 @@ impl Iterator for ElfSectionIter {
 
     fn next(&mut self) -> Option<ElfSection> {
         while self.remaining_sections != 0 {
-            let section = unsafe { &*(self.current_section as *const ElfSection) };
+            let section = unsafe { *(self.current_section as *const ElfSection) };
             self.current_section = unsafe { self.current_section.offset(64) };
             self.remaining_sections -= 1;
             if section.is_used() {
-                return Some(*section);
+                return Some(section);
             }
         }
         None
@@ -76,10 +76,6 @@ impl ElfSection {
 
     pub fn end_address(&self) -> u64 {
         self.addr + self.size
-    }
-
-    pub fn size(&self) -> u64 {
-        self.size
     }
 
     pub fn flags(&self) -> ElfSectionFlags {

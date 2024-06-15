@@ -202,9 +202,9 @@ pub fn remap_the_kernel<A: FrameAllocator>(
                 "sections need to be page aligned"
             );
             println!(
-                "mapping section at addr: {:#x}, size: {:#x}",
+                "mapping section from addr: {:#x} to addr: {:#x}",
                 section.start_address(),
-                section.size()
+                section.end_address()
             );
             let flags = EntryFlags::from_elf_section_flags(&section);
             let start_frame = Frame::containing_address(section.start_address() as usize);
