@@ -69,8 +69,6 @@ pub trait TagTrait: Pointee {
     fn dst_size(base_tag: &Tag) -> Self::Metadata;
 
     unsafe fn from_base_tag(tag: &Tag) -> &Self {
-        let ptr = core::ptr::addr_of!(*tag);
-        let ptr = ptr_meta::from_raw_parts(ptr.cast(), Self::dst_size(tag));
-        &*ptr
+        &*ptr_meta::from_raw_parts(core::ptr::addr_of!(*tag).cast(), Self::dst_size(tag))
     }
 }
