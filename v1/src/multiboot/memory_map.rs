@@ -14,8 +14,6 @@ pub struct MemoryMapTag {
 
 impl MemoryMapTag {
     pub fn memory_areas(&self) -> &[MemoryArea] {
-        // If this ever fails, we need to model this differently in this crate.
-        assert_eq!(self.entry_size as usize, mem::size_of::<MemoryArea>());
         &self.areas
     }
 }
@@ -60,59 +58,6 @@ impl From<u32> for MemoryAreaTypeId {
 impl From<MemoryAreaTypeId> for u32 {
     fn from(value: MemoryAreaTypeId) -> Self {
         value.0
-    }
-}
-
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-enum MemoryAreaType {
-    Available,
-    Reserved,
-    AcpiAvailable,
-    ReservedHibernate,
-    Defective,
-    Custom(u32),
-}
-
-impl From<MemoryAreaTypeId> for MemoryAreaType {
-    fn from(value: MemoryAreaTypeId) -> Self {
-        match value.0 {
-            1 => Self::Available,
-            2 => Self::Reserved,
-            3 => Self::AcpiAvailable,
-            4 => Self::ReservedHibernate,
-            5 => Self::Defective,
-            val => Self::Custom(val),
-        }
-    }
-}
-
-impl From<MemoryAreaType> for MemoryAreaTypeId {
-    fn from(value: MemoryAreaType) -> Self {
-        let integer = match value {
-            MemoryAreaType::Available => 1,
-            MemoryAreaType::Reserved => 2,
-            MemoryAreaType::AcpiAvailable => 3,
-            MemoryAreaType::ReservedHibernate => 4,
-            MemoryAreaType::Defective => 5,
-            MemoryAreaType::Custom(val) => val,
-        };
-        integer.into()
-    }
-}
-
-impl PartialEq<MemoryAreaType> for MemoryAreaTypeId {
-    fn eq(&self, other: &MemoryAreaType) -> bool {
-        let val: MemoryAreaTypeId = (*other).into();
-        let val: u32 = val.0;
-        self.0.eq(&val)
-    }
-}
-
-impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
-    fn eq(&self, other: &MemoryAreaTypeId) -> bool {
-        let val: MemoryAreaTypeId = (*self).into();
-        let val: u32 = val.0;
-        other.0.eq(&val)
     }
 }
 
