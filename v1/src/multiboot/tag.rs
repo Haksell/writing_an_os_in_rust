@@ -43,7 +43,7 @@ impl Tag {
         self.typ.into()
     }
 
-    pub fn cast_tag<'a, T: TagTrait + ?Sized + 'a>(&'a self) -> &'a T {
+    pub fn cast_tag<T: TagTrait + ?Sized>(&self) -> &T {
         assert_eq!(self.typ, T::ID.into());
         unsafe { TagTrait::from_base_tag(self) }
     }
