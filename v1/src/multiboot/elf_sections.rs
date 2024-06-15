@@ -43,25 +43,20 @@ impl Iterator for ElfSectionIter {
 
     fn next(&mut self) -> Option<ElfSection> {
         while self.remaining_sections != 0 {
-            let section = ElfSection {
-                inner: self.current_section,
-            };
+            let section = unsafe { &*(self.current_section as *const ElfSection) };
             self.current_section = unsafe { self.current_section.offset(64) };
             self.remaining_sections -= 1;
             if section.is_used() {
-                return Some(section);
+                return Some(*section);
             }
         }
         None
     }
 }
 
-pub struct ElfSection {
-    inner: *const u8,
-}
-
+#[derive(Clone, Copy)]
 #[repr(C, packed)]
-struct ElfSectionInner64 {
+pub struct ElfSection {
     name_index: u32,
     typ: u32,
     flags: u64,
@@ -76,19 +71,19 @@ struct ElfSectionInner64 {
 
 impl ElfSection {
     pub fn start_address(&self) -> u64 {
-        self.get().addr
+        self.addr
     }
 
     pub fn end_address(&self) -> u64 {
-        self.get().addr + self.get().size
+        self.addr + self.size
     }
 
     pub fn size(&self) -> u64 {
-        self.get().size
+        self.size
     }
 
     pub fn flags(&self) -> ElfSectionFlags {
-        ElfSectionFlags::from_bits_truncate(self.get().flags)
+        ElfSectionFlags::from_bits_truncate(self.flags)
     }
 
     pub fn is_allocated(&self) -> bool {
@@ -96,11 +91,7 @@ impl ElfSection {
     }
 
     fn is_used(&self) -> bool {
-        self.get().typ != 0
-    }
-
-    fn get(&self) -> &ElfSectionInner64 {
-        unsafe { &*(self.inner as *const ElfSectionInner64) }
+        self.typ != 0
     }
 }
 
