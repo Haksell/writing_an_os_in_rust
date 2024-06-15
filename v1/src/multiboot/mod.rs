@@ -33,27 +33,18 @@ pub use command_line::CommandLineTag;
 pub use efi::{
     EFIBootServicesNotExitedTag, EFIImageHandle32Tag, EFIImageHandle64Tag, EFISdt32Tag, EFISdt64Tag,
 };
-pub use elf_sections::{
-    ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionType, ElfSectionsTag,
-};
+pub use elf_sections::{ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionsTag};
 pub use end::EndTag;
-pub use framebuffer::{FramebufferColor, FramebufferField, FramebufferTag, FramebufferType};
+pub use framebuffer::FramebufferTag;
 pub use image_load_addr::ImageLoadPhysAddrTag;
-pub use memory_map::{
-    BasicMemoryInfoTag, EFIMemoryAreaType, EFIMemoryAttribute, EFIMemoryDesc, EFIMemoryMapTag,
-    MemoryArea, MemoryAreaType, MemoryAreaTypeId, MemoryMapTag,
-};
-pub use module::{ModuleIter, ModuleTag};
-pub use ptr_meta::Pointee;
+pub use memory_map::{BasicMemoryInfoTag, EFIMemoryMapTag, MemoryArea, MemoryMapTag};
+pub use module::ModuleIter;
 pub use rsdp::{RsdpV1Tag, RsdpV2Tag};
 pub use smbios::SmbiosTag;
-pub use tag::{StringError, Tag};
+pub use tag::Tag;
 pub use tag_trait::TagTrait;
 pub use tag_type::{TagType, TagTypeId};
-pub use vbe_info::{
-    VBECapabilities, VBEControlInfo, VBEDirectColorAttributes, VBEField, VBEInfoTag,
-    VBEMemoryModel, VBEModeAttributes, VBEModeInfo, VBEWindowAttributes,
-};
+pub use vbe_info::VBEInfoTag;
 
 use core::fmt;
 use core::mem::size_of;
@@ -320,62 +311,6 @@ impl<'a> BootInformation<'a> {
         self.get_tag::<VBEInfoTag>()
     }
 
-    // ### END OF TAG GETTERS
-    // ######################################################
-
-    /// Public getter to find any Multiboot tag by its type, including
-    /// specified and custom ones.
-    ///
-    /// # Specified or Custom Tags
-    /// The Multiboot2 specification specifies a list of tags, see [`TagType`].
-    /// However, it doesn't forbid to use custom tags. Because of this, there
-    /// exists the [`TagType`] abstraction. It is recommended to use this
-    /// getter only for custom tags. For specified tags, use getters, such as
-    /// [`Self::efi_ih64_tag`].
-    ///
-    /// ## Use Custom Tags
-    /// The following example shows how you may use this interface to parse
-    /// custom tags from the MBI. If they are dynamically sized (DST), a few more
-    /// special handling is required. This is reflected by code-comments.
-    ///
-    /// ```no_run
-    /// use std::str::Utf8Error;
-    /// use multiboot2::{BootInformation, BootInformationHeader, Tag, TagTrait, TagType, TagTypeId};
-    ///
-    /// #[repr(C)]
-    /// #[derive(multiboot2::Pointee)] // Only needed for DSTs.
-    /// struct CustomTag {
-    ///     tag: TagTypeId,
-    ///     size: u32,
-    ///     // begin of inline string
-    ///     name: [u8],
-    /// }
-    ///
-    /// // This implementation is only necessary for tags that are DSTs.
-    /// impl TagTrait for CustomTag {
-    ///     const ID: TagType = TagType::Custom(0x1337);
-    ///
-    ///     fn dst_size(base_tag: &Tag) -> usize {
-    ///         // The size of the sized portion of the custom tag.
-    ///         let tag_base_size = 8; // id + size is 8 byte in size
-    ///         assert!(base_tag.size >= 8);
-    ///         base_tag.size as usize - tag_base_size
-    ///     }
-    /// }
-    ///
-    /// impl CustomTag {
-    ///     fn name(&self) -> Result<&str, Utf8Error> {
-    ///         Tag::parse_slice_as_string(&self.name)
-    ///     }
-    /// }
-    /// let mbi_ptr = 0xdeadbeef as *const BootInformationHeader;
-    /// let mbi = unsafe { BootInformation::load(mbi_ptr).unwrap() };
-    ///
-    /// let tag = mbi
-    ///     .get_tag::<CustomTag>()
-    ///     .unwrap();
-    /// assert_eq!(tag.name(), Ok("name"));
-    /// ```
     pub fn get_tag<TagT: TagTrait + ?Sized + 'a>(&'a self) -> Option<&'a TagT> {
         self.tags()
             .find(|tag| tag.typ == TagT::ID)

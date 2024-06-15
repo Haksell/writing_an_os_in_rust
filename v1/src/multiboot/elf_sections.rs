@@ -3,7 +3,6 @@
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::fmt::{Debug, Formatter};
 use core::mem::size_of;
-use core::str::Utf8Error;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
 
@@ -180,29 +179,6 @@ impl ElfSection {
         }
     }
 
-    /// Get the "raw" section type as a `u32`
-    pub fn section_type_raw(&self) -> u32 {
-        self.get().typ()
-    }
-
-    /// Read the name of the section.
-    pub fn name(&self) -> Result<&str, Utf8Error> {
-        use core::{slice, str};
-
-        let name_ptr = unsafe { self.string_table().offset(self.get().name_index() as isize) };
-
-        // strlen without null byte
-        let strlen = {
-            let mut len = 0;
-            while unsafe { *name_ptr.offset(len) } != 0 {
-                len += 1;
-            }
-            len as usize
-        };
-
-        str::from_utf8(unsafe { slice::from_raw_parts(name_ptr, strlen) })
-    }
-
     /// Get the physical start address of the section.
     pub fn start_address(&self) -> u64 {
         self.get().addr()
@@ -218,16 +194,6 @@ impl ElfSection {
     /// Get the section's size in bytes.
     pub fn size(&self) -> u64 {
         self.get().size()
-    }
-
-    /// Get the section's address alignment constraints.
-    ///
-    /// That is, the value of `start_address` must be congruent to 0,
-    /// modulo the value of `addrlign`. Currently, only 0 and positive
-    /// integral powers of two are allowed. Values 0 and 1 mean the section has no
-    /// alignment constraints.
-    pub fn addralign(&self) -> u64 {
-        self.get().addralign()
     }
 
     /// Get the section's flags.
@@ -247,20 +213,9 @@ impl ElfSection {
             s => panic!("Unexpected entry size: {}", s),
         }
     }
-
-    unsafe fn string_table(&self) -> *const u8 {
-        let addr = match self.entry_size {
-            40 => (*(self.string_section as *const ElfSectionInner32)).addr as usize,
-            64 => (*(self.string_section as *const ElfSectionInner64)).addr as usize,
-            s => panic!("Unexpected entry size: {}", s),
-        };
-        addr as *const _
-    }
 }
 
 trait ElfSectionInner {
-    fn name_index(&self) -> u32;
-
     fn typ(&self) -> u32;
 
     fn flags(&self) -> u64;
@@ -268,15 +223,9 @@ trait ElfSectionInner {
     fn addr(&self) -> u64;
 
     fn size(&self) -> u64;
-
-    fn addralign(&self) -> u64;
 }
 
 impl ElfSectionInner for ElfSectionInner32 {
-    fn name_index(&self) -> u32 {
-        self.name_index
-    }
-
     fn typ(&self) -> u32 {
         self.typ
     }
@@ -292,17 +241,9 @@ impl ElfSectionInner for ElfSectionInner32 {
     fn size(&self) -> u64 {
         self.size.into()
     }
-
-    fn addralign(&self) -> u64 {
-        self.addralign.into()
-    }
 }
 
 impl ElfSectionInner for ElfSectionInner64 {
-    fn name_index(&self) -> u32 {
-        self.name_index
-    }
-
     fn typ(&self) -> u32 {
         self.typ
     }
@@ -317,10 +258,6 @@ impl ElfSectionInner for ElfSectionInner64 {
 
     fn size(&self) -> u64 {
         self.size
-    }
-
-    fn addralign(&self) -> u64 {
-        self.addralign
     }
 }
 

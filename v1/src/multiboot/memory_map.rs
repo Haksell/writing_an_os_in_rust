@@ -1,9 +1,4 @@
-//! Module for [`MemoryMapTag`], [`EFIMemoryMapTag`] and [`BasicMemoryInfoTag`]
-//! and corresponding helper types.
-
-pub use uefi_raw::table::boot::MemoryAttribute as EFIMemoryAttribute;
 pub use uefi_raw::table::boot::MemoryDescriptor as EFIMemoryDesc;
-pub use uefi_raw::table::boot::MemoryType as EFIMemoryAreaType;
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::fmt::{Debug, Formatter};
@@ -62,16 +57,6 @@ pub struct MemoryArea {
 }
 
 impl MemoryArea {
-    /// Create a new MemoryArea.
-    pub fn new(base_addr: u64, length: u64, typ: impl Into<MemoryAreaTypeId>) -> Self {
-        Self {
-            base_addr,
-            length,
-            typ: typ.into(),
-            _reserved: 0,
-        }
-    }
-
     /// The start address of the memory region.
     pub fn start_address(&self) -> u64 {
         self.base_addr
@@ -189,20 +174,6 @@ impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
     }
 }
 
-/// Basic memory info tag.
-///
-/// This tag includes "basic memory information". This means (legacy) lower and
-/// upper memory: In Real Mode (modeled after the 8086), only the first 1MB of
-/// memory is accessible. Typically, the region between 640KB and 1MB is not
-/// freely usable, because it is used for memory-mapped IO, for instance. The
-/// term “lower memory” refers to those first 640KB of memory that are freely
-/// usable for an application in Real Mode. “Upper memory” then refers to the
-/// next freely usable chunk of memory, starting at 1MB up to about 10MB, in
-/// practice. This is the memory an application running on a 286 (which had a
-/// 24-bit address bus) could use, historically.
-///
-/// Nowadays, much bigger chunks of continuous memory are available at higher
-/// addresses, but the Multiboot standard still references those two terms.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct BasicMemoryInfoTag {
@@ -210,25 +181,6 @@ pub struct BasicMemoryInfoTag {
     size: u32,
     memory_lower: u32,
     memory_upper: u32,
-}
-
-impl BasicMemoryInfoTag {
-    pub fn new(memory_lower: u32, memory_upper: u32) -> Self {
-        Self {
-            typ: Self::ID.into(),
-            size: mem::size_of::<BasicMemoryInfoTag>().try_into().unwrap(),
-            memory_lower,
-            memory_upper,
-        }
-    }
-
-    pub fn memory_lower(&self) -> u32 {
-        self.memory_lower
-    }
-
-    pub fn memory_upper(&self) -> u32 {
-        self.memory_upper
-    }
 }
 
 impl TagTrait for BasicMemoryInfoTag {
