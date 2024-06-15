@@ -23,6 +23,7 @@ struct BootInformationHeader {
     // Followed by the boot information tags.
 }
 
+// TODO: remove this crap
 #[derive(ptr_meta::Pointee)]
 #[repr(C)]
 struct BootInformationInner {
@@ -55,8 +56,7 @@ impl<'a> BootInformation<'a> {
     }
 
     pub fn elf_sections(&self) -> Option<ElfSectionIter> {
-        let tag = self.get_tag::<ElfSectionsTag>();
-        tag.map(|t| {
+        self.get_tag::<ElfSectionsTag>().map(|t| {
             assert!((t.entry_size * t.shndx) <= t.size);
             t.sections()
         })
