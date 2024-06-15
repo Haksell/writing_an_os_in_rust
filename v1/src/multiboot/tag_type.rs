@@ -2,7 +2,6 @@
 //!
 //! The relevant exports of this module are [`TagTypeId`] and [`TagType`].
 
-use core::fmt::{Debug, Formatter};
 use core::hash::Hash;
 
 /// Serialized form of [`TagType`] that matches the binary representation
@@ -12,20 +11,12 @@ use core::hash::Hash;
 ///
 /// [`Tag`]: crate::Tag
 #[repr(transparent)]
-#[derive(Copy, Clone, PartialOrd, PartialEq, Eq, Ord, Hash)]
+#[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Ord, Hash)]
 pub struct TagTypeId(u32);
 
 impl TagTypeId {
-    /// Constructor.
     pub fn new(val: u32) -> Self {
         Self(val)
-    }
-}
-
-impl Debug for TagTypeId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let tag_type = TagType::from(*self);
-        Debug::fmt(&tag_type, f)
     }
 }
 
