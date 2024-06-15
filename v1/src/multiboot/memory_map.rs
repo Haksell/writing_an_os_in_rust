@@ -117,6 +117,7 @@ impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
 }
 
 const EFI_METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
+
 #[derive(ptr_meta::Pointee, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 struct EFIMemoryMapTag {
