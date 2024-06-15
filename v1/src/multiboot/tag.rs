@@ -37,10 +37,6 @@ pub struct Tag {
 }
 
 impl Tag {
-    fn typ(&self) -> TagType {
-        self.typ.into()
-    }
-
     pub fn cast_tag<T: TagTrait + ?Sized>(&self) -> &T {
         assert_eq!(self.typ, T::ID.into());
         unsafe { TagTrait::from_base_tag(self) }
@@ -65,7 +61,7 @@ impl Iterator for TagIter {
 
     fn next(&mut self) -> Option<&'static Tag> {
         let tag = unsafe { &*self.current };
-        match tag.typ() {
+        match tag.typ.into() {
             TagType::End => None,
             _ => {
                 let ptr_offset = (tag.size as usize + 7) & !7;
