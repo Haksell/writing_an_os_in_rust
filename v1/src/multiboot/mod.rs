@@ -9,13 +9,13 @@ pub use self::{
 use self::{
     elf_sections::{ElfSectionIter, ElfSectionsTag},
     memory_map::MemoryMapTag,
-    tag::{Tag, TagIter, TagTrait, TagType},
+    tag::{Tag, TagTrait, TagType},
 };
 
 pub struct MultiBoot {
     pub start_address: usize,
+    first_tag: usize,
     pub end_address: usize,
-    tags: &'static [u8],
 }
 
 impl MultiBoot {
@@ -23,23 +23,33 @@ impl MultiBoot {
         let total_size = *(multiboot_address as *const u32) as usize;
         Self {
             start_address: multiboot_address,
+            first_tag: multiboot_address + 8,
             end_address: multiboot_address + total_size,
-            tags: core::slice::from_raw_parts((multiboot_address + 8) as *const u8, total_size - 8),
         }
     }
 
     pub fn elf_sections(&self) -> ElfSectionIter {
-        self.get_tag::<ElfSectionsTag>().sections()
+        self.get_tag::<ElfSectionsTag>().unwrap().sections()
     }
 
     pub fn memory_areas(&self) -> &[MemoryArea] {
-        &self.get_tag::<MemoryMapTag>().areas
+        &self.get_tag::<MemoryMapTag>().unwrap().areas
     }
 
-    fn get_tag<T: TagTrait + ?Sized>(&self) -> &T {
-        let base_tag = TagIter::new(self.tags)
-            .find(|tag| tag.typ == T::ID.into())
-            .unwrap();
-        unsafe { TagTrait::from_base_tag(base_tag) }
+    fn get_tag<T: TagTrait + ?Sized>(&self) -> Option<&T> {
+        let mut current = self.first_tag as *const Tag;
+        loop {
+            let tag = unsafe { &*current };
+            match tag.typ.into() {
+                TagType::End => return None,
+                _ => {
+                    let ptr_offset = (tag.size as usize + 7) & !7;
+                    current = unsafe { current.cast::<u8>().add(ptr_offset).cast::<Tag>() };
+                    if tag.typ == T::ID.into() {
+                        return Some(unsafe { TagTrait::from_base_tag(tag) });
+                    }
+                }
+            }
+        }
     }
 }
