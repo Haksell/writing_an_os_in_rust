@@ -1,4 +1,3 @@
-#![no_std]
 #![cfg_attr(feature = "unstable", feature(error_in_core))]
 #![deny(missing_debug_implementations)]
 // --- BEGIN STYLE CHECKS ---
@@ -7,44 +6,11 @@
 #![deny(clippy::all)]
 #![deny(rustdoc::all)]
 #![allow(rustdoc::private_doc_tests)]
-// --- END STYLE CHECKS ---
-
-//! Library that assists parsing the Multiboot2 Information Structure (MBI) from
-//! Multiboot2-compliant bootloaders, such as GRUB. It supports all tags from the
-//! specification including full support for the sections of ELF files. This library
-//! is `no_std` and can be used in a Multiboot2-kernel.
-//!
-//! The GNU Multiboot(2) specification aims to provide a standardised
-//! method of sharing commonly used information about the host machine at
-//! boot time and give the payload, i.e. a kernel, a well defined machine
-//! state.
-//!
-//! ## Example
-//!
-//! ```rust
-//! use multiboot2::{BootInformation, BootInformationHeader};
-//!
-//! fn kernel_entry(mb_magic: u32, mbi_ptr: u32) {
-//!     if mb_magic == multiboot2::MAGIC {
-//!         let boot_info = unsafe { BootInformation::load(mbi_ptr as *const BootInformationHeader).unwrap() };
-//!         let _cmd = boot_info.command_line_tag();
-//!     } else { /* Panic or use multiboot1 flow. */ }
-//! }
-//! ```
-//!
-//! ## MSRV
-//! The MSRV is 1.70.0 stable.
-
-#[cfg(feature = "builder")]
-extern crate alloc;
 
 // this crate can use std in tests only
 #[cfg_attr(test, macro_use)]
 #[cfg(test)]
 extern crate std;
-
-#[cfg(feature = "builder")]
-pub mod builder;
 
 mod boot_loader_name;
 mod command_line;
