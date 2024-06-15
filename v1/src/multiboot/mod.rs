@@ -1,17 +1,17 @@
-mod boot_loader_name;
-mod command_line;
-mod efi;
+// mod boot_loader_name;
+// mod command_line;
+// mod efi;
 mod elf_sections;
 mod end;
-mod image_load_addr;
+// mod image_load_addr;
 mod memory_map;
-mod module;
-mod rsdp;
-mod smbios;
+// mod module;
+// mod rsdp;
+// mod smbios;
 mod tag;
 mod tag_trait;
 mod tag_type;
-mod vbe_info;
+// mod vbe_info;
 
 pub use elf_sections::{ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionsTag};
 use end::EndTag;
