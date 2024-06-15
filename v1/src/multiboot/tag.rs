@@ -45,14 +45,6 @@ impl Tag {
         // for DST tags are sane.
         unsafe { TagTrait::from_base_tag(self) }
     }
-
-    /// Parses the provided byte sequence as Multiboot string, which maps to a
-    /// [`str`].
-    pub fn parse_slice_as_string(bytes: &[u8]) -> Result<&str, StringError> {
-        let cstr = core::ffi::CStr::from_bytes_until_nul(bytes).map_err(StringError::MissingNul)?;
-
-        cstr.to_str().map_err(StringError::Utf8)
-    }
 }
 
 impl Debug for Tag {
