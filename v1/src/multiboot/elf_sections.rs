@@ -10,25 +10,17 @@ pub struct ElfSectionsTag {
     pub size: u32,
     number_of_sections: u32,
     pub entry_size: u32,
-    pub shndx: u32,
+    shndx: u32,
     sections: [u8],
 }
 
 impl ElfSectionsTag {
     pub fn sections(&self) -> ElfSectionIter {
-        let string_section_offset = (self.shndx * self.entry_size) as isize;
-        let string_section_ptr =
-            unsafe { self.first_section().offset(string_section_offset) as *const _ };
         ElfSectionIter {
-            current_section: self.first_section(),
+            current_section: &self.sections[0],
             remaining_sections: self.number_of_sections,
             entry_size: self.entry_size,
-            string_section: string_section_ptr,
         }
-    }
-
-    fn first_section(&self) -> *const u8 {
-        &self.sections[0]
     }
 }
 
@@ -46,7 +38,6 @@ pub struct ElfSectionIter {
     current_section: *const u8,
     remaining_sections: u32,
     entry_size: u32,
-    string_section: *const u8,
 }
 
 impl Iterator for ElfSectionIter {
@@ -56,7 +47,6 @@ impl Iterator for ElfSectionIter {
         while self.remaining_sections != 0 {
             let section = ElfSection {
                 inner: self.current_section,
-                string_section: self.string_section,
                 entry_size: self.entry_size,
             };
             self.current_section = unsafe { self.current_section.offset(self.entry_size as isize) };
@@ -72,7 +62,6 @@ impl Iterator for ElfSectionIter {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
-    string_section: *const u8,
     entry_size: u32,
 }
 

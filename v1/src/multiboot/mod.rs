@@ -27,10 +27,7 @@ impl BootInformation {
 
     pub fn elf_sections(&self) -> ElfSectionIter {
         self.get_tag::<ElfSectionsTag>()
-            .map(|t| {
-                assert!((t.entry_size * t.shndx) <= t.size);
-                t.sections()
-            })
+            .map(|t| t.sections())
             .unwrap()
     }
 
