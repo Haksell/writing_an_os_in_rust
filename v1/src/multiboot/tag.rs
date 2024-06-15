@@ -17,8 +17,6 @@ impl Tag {
 
     pub fn cast_tag<'a, T: TagTrait + ?Sized + 'a>(&'a self) -> &'a T {
         assert_eq!(self.typ, T::ID);
-        // Safety: At this point, we trust that "self.size" and the size hint
-        // for DST tags are sane.
         unsafe { TagTrait::from_base_tag(self) }
     }
 }
