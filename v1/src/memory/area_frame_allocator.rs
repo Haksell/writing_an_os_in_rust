@@ -1,5 +1,5 @@
 use super::{Frame, FrameAllocator};
-use multiboot2::MemoryArea;
+use crate::multiboot2::MemoryArea;
 
 pub struct AreaFrameAllocator<'a> {
     next_free_frame: Frame,

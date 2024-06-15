@@ -7,8 +7,12 @@ mod vga_buffer;
 
 mod interrupts;
 mod memory;
+mod multiboot2;
 
 extern crate alloc;
+
+#[macro_use]
+extern crate bitflags;
 
 use alloc::{string::String, vec};
 use core::{arch::asm, panic::PanicInfo};

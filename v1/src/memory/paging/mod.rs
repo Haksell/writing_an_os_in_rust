@@ -7,12 +7,12 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
+use crate::multiboot2::BootInformation;
 use crate::vga_buffer::VGA_ADDRESS;
 use core::{
     arch::asm,
     ops::{Add, Deref, DerefMut},
 };
-use multiboot2::BootInformation;
 use x86_64::instructions::tlb;
 
 const ENTRY_COUNT: usize = 512;

@@ -16,7 +16,7 @@ use self::{
     },
     stack_allocator::StackAllocator,
 };
-use multiboot2::BootInformation;
+use crate::multiboot2::BootInformation;
 use paging::ActivePageTable;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;

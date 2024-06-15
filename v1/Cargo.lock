@@ -26,9 +26,12 @@ version = "0.1.0"
 dependencies = [
  "bit_field",
  "bitflags",
+ "derive_more",
  "lazy_static",
- "multiboot2",
+ "log",
+ "ptr_meta",
  "spin 0.9.8",
+ "uefi-raw",
  "volatile 0.3.0",
  "x86_64",
 ]
@@ -68,19 +71,6 @@ name = "log"
 version = "0.4.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "90ed8c1e510134f979dbc4f070f87d4313098b704861a105fe34231c70a3901c"
-
-[[package]]
-name = "multiboot2"
-version = "0.20.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad7ef048d4783355163fd0c874aac3db54b919dc6a86dc29bb13f67308b114b0"
-dependencies = [
- "bitflags",
- "derive_more",
- "log",
- "ptr_meta",
- "uefi-raw",
-]
 
 [[package]]
 name = "proc-macro2"
