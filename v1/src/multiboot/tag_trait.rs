@@ -1,5 +1,3 @@
-//! Module for [`TagTrait`].
-
 use super::{Tag, TagType};
 use ptr_meta::Pointee;
 
@@ -23,26 +21,6 @@ pub trait TagTrait: Pointee {
     /// For sized tags, this just returns `()`. For DSTs, this returns an
     /// `usize`.
     fn dst_size(base_tag: &Tag) -> Self::Metadata;
-
-    /// Returns the tag as the common base tag structure.
-    fn as_base_tag(&self) -> &Tag {
-        let ptr = core::ptr::addr_of!(*self);
-        unsafe { &*ptr.cast::<Tag>() }
-    }
-
-    /// Returns the total size of the tag. The depends on the `size` field of
-    /// the tag.
-    fn size(&self) -> usize {
-        self.as_base_tag().size as usize
-    }
-
-    /// Returns a slice to the underlying bytes of the tag. This includes all
-    /// bytes, also for tags that are DSTs. The slice length depends on the
-    /// `size` field of the tag.
-    fn as_bytes(&self) -> &[u8] {
-        let ptr = core::ptr::addr_of!(*self);
-        unsafe { core::slice::from_raw_parts(ptr.cast(), self.size()) }
-    }
 
     /// Creates a reference to a (dynamically sized) tag type in a safe way.
     /// DST tags need to implement a proper [`Self::dst_size`] implementation.

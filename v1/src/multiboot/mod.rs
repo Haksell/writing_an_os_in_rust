@@ -1,17 +1,3 @@
-#![cfg_attr(feature = "unstable", feature(error_in_core))]
-#![deny(missing_debug_implementations)]
-// --- BEGIN STYLE CHECKS ---
-// These checks are optional in CI for PRs, as discussed in
-// https://github.com/rust-osdev/multiboot2/pull/92
-#![deny(clippy::all)]
-#![deny(rustdoc::all)]
-#![allow(rustdoc::private_doc_tests)]
-
-// this crate can use std in tests only
-#[cfg_attr(test, macro_use)]
-#[cfg(test)]
-extern crate std;
-
 mod boot_loader_name;
 mod command_line;
 mod efi;

@@ -34,9 +34,6 @@ pub struct VBEInfoTag {
 
     /// Contains VBE controller information returned by the VBE Function `00h`.
     pub control_info: VBEControlInfo,
-
-    /// Contains VBE mode information returned by the VBE Function `01h`.
-    pub mode_info: VBEModeInfo,
 }
 
 impl TagTrait for VBEInfoTag {
@@ -160,7 +157,6 @@ pub struct VBEModeInfo {
     pub number_of_banks: u8,
 
     /// Memory model type
-    pub memory_model: VBEMemoryModel,
 
     /// Bank size (Measured in Kilobytes.)
     pub bank_size: u8,
@@ -205,38 +201,6 @@ pub struct VBEModeInfo {
 
     /// Remainder of mode info block
     reserved1: [u8; 206],
-}
-
-impl fmt::Debug for VBEModeInfo {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("VBEModeInfo")
-            .field("mode_attributes", &{ self.mode_attributes })
-            .field("window_a_attributes", &self.window_a_attributes)
-            .field("window_b_attributes", &self.window_b_attributes)
-            .field("window_granularity", &{ self.window_granularity })
-            .field("window_size", &{ self.window_size })
-            .field("window_a_segment", &{ self.window_a_segment })
-            .field("window_b_segment", &{ self.window_b_segment })
-            .field("window_function_ptr", &{ self.window_function_ptr })
-            .field("pitch", &{ self.pitch })
-            .field("resolution", &{ self.resolution })
-            .field("character_size", &self.character_size)
-            .field("number_of_planes", &self.number_of_planes)
-            .field("bpp", &self.bpp)
-            .field("number_of_banks", &self.number_of_banks)
-            .field("memory_model", &self.memory_model)
-            .field("bank_size", &self.bank_size)
-            .field("number_of_image_pages", &self.number_of_image_pages)
-            .field("red_field", &self.red_field)
-            .field("green_field", &self.green_field)
-            .field("blue_field", &self.blue_field)
-            .field("reserved_field", &self.reserved_field)
-            .field("direct_color_attributes", &self.direct_color_attributes)
-            .field("framebuffer_base_ptr", &{ self.framebuffer_base_ptr })
-            .field("offscreen_memory_offset", &{ self.offscreen_memory_offset })
-            .field("offscreen_memory_size", &{ self.offscreen_memory_size })
-            .finish()
-    }
 }
 
 /// A VBE colour field.
@@ -339,20 +303,4 @@ bitflags! {
         /// Bits in Rsvd field when cleared are reserved and usable when set.
         const RESERVED_USABLE = 0x2;
     }
-}
-
-/// The MemoryModel field specifies the general type of memory organization used in modes.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(u8)]
-#[allow(missing_docs)]
-#[allow(clippy::upper_case_acronyms)]
-pub enum VBEMemoryModel {
-    Text = 0x00,
-    CGAGraphics = 0x01,
-    HerculesGraphics = 0x02,
-    Planar = 0x03,
-    PackedPixel = 0x04,
-    Unchained = 0x05,
-    DirectColor = 0x06,
-    YUV = 0x07,
 }
