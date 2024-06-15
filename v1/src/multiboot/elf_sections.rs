@@ -143,18 +143,23 @@ impl ElfSection {
             }
         }
     }
+
     pub fn start_address(&self) -> u64 {
         self.get().addr()
     }
+
     pub fn end_address(&self) -> u64 {
         self.get().addr() + self.get().size()
     }
+
     pub fn size(&self) -> u64 {
         self.get().size()
     }
+
     pub fn flags(&self) -> ElfSectionFlags {
         ElfSectionFlags::from_bits_truncate(self.get().flags())
     }
+
     pub fn is_allocated(&self) -> bool {
         self.flags().contains(ElfSectionFlags::ALLOCATED)
     }
@@ -210,9 +215,10 @@ impl ElfSectionInner for ElfSectionInner64 {
         self.size
     }
 }
+
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(u32)]
-pub enum ElfSectionType {
+enum ElfSectionType {
     Unused = 0,
     ProgramSection = 1,
     LinkerSymbolTable = 2,
