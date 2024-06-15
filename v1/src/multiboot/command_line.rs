@@ -1,11 +1,7 @@
 //! Module for [`CommandLineTag`].
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
-
-use super::tag::StringError;
-use core::fmt::{Debug, Formatter};
 use core::mem;
-use core::str;
 
 pub(crate) const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + mem::size_of::<u32>();
 

@@ -1,8 +1,4 @@
-//! Module for [`ModuleTag`].
-
-use super::tag::StringError;
 use super::{Tag, TagIter, TagTrait, TagType, TagTypeId};
-use core::fmt::{Debug, Formatter};
 use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + 3 * size_of::<u32>();
@@ -19,26 +15,6 @@ pub struct ModuleTag {
     mod_end: u32,
     /// Null-terminated UTF-8 string
     cmdline: [u8],
-}
-
-impl ModuleTag {
-    /// Reads the command line of the boot module as Rust string slice without
-    /// the null-byte.
-    /// This is an null-terminated UTF-8 string. If this returns `Err` then perhaps the memory
-    /// is invalid or the bootloader doesn't follow the spec.
-    ///
-    /// For example, this returns `"--test cmdline-option"`.if the GRUB config
-    /// contains  `"module2 /some_boot_module --test cmdline-option"`.
-    ///
-    /// If the function returns `Err` then perhaps the memory is invalid.
-    pub fn cmdline(&self) -> Result<&str, StringError> {
-        Tag::parse_slice_as_string(&self.cmdline)
-    }
-
-    /// The size of the module/the BLOB in memory.
-    pub fn module_size(&self) -> u32 {
-        self.mod_end - self.mod_start
-    }
 }
 
 impl TagTrait for ModuleTag {

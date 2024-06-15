@@ -81,49 +81,6 @@ pub struct FramebufferTag {
     buffer: [u8],
 }
 
-impl FramebufferTag {
-    /// The type of framebuffer, one of: `Indexed`, `RGB` or `Text`.
-    pub fn buffer_type(&self) -> Result<FramebufferType, UnknownFramebufferType> {
-        let mut reader = Reader::new(self.buffer.as_ptr());
-        let typ = FramebufferTypeId::try_from(self.type_no)?;
-        match typ {
-            FramebufferTypeId::Indexed => {
-                let num_colors = reader.read_u32();
-                let palette = unsafe {
-                    slice::from_raw_parts(
-                        reader.current_address() as *const FramebufferColor,
-                        num_colors as usize,
-                    )
-                } as &'static [FramebufferColor];
-                Ok(FramebufferType::Indexed { palette })
-            }
-            FramebufferTypeId::RGB => {
-                let red_pos = reader.read_u8(); // These refer to the bit positions of the LSB of each field
-                let red_mask = reader.read_u8(); // And then the length of the field from LSB to MSB
-                let green_pos = reader.read_u8();
-                let green_mask = reader.read_u8();
-                let blue_pos = reader.read_u8();
-                let blue_mask = reader.read_u8();
-                Ok(FramebufferType::RGB {
-                    red: FramebufferField {
-                        position: red_pos,
-                        size: red_mask,
-                    },
-                    green: FramebufferField {
-                        position: green_pos,
-                        size: green_mask,
-                    },
-                    blue: FramebufferField {
-                        position: blue_pos,
-                        size: blue_mask,
-                    },
-                })
-            }
-            FramebufferTypeId::Text => Ok(FramebufferType::Text),
-        }
-    }
-}
-
 impl TagTrait for FramebufferTag {
     const ID: TagType = TagType::Framebuffer;
 

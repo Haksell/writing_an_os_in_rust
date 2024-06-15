@@ -1,7 +1,7 @@
 //! Module for [`ElfSectionsTag`].
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::fmt::{Debug, Formatter};
+use core::fmt::Debug;
 use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
