@@ -24,16 +24,3 @@ impl TagTrait for EndTag {
 
     fn dst_size(_base_tag: &Tag) {}
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    /// Compile time test for [`EndTag`].
-    fn test_end_tag_size() {
-        unsafe {
-            core::mem::transmute::<[u8; 8], EndTag>([0u8; 8]);
-        }
-    }
-}

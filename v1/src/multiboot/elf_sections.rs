@@ -1,8 +1,6 @@
 //! Module for [`ElfSectionsTag`].
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
-#[cfg(feature = "builder")]
-use crate::builder::BoxedDst;
 use core::fmt::{Debug, Formatter};
 use core::mem::size_of;
 use core::str::Utf8Error;
@@ -24,24 +22,6 @@ pub struct ElfSectionsTag {
 }
 
 impl ElfSectionsTag {
-    /// Create a new ElfSectionsTag with the given data.
-    #[cfg(feature = "builder")]
-    pub fn new(
-        number_of_sections: u32,
-        entry_size: u32,
-        shndx: u32,
-        sections: &[u8],
-    ) -> BoxedDst<Self> {
-        let mut bytes = [
-            number_of_sections.to_le_bytes(),
-            entry_size.to_le_bytes(),
-            shndx.to_le_bytes(),
-        ]
-        .concat();
-        bytes.extend_from_slice(sections);
-        BoxedDst::new(&bytes)
-    }
-
     /// Get an iterator of loaded ELF sections.
     pub(crate) fn sections(&self) -> ElfSectionIter {
         let string_section_offset = (self.shndx * self.entry_size) as isize;

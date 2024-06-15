@@ -24,24 +24,6 @@ impl Display for StringError {
     }
 }
 
-#[cfg(feature = "unstable")]
-impl core::error::Error for StringError {
-    fn source(&self) -> Option<&(dyn core::error::Error + 'static)> {
-        match self {
-            StringError::MissingNul(e) => Some(e),
-            StringError::Utf8(e) => Some(e),
-        }
-    }
-}
-
-/// Common base structure for all tags that can be passed via the Multiboot2
-/// Information Structure (MBI) to a Multiboot2 payload/program/kernel.
-///
-/// Can be transformed to any other tag (sized or unsized/DST) via
-/// [`Tag::cast_tag`].
-///
-/// Do not confuse them with the Multiboot2 header tags. They are something
-/// different.
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct Tag {
@@ -136,36 +118,5 @@ impl<'a> Iterator for TagIter<'a> {
                 Some(tag)
             }
         }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn parse_slice_as_string() {
-        // empty slice is invalid
-        assert!(matches!(
-            Tag::parse_slice_as_string(&[]),
-            Err(StringError::MissingNul(_))
-        ));
-        // empty string is fine
-        assert_eq!(Tag::parse_slice_as_string(&[0x00]), Ok(""));
-        // reject invalid utf8
-        assert!(matches!(
-            Tag::parse_slice_as_string(&[0xff, 0x00]),
-            Err(StringError::Utf8(_))
-        ));
-        // reject missing null
-        assert!(matches!(
-            Tag::parse_slice_as_string(b"hello"),
-            Err(StringError::MissingNul(_))
-        ));
-        // must not include final null
-        assert_eq!(Tag::parse_slice_as_string(b"hello\0"), Ok("hello"));
-        assert_eq!(Tag::parse_slice_as_string(b"hello\0\0"), Ok("hello"));
-        // must skip everytihng after first null
-        assert_eq!(Tag::parse_slice_as_string(b"hello\0foo"), Ok("hello"));
     }
 }

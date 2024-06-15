@@ -33,25 +33,6 @@ pub struct RsdpV1Tag {
 }
 
 impl RsdpV1Tag {
-    #[cfg(feature = "builder")]
-    pub fn new(
-        signature: [u8; 8],
-        checksum: u8,
-        oem_id: [u8; 6],
-        revision: u8,
-        rsdt_address: u32,
-    ) -> Self {
-        Self {
-            typ: Self::ID.into(),
-            size: size_of::<Self>().try_into().unwrap(),
-            signature,
-            checksum,
-            oem_id,
-            revision,
-            rsdt_address,
-        }
-    }
-
     /// The "RSD PTR " marker signature.
     ///
     /// This is originally a 8-byte C string (not null terminated!) that must contain "RSD PTR "
@@ -110,33 +91,6 @@ pub struct RsdpV2Tag {
 }
 
 impl RsdpV2Tag {
-    #[cfg(feature = "builder")]
-    #[allow(clippy::too_many_arguments)]
-    pub fn new(
-        signature: [u8; 8],
-        checksum: u8,
-        oem_id: [u8; 6],
-        revision: u8,
-        rsdt_address: u32,
-        length: u32,
-        xsdt_address: u64,
-        ext_checksum: u8,
-    ) -> Self {
-        Self {
-            typ: Self::ID.into(),
-            size: size_of::<Self>().try_into().unwrap(),
-            signature,
-            checksum,
-            oem_id,
-            revision,
-            rsdt_address,
-            length,
-            xsdt_address,
-            ext_checksum,
-            _reserved: [0; 3],
-        }
-    }
-
     /// The "RSD PTR " marker signature.
     ///
     /// This is originally a 8-byte C string (not null terminated!) that must contain "RSD PTR ".

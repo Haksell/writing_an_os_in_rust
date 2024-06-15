@@ -82,53 +82,6 @@ pub struct FramebufferTag {
 }
 
 impl FramebufferTag {
-    #[cfg(feature = "builder")]
-    pub fn new(
-        address: u64,
-        pitch: u32,
-        width: u32,
-        height: u32,
-        bpp: u8,
-        buffer_type: FramebufferType,
-    ) -> BoxedDst<Self> {
-        let mut bytes: Vec<u8> = address.to_le_bytes().into();
-        bytes.extend(pitch.to_le_bytes());
-        bytes.extend(width.to_le_bytes());
-        bytes.extend(height.to_le_bytes());
-        bytes.extend(bpp.to_le_bytes());
-        bytes.extend(buffer_type.to_bytes());
-        BoxedDst::new(&bytes)
-    }
-
-    /// Contains framebuffer physical address.
-    ///
-    /// This field is 64-bit wide but bootloader should set it under 4GiB if
-    /// possible for compatibility with payloads which aren’t aware of PAE or
-    /// amd64.
-    pub fn address(&self) -> u64 {
-        self.address
-    }
-
-    /// Contains the pitch in bytes.
-    pub fn pitch(&self) -> u32 {
-        self.pitch
-    }
-
-    /// Contains framebuffer width in pixels.
-    pub fn width(&self) -> u32 {
-        self.width
-    }
-
-    /// Contains framebuffer height in pixels.
-    pub fn height(&self) -> u32 {
-        self.height
-    }
-
-    /// Contains number of bits per pixel.
-    pub fn bpp(&self) -> u8 {
-        self.bpp
-    }
-
     /// The type of framebuffer, one of: `Indexed`, `RGB` or `Text`.
     pub fn buffer_type(&self) -> Result<FramebufferType, UnknownFramebufferType> {
         let mut reader = Reader::new(self.buffer.as_ptr());
@@ -260,35 +213,6 @@ pub enum FramebufferType<'a> {
     Text,
 }
 
-#[cfg(feature = "builder")]
-impl<'a> FramebufferType<'a> {
-    fn to_bytes(&self) -> Vec<u8> {
-        let mut v = Vec::new();
-        match self {
-            FramebufferType::Indexed { palette } => {
-                v.extend(0u8.to_le_bytes()); // type
-                v.extend(0u16.to_le_bytes()); // reserved
-                v.extend((palette.len() as u32).to_le_bytes());
-                for color in palette.iter() {
-                    v.extend(color.as_bytes());
-                }
-            }
-            FramebufferType::RGB { red, green, blue } => {
-                v.extend(1u8.to_le_bytes()); // type
-                v.extend(0u16.to_le_bytes()); // reserved
-                v.extend(red.as_bytes());
-                v.extend(green.as_bytes());
-                v.extend(blue.as_bytes());
-            }
-            FramebufferType::Text => {
-                v.extend(2u8.to_le_bytes()); // type
-                v.extend(0u16.to_le_bytes()); // reserved
-            }
-        }
-        v
-    }
-}
-
 /// An RGB color type field.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
@@ -299,9 +223,6 @@ pub struct FramebufferField {
     /// Color mask size.
     pub size: u8,
 }
-
-#[cfg(feature = "builder")]
-impl AsBytes for FramebufferField {}
 
 /// A framebuffer color descriptor in the palette.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -317,24 +238,7 @@ pub struct FramebufferColor {
     pub blue: u8,
 }
 
-#[cfg(feature = "builder")]
-impl AsBytes for FramebufferColor {}
-
 /// Error when an unknown [`FramebufferTypeId`] is found.
 #[derive(Debug, Copy, Clone, Display, PartialEq, Eq)]
 #[display(fmt = "Unknown framebuffer type {}", _0)]
 pub struct UnknownFramebufferType(u8);
-
-#[cfg(feature = "unstable")]
-impl core::error::Error for UnknownFramebufferType {}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    // Compile time test
-    #[test]
-    fn test_size() {
-        assert_eq!(size_of::<FramebufferColor>(), 3)
-    }
-}

@@ -4,8 +4,6 @@ use super::tag::StringError;
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::fmt::{Debug, Formatter};
 use core::mem::size_of;
-#[cfg(feature = "builder")]
-use {crate::builder::BoxedDst, alloc::vec::Vec};
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + size_of::<u32>();
 
@@ -20,16 +18,6 @@ pub struct BootLoaderNameTag {
 }
 
 impl BootLoaderNameTag {
-    #[cfg(feature = "builder")]
-    pub fn new(name: &str) -> BoxedDst<Self> {
-        let mut bytes: Vec<_> = name.bytes().collect();
-        if !bytes.ends_with(&[0]) {
-            // terminating null-byte
-            bytes.push(0);
-        }
-        BoxedDst::new(&bytes)
-    }
-
     /// Reads the name of the bootloader that is booting the kernel as Rust
     /// string slice without the null-byte.
     ///
