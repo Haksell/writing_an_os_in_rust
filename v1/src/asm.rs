@@ -64,9 +64,9 @@ pub fn enable_write_protect_bit() {
 }
 
 #[inline]
-pub fn tlb_flush(addr: VirtAddr) {
+pub fn tlb_flush(addr: u64) {
     unsafe {
-        asm!("invlpg [{}]", in(reg) addr.as_u64(), options(nostack, preserves_flags));
+        asm!("invlpg [{}]", in(reg) addr, options(nostack, preserves_flags));
     }
 }
 
