@@ -49,15 +49,14 @@ pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
     );
     println!(
         "multiboot_start: {:#x}, multiboot_end: {:#x}",
-        boot_info.start_address(),
-        boot_info.end_address()
+        boot_info.start_address, boot_info.end_address
     );
 
     let mut frame_allocator = AreaFrameAllocator::new(
         kernel_start as usize,
         kernel_end as usize,
-        boot_info.start_address(),
-        boot_info.end_address(),
+        boot_info.start_address,
+        boot_info.end_address,
         boot_info.memory_map_tag().clone().unwrap().memory_areas(),
     );
     let mut active_table = remap_the_kernel(&mut frame_allocator, boot_info);

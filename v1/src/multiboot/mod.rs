@@ -12,38 +12,23 @@ use self::tag::{Tag, TagIter, TagTrait};
 use self::tag_type::TagType;
 use core::mem::size_of;
 
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(C)]
-struct BootInformationHeader {
-    total_size: u32,
-    _reserved: u32,
+pub struct BootInformation {
+    pub start_address: usize,
+    pub end_address: usize,
+    tags: &'static [u8],
 }
 
-pub struct BootInformation<'a> {
-    header: &'a BootInformationHeader,
-    tags: &'a [u8],
-}
-
-impl<'a> BootInformation<'a> {
-    pub unsafe fn load(ptr: usize) -> Self {
-        let header_ptr = ptr as *const BootInformationHeader;
-        let header = &*header_ptr;
-        let slice_size = header.total_size as usize - size_of::<BootInformationHeader>();
-        let tags_ptr = header_ptr.add(1) as *const u8;
+impl BootInformation {
+    pub unsafe fn load(multiboot_address: usize) -> Self {
+        let total_size = *(multiboot_address as *const u32);
+        let tags_ptr = (multiboot_address + size_of::<u32>() * 2) as *const u8;
+        let slice_size = total_size as usize - size_of::<u32>() * 2;
         let tags = core::slice::from_raw_parts(tags_ptr, slice_size);
-        Self { header, tags }
-    }
-
-    pub fn start_address(&self) -> usize {
-        self.header as *const _ as usize
-    }
-
-    pub fn end_address(&self) -> usize {
-        self.start_address() + self.total_size()
-    }
-
-    fn total_size(&self) -> usize {
-        self.header.total_size as usize
+        Self {
+            start_address: multiboot_address,
+            end_address: multiboot_address + total_size as usize,
+            tags,
+        }
     }
 
     pub fn elf_sections(&self) -> Option<ElfSectionIter> {
@@ -57,7 +42,7 @@ impl<'a> BootInformation<'a> {
         self.get_tag::<MemoryMapTag>()
     }
 
-    fn get_tag<TagT: TagTrait + ?Sized + 'a>(&'a self) -> Option<&'a TagT> {
+    fn get_tag<TagT: TagTrait + ?Sized>(&self) -> Option<&TagT> {
         self.tags()
             .find(|tag| tag.typ == TagT::ID)
             .map(|tag| tag.cast_tag::<TagT>())

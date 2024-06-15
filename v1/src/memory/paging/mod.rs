@@ -221,8 +221,8 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         );
 
         for frame in Frame::range_inclusive(
-            Frame::containing_address(boot_info.start_address()),
-            Frame::containing_address(boot_info.end_address() - 1),
+            Frame::containing_address(boot_info.start_address),
+            Frame::containing_address(boot_info.end_address - 1),
         ) {
             mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
         }
