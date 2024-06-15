@@ -170,11 +170,8 @@ impl ElfSection {
 
 trait ElfSectionInner {
     fn typ(&self) -> u32;
-
     fn flags(&self) -> u64;
-
     fn addr(&self) -> u64;
-
     fn size(&self) -> u64;
 }
 

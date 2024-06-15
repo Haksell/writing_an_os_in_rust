@@ -10,12 +10,9 @@ pub struct Tag {
 }
 
 impl Tag {
-    /// Returns the underlying type of the tag.
     fn typ(&self) -> TagType {
         self.typ.into()
     }
-
-    /// Casts the base tag to the specific tag type.
     pub fn cast_tag<'a, T: TagTrait + ?Sized + 'a>(&'a self) -> &'a T {
         assert_eq!(self.typ, T::ID);
         // Safety: At this point, we trust that "self.size" and the size hint
@@ -23,20 +20,14 @@ impl Tag {
         unsafe { TagTrait::from_base_tag(self) }
     }
 }
-
-/// Iterates the MBI's tags from the first tag to the end tag.
 #[derive(Clone)]
 pub struct TagIter<'a> {
-    /// Pointer to the next tag. Updated in each iteration.
     current: *const Tag,
-    /// The pointer right after the MBI. Used for additional bounds checking.
     end_ptr_exclusive: *const u8,
-    /// Lifetime capture of the MBI's memory.
     _mem: PhantomData<&'a ()>,
 }
 
 impl<'a> TagIter<'a> {
-    /// Creates a new iterator
     pub fn new(mem: &'a [u8]) -> Self {
         assert_eq!(mem.as_ptr().align_offset(8), 0);
         TagIter {

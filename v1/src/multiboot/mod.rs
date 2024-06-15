@@ -1,5 +1,4 @@
 mod elf_sections;
-mod end;
 mod memory_map;
 mod tag;
 mod tag_trait;
@@ -8,26 +7,16 @@ mod tag_type;
 pub use elf_sections::{ElfSection, ElfSectionFlags};
 pub use memory_map::MemoryArea;
 
-use elf_sections::{ElfSectionIter, ElfSectionsTag};
-use end::EndTag;
-use memory_map::MemoryMapTag;
-use tag::Tag;
-use tag_trait::TagTrait;
-use tag_type::{TagType, TagTypeId};
-
+use self::elf_sections::{ElfSectionIter, ElfSectionsTag};
+use self::memory_map::MemoryMapTag;
+use self::tag::{Tag, TagIter};
+use self::tag_trait::TagTrait;
+use self::tag_type::{TagType, TagTypeId};
 use core::mem::size_of;
-use tag::TagIter;
-
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum MbiLoadError {
-    IllegalAddress,
-    IllegalTotalSize(u32),
-    NoEndTag,
-}
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
-pub struct BootInformationHeader {
+struct BootInformationHeader {
     // size is multiple of 8
     total_size: u32,
     _reserved: u32,
@@ -41,69 +30,26 @@ struct BootInformationInner {
     tags: [u8],
 }
 
-impl BootInformationInner {
-    fn has_valid_end_tag(&self) -> bool {
-        let end_tag_prototype = EndTag::default();
-
-        let self_ptr = unsafe { self.tags.as_ptr().sub(size_of::<BootInformationHeader>()) };
-
-        let end_tag_ptr = unsafe {
-            self_ptr
-                .add(self.header.total_size as usize)
-                .sub(size_of::<EndTag>())
-        };
-        let end_tag = unsafe { &*(end_tag_ptr as *const EndTag) };
-
-        end_tag.typ == end_tag_prototype.typ && end_tag.size == end_tag_prototype.size
-    }
-}
-
-/// A Multiboot 2 Boot Information (MBI) accessor.
 #[repr(transparent)]
 pub struct BootInformation<'a>(&'a BootInformationInner);
 
 impl<'a> BootInformation<'a> {
-    pub unsafe fn load(ptr: *const BootInformationHeader) -> Result<Self, MbiLoadError> {
-        // null or not aligned
-        if ptr.is_null() || ptr.align_offset(8) != 0 {
-            return Err(MbiLoadError::IllegalAddress);
-        }
-
-        // mbi: reference to basic header
+    pub unsafe fn load(ptr: usize) -> Self {
+        let ptr = ptr as *const BootInformationHeader;
         let mbi = &*ptr;
-
-        // Check if total size is not 0 and a multiple of 8.
-        if mbi.total_size == 0 || mbi.total_size & 0b111 != 0 {
-            return Err(MbiLoadError::IllegalTotalSize(mbi.total_size));
-        }
-
         let slice_size = mbi.total_size as usize - size_of::<BootInformationHeader>();
-        // mbi: reference to full mbi
         let mbi = ptr_meta::from_raw_parts::<BootInformationInner>(ptr.cast(), slice_size);
-        let mbi = &*mbi;
-
-        if !mbi.has_valid_end_tag() {
-            return Err(MbiLoadError::NoEndTag);
-        }
-
-        Ok(Self(mbi))
+        Self(&*mbi)
     }
 
-    /// Get the start address of the boot info.
     pub fn start_address(&self) -> usize {
-        self.as_ptr() as usize
-    }
-
-    /// Get the start address of the boot info as pointer.
-    fn as_ptr(&self) -> *const () {
-        core::ptr::addr_of!(*self.0).cast()
+        core::ptr::addr_of!(*self.0).cast() as *const () as usize
     }
 
     pub fn end_address(&self) -> usize {
         self.start_address() + self.total_size()
     }
 
-    /// Get the total size of the boot info struct.
     fn total_size(&self) -> usize {
         self.0.header.total_size as usize
     }
@@ -116,7 +62,6 @@ impl<'a> BootInformation<'a> {
         })
     }
 
-    /// Search for the Memory map tag.
     pub fn memory_map_tag(&self) -> Option<&MemoryMapTag> {
         self.get_tag::<MemoryMapTag>()
     }
@@ -127,7 +72,6 @@ impl<'a> BootInformation<'a> {
             .map(|tag| tag.cast_tag::<TagT>())
     }
 
-    /// Returns an iterator over all tags.
     fn tags(&self) -> TagIter {
         TagIter::new(&self.0.tags)
     }
