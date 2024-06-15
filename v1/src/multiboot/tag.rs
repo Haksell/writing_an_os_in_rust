@@ -1,4 +1,3 @@
-use core::marker::PhantomData;
 use ptr_meta::Pointee;
 
 pub enum TagType {
@@ -50,25 +49,23 @@ impl Tag {
 }
 
 #[derive(Clone)]
-pub struct TagIter<'a> {
+pub struct TagIter {
     current: *const Tag,
-    _mem: PhantomData<&'a ()>,
 }
 
-impl<'a> TagIter<'a> {
-    pub fn new(mem: &'a [u8]) -> Self {
+impl TagIter {
+    pub fn new(mem: &'static [u8]) -> Self {
         assert_eq!(mem.as_ptr().align_offset(8), 0);
         TagIter {
             current: mem.as_ptr().cast(),
-            _mem: PhantomData,
         }
     }
 }
 
-impl<'a> Iterator for TagIter<'a> {
-    type Item = &'a Tag;
+impl Iterator for TagIter {
+    type Item = &'static Tag;
 
-    fn next(&mut self) -> Option<&'a Tag> {
+    fn next(&mut self) -> Option<&'static Tag> {
         let tag = unsafe { &*self.current };
         match tag.typ() {
             TagType::End => None,
