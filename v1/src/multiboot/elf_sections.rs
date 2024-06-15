@@ -13,16 +13,16 @@ const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
 #[repr(C)]
 pub struct ElfSectionsTag {
     typ: TagTypeId,
-    pub(crate) size: u32,
+    pub size: u32,
     number_of_sections: u32,
-    pub(crate) entry_size: u32,
-    pub(crate) shndx: u32, // string table
+    pub entry_size: u32,
+    pub shndx: u32, // string table
     sections: [u8],
 }
 
 impl ElfSectionsTag {
     /// Get an iterator of loaded ELF sections.
-    pub(crate) fn sections(&self) -> ElfSectionIter {
+    pub fn sections(&self) -> ElfSectionIter {
         let string_section_offset = (self.shndx * self.entry_size) as isize;
         let string_section_ptr =
             unsafe { self.first_section().offset(string_section_offset) as *const _ };
