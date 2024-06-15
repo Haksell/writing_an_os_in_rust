@@ -10,13 +10,7 @@ pub struct MemoryMapTag {
     size: u32,
     entry_size: u32,
     entry_version: u32,
-    areas: [MemoryArea],
-}
-
-impl MemoryMapTag {
-    pub fn memory_areas(&self) -> &[MemoryArea] {
-        &self.areas
-    }
+    pub areas: [MemoryArea],
 }
 
 impl TagTrait for MemoryMapTag {

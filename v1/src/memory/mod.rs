@@ -20,7 +20,7 @@ use crate::multiboot::BootInformation;
 use paging::ActivePageTable;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
-const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
+const HEAP_SIZE: usize = 100 * 1024;
 pub const PAGE_SIZE: usize = 4096;
 
 #[global_allocator]
@@ -55,7 +55,7 @@ pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
         kernel_end as usize,
         boot_info.start_address,
         boot_info.end_address,
-        boot_info.memory_map_tag().clone().unwrap().memory_areas(),
+        &boot_info.memory_map_tag().clone().unwrap().areas,
     );
     let mut active_table = remap_the_kernel(&mut frame_allocator, boot_info);
     println!("Kernel remapped! Whatever that means.");
