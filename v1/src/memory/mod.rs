@@ -4,6 +4,8 @@ mod locked;
 mod paging;
 mod stack_allocator;
 
+use crate::MULTIBOOT;
+
 pub use self::{
     area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel, stack_allocator::Stack,
 };
@@ -12,36 +14,30 @@ use self::{
     heap_allocator::BumpAllocator,
     locked::Locked,
     paging::{
-        PhysicalAddress, {EntryFlags, Page},
+        ActivePageTable, PhysicalAddress, {EntryFlags, Page},
     },
     stack_allocator::StackAllocator,
 };
-use multiboot2::BootInformation;
-use paging::ActivePageTable;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
-const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
+const HEAP_SIZE: usize = 100 * 1024;
 pub const PAGE_SIZE: usize = 4096;
 
-// in lib.rs?
 #[global_allocator]
 static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
-pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
-    // assert_has_not_been_called!("memory::init must be called only once");
-    let kernel_start = boot_info
+pub fn init() -> MemoryController {
+    let kernel_start = MULTIBOOT
         .elf_sections()
-        .unwrap()
         .filter(|s| s.is_allocated())
         .map(|s| s.start_address())
         .min()
         .unwrap();
-    let kernel_end = boot_info
+    let kernel_end = MULTIBOOT
         .elf_sections()
-        .unwrap()
         .filter(|s| s.is_allocated())
-        .map(|s| s.start_address() + s.size())
+        .map(|s| s.end_address())
         .max()
         .unwrap();
 
@@ -51,18 +47,17 @@ pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
     );
     println!(
         "multiboot_start: {:#x}, multiboot_end: {:#x}",
-        boot_info.start_address(),
-        boot_info.end_address()
+        MULTIBOOT.start_address, MULTIBOOT.end_address
     );
 
     let mut frame_allocator = AreaFrameAllocator::new(
         kernel_start as usize,
         kernel_end as usize,
-        boot_info.start_address(),
-        boot_info.end_address(),
-        boot_info.memory_map_tag().clone().unwrap().memory_areas(),
+        MULTIBOOT.start_address,
+        MULTIBOOT.end_address,
+        &MULTIBOOT.memory_areas(),
     );
-    let mut active_table = remap_the_kernel(&mut frame_allocator, boot_info);
+    let mut active_table = remap_the_kernel(&mut frame_allocator);
     println!("Kernel remapped! Whatever that means.");
 
     let heap_start_page = Page::containing_address(HEAP_START);
@@ -136,13 +131,13 @@ pub trait FrameAllocator {
     fn deallocate_frame(&mut self, frame: Frame);
 }
 
-pub struct MemoryController<'a> {
+pub struct MemoryController {
     active_table: ActivePageTable,
-    frame_allocator: AreaFrameAllocator<'a>,
+    frame_allocator: AreaFrameAllocator,
     stack_allocator: StackAllocator,
 }
 
-impl<'a> MemoryController<'a> {
+impl MemoryController {
     pub fn alloc_stack(&mut self, size_in_pages: usize) -> Option<Stack> {
         self.stack_allocator.alloc_stack(
             &mut self.active_table,

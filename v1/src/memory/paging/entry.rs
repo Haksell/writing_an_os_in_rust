@@ -1,6 +1,6 @@
 use super::super::Frame;
+use crate::multiboot::{ElfSection, ElfSectionFlags};
 use bitflags::bitflags;
-use multiboot2::{ElfSection, ElfSectionFlags};
 
 // TODO: u64 -> usize verywhere?
 

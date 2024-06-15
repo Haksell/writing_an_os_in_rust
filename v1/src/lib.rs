@@ -1,34 +1,47 @@
 #![no_std]
 #![allow(internal_features)]
-#![feature(abi_x86_interrupt, allocator_api, ptr_internals)]
+#![feature(abi_x86_interrupt, allocator_api, ptr_internals, ptr_metadata)]
 
 #[macro_use]
 mod vga_buffer;
 
 mod interrupts;
 mod memory;
+mod multiboot;
 
 extern crate alloc;
 
+use self::multiboot::MultiBoot;
 use alloc::{string::String, vec};
-use core::{arch::asm, panic::PanicInfo};
-use multiboot2::{BootInformation, BootInformationHeader};
+use core::{
+    arch::asm,
+    panic::PanicInfo,
+    sync::atomic::{AtomicUsize, Ordering},
+};
+use lazy_static::lazy_static;
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
 };
 
+lazy_static! {
+    static ref MULTIBOOT: MultiBoot =
+        unsafe { MultiBoot::load(MULTIBOOT_START.load(Ordering::SeqCst)) };
+}
+
+static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
+
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
+    MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
+
     // TODO: enable bits directly in asm?
     enable_nxe_bit();
     enable_write_protect_bit();
 
     vga_buffer::clear_screen();
 
-    let boot_info =
-        unsafe { BootInformation::load(multiboot_start as *const BootInformationHeader).unwrap() };
-    let mut memory_controller = memory::init(&boot_info);
+    let mut memory_controller = memory::init();
 
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
     println!("This string too: {}", String::from("ooga") + "chaka");

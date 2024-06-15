@@ -7,12 +7,11 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::vga_buffer::VGA_ADDRESS;
+use crate::{vga_buffer::VGA_ADDRESS, MULTIBOOT};
 use core::{
     arch::asm,
     ops::{Add, Deref, DerefMut},
 };
-use multiboot2::BootInformation;
 use x86_64::instructions::tlb;
 
 const ENTRY_COUNT: usize = 512;
@@ -182,10 +181,7 @@ impl InactivePageTable {
     }
 }
 
-pub fn remap_the_kernel<A: FrameAllocator>(
-    allocator: &mut A,
-    boot_info: &BootInformation,
-) -> ActivePageTable {
+pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable {
     let mut temporary_page = TemporaryPage::new(Page { number: 0xcafebabe }, allocator);
     let mut active_table = unsafe { ActivePageTable::new() };
     let mut new_table = {
@@ -193,18 +189,14 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         InactivePageTable::new(frame, &mut active_table, &mut temporary_page)
     };
     active_table.with(&mut new_table, &mut temporary_page, |mapper| {
-        for section in boot_info.elf_sections().expect("Memory map tag required") {
+        for section in MULTIBOOT.elf_sections() {
             if !section.is_allocated() {
                 continue;
             }
-            assert!(
-                section.start_address() as usize % PAGE_SIZE == 0,
-                "sections need to be page aligned"
-            );
             println!(
-                "mapping section at addr: {:#x}, size: {:#x}",
+                "mapping section from {:#x} to {:#x}",
                 section.start_address(),
-                section.size()
+                section.end_address()
             );
             let flags = EntryFlags::from_elf_section_flags(&section);
             let start_frame = Frame::containing_address(section.start_address() as usize);
@@ -221,8 +213,8 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         );
 
         for frame in Frame::range_inclusive(
-            Frame::containing_address(boot_info.start_address()),
-            Frame::containing_address(boot_info.end_address() - 1),
+            Frame::containing_address(MULTIBOOT.start_address),
+            Frame::containing_address(MULTIBOOT.end_address - 1),
         ) {
             mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
         }
