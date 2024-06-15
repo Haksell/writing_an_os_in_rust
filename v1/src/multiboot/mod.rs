@@ -23,11 +23,10 @@ impl BootInformation {
         let total_size = *(multiboot_address as *const u32);
         let tags_ptr = (multiboot_address + size_of::<u32>() * 2) as *const u8;
         let slice_size = total_size as usize - size_of::<u32>() * 2;
-        let tags = core::slice::from_raw_parts(tags_ptr, slice_size);
         Self {
             start_address: multiboot_address,
             end_address: multiboot_address + total_size as usize,
-            tags,
+            tags: core::slice::from_raw_parts(tags_ptr, slice_size),
         }
     }
 
