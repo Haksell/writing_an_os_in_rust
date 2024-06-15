@@ -19,7 +19,6 @@ impl ElfSectionsTag {
         ElfSectionIter {
             current_section: &self.sections[0],
             remaining_sections: self.number_of_sections,
-            entry_size: self.entry_size,
         }
     }
 }
@@ -37,7 +36,6 @@ impl TagTrait for ElfSectionsTag {
 pub struct ElfSectionIter {
     current_section: *const u8,
     remaining_sections: u32,
-    entry_size: u32,
 }
 
 impl Iterator for ElfSectionIter {
@@ -47,9 +45,8 @@ impl Iterator for ElfSectionIter {
         while self.remaining_sections != 0 {
             let section = ElfSection {
                 inner: self.current_section,
-                entry_size: self.entry_size,
             };
-            self.current_section = unsafe { self.current_section.offset(self.entry_size as isize) };
+            self.current_section = unsafe { self.current_section.offset(64) };
             self.remaining_sections -= 1;
             if section.is_used() {
                 return Some(section);
@@ -62,7 +59,6 @@ impl Iterator for ElfSectionIter {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub struct ElfSection {
     inner: *const u8,
-    entry_size: u32,
 }
 
 #[derive(Clone, Copy)]
@@ -106,16 +102,11 @@ impl ElfSection {
     }
 
     fn get(&self) -> &ElfSectionInner64 {
-        match self.entry_size {
-            64 => unsafe { &*(self.inner as *const ElfSectionInner64) },
-            s => panic!("Unexpected entry size: {}", s),
-        }
+        unsafe { &*(self.inner as *const ElfSectionInner64) }
     }
 }
 
 bitflags! {
-    #[derive(Clone, Copy,  Default, PartialEq, Eq, PartialOrd, Ord)]
-    #[repr(transparent)]
     pub struct ElfSectionFlags: u64 {
         const WRITABLE = 0x1;
         const ALLOCATED = 0x2;
