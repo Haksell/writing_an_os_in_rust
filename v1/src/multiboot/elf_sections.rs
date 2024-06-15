@@ -4,7 +4,6 @@ use core::mem::size_of;
 
 const METADATA_SIZE: usize = 5 * size_of::<u32>();
 
-#[derive(ptr_meta::Pointee)]
 #[repr(C)]
 pub struct ElfSectionsTag {
     typ: u32,

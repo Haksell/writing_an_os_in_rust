@@ -3,7 +3,6 @@ use core::mem::size_of;
 
 const METADATA_SIZE: usize = 4 * size_of::<u32>();
 
-#[derive(ptr_meta::Pointee)]
 #[repr(C)]
 pub struct MemoryMapTag {
     typ: u32,

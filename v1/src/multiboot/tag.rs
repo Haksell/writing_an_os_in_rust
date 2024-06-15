@@ -1,5 +1,4 @@
-use core::ptr::addr_of;
-use ptr_meta::Pointee;
+use core::ptr::Pointee;
 
 pub enum TagType {
     End,
@@ -39,9 +38,9 @@ pub struct Tag {
 pub trait TagTrait: Pointee {
     const ID: TagType;
 
-    fn dst_size(base_tag: &Tag) -> Self::Metadata;
+    fn dst_size(base_tag: &Tag) -> <Self as Pointee>::Metadata;
 
     unsafe fn from_base_tag(tag: &Tag) -> &Self {
-        &*ptr_meta::from_raw_parts(addr_of!(*tag).cast(), Self::dst_size(tag))
+        &*core::ptr::from_raw_parts(tag as *const _ as *const (), Self::dst_size(tag))
     }
 }

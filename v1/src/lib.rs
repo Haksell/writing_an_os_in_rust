@@ -1,6 +1,6 @@
 #![no_std]
 #![allow(internal_features)]
-#![feature(abi_x86_interrupt, allocator_api, ptr_internals)]
+#![feature(abi_x86_interrupt, allocator_api, ptr_internals, ptr_metadata)]
 
 #[macro_use]
 mod vga_buffer;
