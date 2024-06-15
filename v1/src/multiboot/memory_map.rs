@@ -216,35 +216,6 @@ pub struct EFIMemoryMapTag {
     memory_map: [u8],
 }
 
-impl EFIMemoryMapTag {
-    pub fn memory_areas(&self) -> EFIMemoryAreaIter {
-        // If this ever fails, this needs to be refactored in a joint-effort
-        // with the uefi-rs project to have all corresponding typings.
-        assert_eq!(self.desc_version, EFIMemoryDesc::VERSION);
-        assert_eq!(
-            self.memory_map
-                .as_ptr()
-                .align_offset(mem::align_of::<EFIMemoryDesc>()),
-            0
-        );
-
-        EFIMemoryAreaIter::new(self)
-    }
-}
-
-impl Debug for EFIMemoryMapTag {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("EFIMemoryMapTag")
-            .field("typ", &self.typ)
-            .field("size", &self.size)
-            .field("desc_size", &self.desc_size)
-            .field("buf", &self.memory_map.as_ptr())
-            .field("buf_len", &self.memory_map.len())
-            .field("entries", &self.memory_areas().len())
-            .finish()
-    }
-}
-
 impl TagTrait for EFIMemoryMapTag {
     const ID: TagType = TagType::EfiMmap;
 
@@ -255,26 +226,12 @@ impl TagTrait for EFIMemoryMapTag {
 }
 
 /// An iterator over the EFI memory areas emitting [`EFIMemoryDesc`] items.
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct EFIMemoryAreaIter<'a> {
     mmap_tag: &'a EFIMemoryMapTag,
     i: usize,
     entries: usize,
     phantom: PhantomData<&'a EFIMemoryDesc>,
-}
-
-impl<'a> EFIMemoryAreaIter<'a> {
-    fn new(mmap_tag: &'a EFIMemoryMapTag) -> Self {
-        let desc_size = mmap_tag.desc_size as usize;
-        let mmap_len = mmap_tag.memory_map.len();
-        assert_eq!(mmap_len % desc_size, 0, "memory map length must be a multiple of `desc_size` by definition. The MBI seems to be corrupt.");
-        Self {
-            mmap_tag,
-            i: 0,
-            entries: mmap_len / desc_size,
-            phantom: PhantomData,
-        }
-    }
 }
 
 impl<'a> Iterator for EFIMemoryAreaIter<'a> {
