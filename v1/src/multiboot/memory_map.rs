@@ -33,17 +33,8 @@ impl TagTrait for MemoryMapTag {
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct MemoryArea {
-    base_addr: u64,
-    length: u64,
+    pub start_address: u64,
+    pub size: u64,
     typ: u32,
     _reserved: u32,
-}
-
-impl MemoryArea {
-    pub fn start_address(&self) -> u64 {
-        self.base_addr
-    }
-    pub fn size(&self) -> u64 {
-        self.length
-    }
 }

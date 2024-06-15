@@ -19,7 +19,7 @@ impl<'a> FrameAllocator for AreaFrameAllocator<'a> {
                     number: self.next_free_frame.number,
                 };
                 let current_area_last_frame =
-                    Frame::containing_address((area.start_address() + area.size() - 1) as usize);
+                    Frame::containing_address((area.start_address + area.size - 1) as usize);
                 if frame > current_area_last_frame {
                     self.choose_next_area();
                 } else if frame >= self.kernel_start && frame <= self.kernel_end {
@@ -71,12 +71,12 @@ impl<'a> AreaFrameAllocator<'a> {
             .areas
             .iter()
             .filter(|area| {
-                Frame::containing_address((area.start_address() + area.size() - 1) as usize)
+                Frame::containing_address((area.start_address + area.size - 1) as usize)
                     >= self.next_free_frame
             })
-            .min_by_key(|area| area.start_address());
+            .min_by_key(|area| area.start_address);
         if let Some(area) = self.current_area {
-            let start_frame = Frame::containing_address(area.start_address() as usize);
+            let start_frame = Frame::containing_address(area.start_address as usize);
             if self.next_free_frame < start_frame {
                 self.next_free_frame = start_frame;
             }
