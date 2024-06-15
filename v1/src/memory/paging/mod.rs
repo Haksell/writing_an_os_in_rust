@@ -7,11 +7,12 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::{vga_buffer::VGA_ADDRESS, MULTIBOOT};
-use core::{
-    arch::asm,
-    ops::{Add, Deref, DerefMut},
+use crate::{
+    asm::{cr3_read, cr3_write},
+    vga_buffer::VGA_ADDRESS,
+    MULTIBOOT,
 };
+use core::ops::{Add, Deref, DerefMut};
 use x86_64::instructions::tlb;
 
 const ENTRY_COUNT: usize = 512;
@@ -106,21 +107,6 @@ impl Deref for ActivePageTable {
 impl DerefMut for ActivePageTable {
     fn deref_mut(&mut self) -> &mut Mapper {
         &mut self.mapper
-    }
-}
-
-fn cr3_read() -> usize {
-    let cr3: usize;
-    unsafe {
-        asm!("mov {}, cr3", out(reg) cr3, options(nomem, nostack, preserves_flags));
-    }
-    cr3
-}
-
-unsafe fn cr3_write(addr: PhysicalAddress) {
-    let value = addr as u64;
-    unsafe {
-        asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
     }
 }
 

@@ -82,6 +82,6 @@ impl Gdt {
             limit: (self.table.len() * size_of::<u64>() - 1) as u16,
             base: VirtAddr::new(self.table.as_ptr() as u64),
         };
-        unsafe { x86_64::instructions::tables::lgdt(&ptr) };
+        unsafe { crate::asm::lgdt(&ptr) };
     }
 }
