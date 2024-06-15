@@ -1,7 +1,3 @@
-//! Module for the base tag definitions and helper types.
-//!
-//! The relevant exports of this module is [`Tag`].
-
 use super::{TagTrait, TagType, TagTypeId};
 use core::marker::PhantomData;
 
@@ -15,7 +11,7 @@ pub struct Tag {
 
 impl Tag {
     /// Returns the underlying type of the tag.
-    pub fn typ(&self) -> TagType {
+    fn typ(&self) -> TagType {
         self.typ.into()
     }
 
@@ -32,7 +28,7 @@ impl Tag {
 #[derive(Clone)]
 pub struct TagIter<'a> {
     /// Pointer to the next tag. Updated in each iteration.
-    pub current: *const Tag,
+    current: *const Tag,
     /// The pointer right after the MBI. Used for additional bounds checking.
     end_ptr_exclusive: *const u8,
     /// Lifetime capture of the MBI's memory.
