@@ -147,7 +147,7 @@ impl ElfSection {
             0x6000_0000..=0x6FFF_FFFF => ElfSectionType::EnvironmentSpecific,
             0x7000_0000..=0x7FFF_FFFF => ElfSectionType::ProcessorSpecific,
             e => {
-                log::warn!(
+                println!(
                     "Unknown section type {:x}. Treating as ElfSectionType::Unused",
                     e
                 );

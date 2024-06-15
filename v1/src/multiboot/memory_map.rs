@@ -1,9 +1,8 @@
-pub use uefi_raw::table::boot::MemoryDescriptor as EFIMemoryDesc;
-
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use core::mem;
+use uefi_raw::table::boot::MemoryDescriptor as EFIMemoryDesc;
 
 const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
 
