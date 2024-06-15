@@ -93,33 +93,6 @@ impl TryFrom<u8> for FramebufferTypeId {
     }
 }
 
-/// The type of framebuffer.
-#[derive(Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub enum FramebufferType<'a> {
-    /// Indexed color.
-    Indexed {
-        #[allow(missing_docs)]
-        palette: &'a [FramebufferColor],
-    },
-
-    /// Direct RGB color.
-    #[allow(missing_docs)]
-    #[allow(clippy::upper_case_acronyms)]
-    RGB {
-        red: FramebufferField,
-        green: FramebufferField,
-        blue: FramebufferField,
-    },
-
-    /// EGA Text.
-    ///
-    /// In this case the framebuffer width and height are expressed in
-    /// characters and not in pixels.
-    ///
-    /// The bpp is equal 16 (16 bits per character) and pitch is expressed in bytes per text line.
-    Text,
-}
-
 /// An RGB color type field.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]

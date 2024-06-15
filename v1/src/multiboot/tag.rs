@@ -6,17 +6,6 @@ use super::{TagTrait, TagType, TagTypeId};
 use core::fmt;
 use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
-use core::str::Utf8Error;
-
-/// Error type describing failures when parsing the string from a tag.
-#[derive(Debug, PartialEq, Eq, Clone)]
-pub enum StringError {
-    /// There is no terminating NUL character, although the specification
-    /// requires one.
-    MissingNul(core::ffi::FromBytesUntilNulError),
-    /// The sequence until the first NUL character is not valid UTF-8.
-    Utf8(Utf8Error),
-}
 
 #[derive(Clone, Copy)]
 #[repr(C)]

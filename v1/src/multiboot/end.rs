@@ -1,8 +1,5 @@
-//! Module for [`EndTag`].
-
 use super::{Tag, TagTrait, TagType, TagTypeId};
 
-/// The end tag ends the information struct.
 #[repr(C)]
 #[derive(Debug)]
 pub struct EndTag {

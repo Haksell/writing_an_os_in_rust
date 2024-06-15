@@ -24,8 +24,6 @@ use tag_type::{TagType, TagTypeId};
 use core::mem::size_of;
 use tag::TagIter;
 
-/// Error type that describes errors while loading/parsing a multiboot2 information structure
-/// from a given address.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum MbiLoadError {
     IllegalAddress,
@@ -33,12 +31,11 @@ pub enum MbiLoadError {
     NoEndTag,
 }
 
-/// The basic header of a boot information.
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct BootInformationHeader {
     // size is multiple of 8
-    pub total_size: u32,
+    total_size: u32,
     _reserved: u32,
     // Followed by the boot information tags.
 }
@@ -51,8 +48,6 @@ struct BootInformationInner {
 }
 
 impl BootInformationInner {
-    /// Checks if the MBI has a valid end tag by checking the end of the mbi's
-    /// bytes.
     fn has_valid_end_tag(&self) -> bool {
         let end_tag_prototype = EndTag::default();
 
@@ -106,7 +101,7 @@ impl<'a> BootInformation<'a> {
     }
 
     /// Get the start address of the boot info as pointer.
-    pub fn as_ptr(&self) -> *const () {
+    fn as_ptr(&self) -> *const () {
         core::ptr::addr_of!(*self.0).cast()
     }
 
@@ -115,7 +110,7 @@ impl<'a> BootInformation<'a> {
     }
 
     /// Get the total size of the boot info struct.
-    pub fn total_size(&self) -> usize {
+    fn total_size(&self) -> usize {
         self.0.header.total_size as usize
     }
 
@@ -132,7 +127,7 @@ impl<'a> BootInformation<'a> {
         self.get_tag::<MemoryMapTag>()
     }
 
-    pub fn get_tag<TagT: TagTrait + ?Sized + 'a>(&'a self) -> Option<&'a TagT> {
+    fn get_tag<TagT: TagTrait + ?Sized + 'a>(&'a self) -> Option<&'a TagT> {
         self.tags()
             .find(|tag| tag.typ == TagT::ID)
             .map(|tag| tag.cast_tag::<TagT>())
