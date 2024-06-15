@@ -8,9 +8,9 @@ const METADATA_SIZE: usize = size_of::<u32>() + 4 * size_of::<u32>();
 #[repr(C)]
 pub struct ElfSectionsTag {
     typ: u32,
-    pub size: u32,
+    size: u32,
     number_of_sections: u32,
-    pub entry_size: u32,
+    entry_size: u32,
     shndx: u32,
     sections: [u8],
 }

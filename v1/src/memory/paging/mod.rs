@@ -7,8 +7,7 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::multiboot::BootInformation;
-use crate::vga_buffer::VGA_ADDRESS;
+use crate::{vga_buffer::VGA_ADDRESS, BOOT_INFO};
 use core::{
     arch::asm,
     ops::{Add, Deref, DerefMut},
@@ -182,10 +181,7 @@ impl InactivePageTable {
     }
 }
 
-pub fn remap_the_kernel<A: FrameAllocator>(
-    allocator: &mut A,
-    boot_info: &BootInformation,
-) -> ActivePageTable {
+pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable {
     let mut temporary_page = TemporaryPage::new(Page { number: 0xcafebabe }, allocator);
     let mut active_table = unsafe { ActivePageTable::new() };
     let mut new_table = {
@@ -193,16 +189,12 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         InactivePageTable::new(frame, &mut active_table, &mut temporary_page)
     };
     active_table.with(&mut new_table, &mut temporary_page, |mapper| {
-        for section in boot_info.elf_sections() {
+        for section in BOOT_INFO.elf_sections() {
             if !section.is_allocated() {
                 continue;
             }
-            assert!(
-                section.start_address() as usize % PAGE_SIZE == 0,
-                "sections need to be page aligned"
-            );
             println!(
-                "mapping section from addr: {:#x} to addr: {:#x}",
+                "mapping section from {:#x} to {:#x}",
                 section.start_address(),
                 section.end_address()
             );
@@ -221,8 +213,8 @@ pub fn remap_the_kernel<A: FrameAllocator>(
         );
 
         for frame in Frame::range_inclusive(
-            Frame::containing_address(boot_info.start_address),
-            Frame::containing_address(boot_info.end_address - 1),
+            Frame::containing_address(BOOT_INFO.start_address),
+            Frame::containing_address(BOOT_INFO.end_address - 1),
         ) {
             mapper.identity_map(frame, EntryFlags::PRESENT, allocator);
         }

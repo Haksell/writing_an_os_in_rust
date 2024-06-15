@@ -22,24 +22,23 @@ use x86_64::registers::{
 };
 
 lazy_static! {
-    static ref BOOT_INFO: BootInformation = {
-        let multiboot_start = MULTIBOOT_START.load(Ordering::SeqCst);
-        unsafe { BootInformation::load(multiboot_start) }
-    };
+    static ref BOOT_INFO: BootInformation =
+        unsafe { BootInformation::load(MULTIBOOT_START.load(Ordering::SeqCst)) };
 }
 
 static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
 
 #[no_mangle]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
+    MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
+
     // TODO: enable bits directly in asm?
     enable_nxe_bit();
     enable_write_protect_bit();
 
     vga_buffer::clear_screen();
 
-    MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
-    let mut memory_controller = memory::init(&BOOT_INFO);
+    let mut memory_controller = memory::init();
 
     println!("This value is boxed: {}", *alloc::boxed::Box::new(42));
     println!("This string too: {}", String::from("ooga") + "chaka");
