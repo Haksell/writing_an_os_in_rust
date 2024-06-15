@@ -23,13 +23,11 @@ const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024; // 100 KiB
 pub const PAGE_SIZE: usize = 4096;
 
-// in lib.rs?
 #[global_allocator]
 static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
 pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
-    // assert_has_not_been_called!("memory::init must be called only once");
     let kernel_start = boot_info
         .elf_sections()
         .unwrap()
