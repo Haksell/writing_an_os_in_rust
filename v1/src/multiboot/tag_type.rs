@@ -29,15 +29,3 @@ impl From<TagType> for u32 {
         }
     }
 }
-
-impl PartialEq<u32> for TagType {
-    fn eq(&self, other: &u32) -> bool {
-        u32::from(*self) == u32::from(*other)
-    }
-}
-
-impl PartialEq<TagType> for u32 {
-    fn eq(&self, other: &TagType) -> bool {
-        other.eq(self)
-    }
-}

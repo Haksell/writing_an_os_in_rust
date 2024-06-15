@@ -40,7 +40,7 @@ impl BootInformation {
 
     fn get_tag<TagT: TagTrait + ?Sized>(&self) -> Option<&TagT> {
         TagIter::new(self.tags)
-            .find(|tag| tag.typ == TagT::ID)
+            .find(|tag| tag.typ == TagT::ID.into())
             .map(|tag| tag.cast_tag::<TagT>())
     }
 }
