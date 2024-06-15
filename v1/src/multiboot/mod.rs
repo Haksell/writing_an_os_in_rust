@@ -26,18 +26,17 @@ impl BootInformation {
     }
 
     pub fn elf_sections(&self) -> ElfSectionIter {
-        self.get_tag::<ElfSectionsTag>()
-            .map(|t| t.sections())
-            .unwrap()
+        self.get_tag::<ElfSectionsTag>().sections()
     }
 
-    pub fn memory_map_tag(&self) -> Option<&MemoryMapTag> {
+    pub fn memory_map_tag(&self) -> &MemoryMapTag {
         self.get_tag::<MemoryMapTag>()
     }
 
-    fn get_tag<TagT: TagTrait + ?Sized>(&self) -> Option<&TagT> {
+    fn get_tag<T: TagTrait + ?Sized>(&self) -> &T {
         TagIter::new(self.tags)
-            .find(|tag| tag.typ == TagT::ID.into())
-            .map(|tag| tag.cast_tag::<TagT>())
+            .find(|tag| tag.typ == T::ID.into())
+            .unwrap()
+            .cast_tag::<T>()
     }
 }
