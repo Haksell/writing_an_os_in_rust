@@ -12,6 +12,6 @@ bitflags = "2.5.0"
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 ptr_meta = { version = "~0.2", default-features = false }
 spin = "0.9.8"
-volatile = { version = "0.3.0", default-features = false }
 uefi-raw = { version = "~0.5", default-features = false }
+volatile = { version = "0.3.0", default-features = false }
 x86_64 = "0.15.1"
