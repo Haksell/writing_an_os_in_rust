@@ -12,12 +12,11 @@ use self::{
     heap_allocator::BumpAllocator,
     locked::Locked,
     paging::{
-        PhysicalAddress, {EntryFlags, Page},
+        ActivePageTable, PhysicalAddress, {EntryFlags, Page},
     },
     stack_allocator::StackAllocator,
 };
 use crate::multiboot::BootInformation;
-use paging::ActivePageTable;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024;
