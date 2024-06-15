@@ -1,5 +1,4 @@
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use core::mem;
 use uefi_raw::table::boot::MemoryDescriptor as EFIMemoryDesc;
@@ -16,7 +15,7 @@ const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u3
 /// This tag may not be provided by some boot loaders on EFI platforms if EFI
 /// boot services are enabled and available for the loaded image (The EFI boot
 /// services tag may exist in the Multiboot2 boot information structure).
-#[derive(ptr_meta::Pointee, Debug, PartialEq, Eq)]
+#[derive(ptr_meta::Pointee, PartialEq, Eq)]
 #[repr(C)]
 pub struct MemoryMapTag {
     typ: TagTypeId,
@@ -67,16 +66,6 @@ impl MemoryArea {
     }
 }
 
-impl Debug for MemoryArea {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        f.debug_struct("MemoryArea")
-            .field("base_addr", &self.base_addr)
-            .field("length", &self.length)
-            .field("typ", &self.typ)
-            .finish()
-    }
-}
-
 /// ABI-friendly version of [`MemoryAreaType`].
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
@@ -94,20 +83,13 @@ impl From<MemoryAreaTypeId> for u32 {
     }
 }
 
-impl Debug for MemoryAreaTypeId {
-    fn fmt(&self, f: &mut Formatter<'_>) -> core::fmt::Result {
-        let mt = MemoryAreaType::from(*self);
-        Debug::fmt(&mt, f)
-    }
-}
-
 /// Abstraction over defined memory types for the memory map as well as custom
 /// ones. Types 1 to 5 are defined in the Multiboot2 spec and correspond to the
 /// entry types of e820 memory maps.
 ///
 /// This is not binary compatible with the Multiboot2 spec. Please use
 /// [`MemoryAreaTypeId`] instead.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum MemoryAreaType {
     /// Available memory free to be used by the OS.
     Available, /* 1 */
@@ -173,7 +155,7 @@ impl PartialEq<MemoryAreaTypeId> for MemoryAreaType {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct BasicMemoryInfoTag {
     typ: TagTypeId,
