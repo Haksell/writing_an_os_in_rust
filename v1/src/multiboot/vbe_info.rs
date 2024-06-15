@@ -1,11 +1,10 @@
 //! Module for [`VBEInfoTag`].
 
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::fmt;
 
 /// This tag contains VBE metadata, VBE controller information returned by the
 /// VBE Function 00h and VBE mode information returned by the VBE Function 01h.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct VBEInfoTag {
     typ: TagTypeId,
@@ -88,25 +87,6 @@ pub struct VBEControlInfo {
 
     /// Data area for OEM strings.
     oem_data: [u8; 256],
-}
-
-impl fmt::Debug for VBEControlInfo {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("VBEControlInfo")
-            .field("signature", &self.signature)
-            .field("version", &{ self.version })
-            .field("oem_string_ptr", &{ self.oem_string_ptr })
-            .field("capabilities", &{ self.capabilities })
-            .field("mode_list_ptr", &{ self.mode_list_ptr })
-            .field("total_memory", &{ self.total_memory })
-            .field("oem_software_revision", &{ self.oem_software_revision })
-            .field("oem_vendor_name_ptr", &{ self.oem_vendor_name_ptr })
-            .field("oem_product_name_ptr", &{ self.oem_product_name_ptr })
-            .field("oem_product_revision_ptr", &{
-                self.oem_product_revision_ptr
-            })
-            .finish()
-    }
 }
 
 /// Extended information about a specific VBE display mode from the

@@ -4,7 +4,7 @@
 
 use super::{TagTrait, TagType, TagTypeId};
 use core::fmt;
-use core::fmt::{Debug, Display, Formatter};
+use core::fmt::{Debug, Formatter};
 use core::marker::PhantomData;
 use core::str::Utf8Error;
 
@@ -16,12 +16,6 @@ pub enum StringError {
     MissingNul(core::ffi::FromBytesUntilNulError),
     /// The sequence until the first NUL character is not valid UTF-8.
     Utf8(Utf8Error),
-}
-
-impl Display for StringError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "{:?}", self)
-    }
 }
 
 #[derive(Clone, Copy)]
