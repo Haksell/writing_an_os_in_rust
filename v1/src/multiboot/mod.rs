@@ -29,8 +29,8 @@ impl BootInformation {
         self.get_tag::<ElfSectionsTag>().sections()
     }
 
-    pub fn memory_map_tag(&self) -> &MemoryMapTag {
-        self.get_tag::<MemoryMapTag>()
+    pub fn memory_areas(&self) -> &[MemoryArea] {
+        &self.get_tag::<MemoryMapTag>().areas
     }
 
     fn get_tag<T: TagTrait + ?Sized>(&self) -> &T {
