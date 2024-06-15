@@ -3,7 +3,6 @@ mod command_line;
 mod efi;
 mod elf_sections;
 mod end;
-mod framebuffer;
 mod image_load_addr;
 mod memory_map;
 mod module;
