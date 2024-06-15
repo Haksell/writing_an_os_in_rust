@@ -26,7 +26,7 @@ pub const PAGE_SIZE: usize = 4096;
 static ALLOCATOR: Locked<BumpAllocator> =
     Locked::new(BumpAllocator::new(HEAP_START, HEAP_START + HEAP_SIZE));
 
-pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController<'a> {
+pub fn init<'a>(boot_info: &'a BootInformation) -> MemoryController {
     let kernel_start = boot_info
         .elf_sections()
         .filter(|s| s.is_allocated())
