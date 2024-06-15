@@ -7,7 +7,7 @@ mod vga_buffer;
 
 mod interrupts;
 mod memory;
-mod multiboot2;
+mod multiboot;
 
 extern crate alloc;
 
@@ -16,7 +16,7 @@ extern crate bitflags;
 
 use alloc::{string::String, vec};
 use core::{arch::asm, panic::PanicInfo};
-use multiboot2::{BootInformation, BootInformationHeader};
+use multiboot::{BootInformation, BootInformationHeader};
 use x86_64::registers::{
     control::{Cr0, Cr0Flags},
     model_specific::Msr,
