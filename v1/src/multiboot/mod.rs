@@ -1,15 +1,13 @@
 mod elf_sections;
 mod memory_map;
 mod tag;
-mod tag_type;
 
 pub use elf_sections::{ElfSection, ElfSectionFlags};
 pub use memory_map::MemoryArea;
 
 use self::elf_sections::{ElfSectionIter, ElfSectionsTag};
 use self::memory_map::MemoryMapTag;
-use self::tag::{Tag, TagIter, TagTrait};
-use self::tag_type::TagType;
+use self::tag::{Tag, TagIter, TagTrait, TagType};
 
 pub struct BootInformation {
     pub start_address: usize,
