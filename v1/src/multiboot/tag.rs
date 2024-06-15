@@ -33,7 +33,6 @@ impl From<TagType> for u32 {
 pub struct Tag {
     pub typ: u32,
     pub size: u32,
-    // followed by additional, tag specific fields
 }
 
 impl Tag {
