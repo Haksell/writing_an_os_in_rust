@@ -22,12 +22,6 @@ pub struct CommandLineTag {
     cmdline: [u8],
 }
 
-impl CommandLineTag {
-    pub fn cmdline(&self) -> Result<&str, StringError> {
-        Tag::parse_slice_as_string(&self.cmdline)
-    }
-}
-
 impl TagTrait for CommandLineTag {
     const ID: TagType = TagType::Cmdline;
 

@@ -2,7 +2,6 @@
 
 use super::tag::StringError;
 use super::{Tag, TagTrait, TagType, TagTypeId};
-use core::fmt::{Debug, Formatter};
 use core::mem::size_of;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>() + size_of::<u32>();

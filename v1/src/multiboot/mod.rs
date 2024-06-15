@@ -14,29 +14,16 @@ mod tag_trait;
 mod tag_type;
 mod vbe_info;
 
-use boot_loader_name::BootLoaderNameTag;
-use command_line::CommandLineTag;
-use efi::{
-    EFIBootServicesNotExitedTag, EFIImageHandle32Tag, EFIImageHandle64Tag, EFISdt32Tag, EFISdt64Tag,
-};
 pub use elf_sections::{ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionsTag};
 use end::EndTag;
-use framebuffer::FramebufferTag;
-use image_load_addr::ImageLoadPhysAddrTag;
-pub use memory_map::{BasicMemoryInfoTag, EFIMemoryMapTag, MemoryArea, MemoryMapTag};
-use module::ModuleIter;
-use rsdp::{RsdpV1Tag, RsdpV2Tag};
-use smbios::SmbiosTag;
+pub use memory_map::{MemoryArea, MemoryMapTag};
 use tag::Tag;
 use tag_trait::TagTrait;
 use tag_type::{TagType, TagTypeId};
-use vbe_info::VBEInfoTag;
 
-use core::fmt;
 use core::mem::size_of;
 use derive_more::Display;
 // Must be public so that custom tags can be DSTs.
-use framebuffer::UnknownFramebufferType;
 use tag::TagIter;
 
 /// Error type that describes errors while loading/parsing a multiboot2 information structure
