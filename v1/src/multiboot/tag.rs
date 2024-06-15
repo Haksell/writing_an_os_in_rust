@@ -1,5 +1,6 @@
-use super::{TagTrait, TagType, TagTypeId};
+use super::{TagType, TagTypeId};
 use core::marker::PhantomData;
+use ptr_meta::Pointee;
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -23,7 +24,6 @@ impl Tag {
 #[derive(Clone)]
 pub struct TagIter<'a> {
     current: *const Tag,
-    end_ptr_exclusive: *const u8,
     _mem: PhantomData<&'a ()>,
 }
 
@@ -32,7 +32,6 @@ impl<'a> TagIter<'a> {
         assert_eq!(mem.as_ptr().align_offset(8), 0);
         TagIter {
             current: mem.as_ptr().cast(),
-            end_ptr_exclusive: unsafe { mem.as_ptr().add(mem.len()) },
             _mem: PhantomData,
         }
     }
@@ -42,24 +41,26 @@ impl<'a> Iterator for TagIter<'a> {
     type Item = &'a Tag;
 
     fn next(&mut self) -> Option<&'a Tag> {
-        // This never failed so far. But better be safe.
-        assert!(self.current.cast::<u8>() < self.end_ptr_exclusive);
-
         let tag = unsafe { &*self.current };
         match tag.typ() {
-            TagType::End => None, // end tag
+            TagType::End => None,
             _ => {
-                // We return the tag and update self.current already to the next
-                // tag.
-
-                // next pointer (rounded up to 8-byte alignment)
                 let ptr_offset = (tag.size as usize + 7) & !7;
-
-                // go to next tag
                 self.current = unsafe { self.current.cast::<u8>().add(ptr_offset).cast::<Tag>() };
-
                 Some(tag)
             }
         }
+    }
+}
+
+pub trait TagTrait: Pointee {
+    const ID: TagType;
+
+    fn dst_size(base_tag: &Tag) -> Self::Metadata;
+
+    unsafe fn from_base_tag(tag: &Tag) -> &Self {
+        let ptr = core::ptr::addr_of!(*tag);
+        let ptr = ptr_meta::from_raw_parts(ptr.cast(), Self::dst_size(tag));
+        &*ptr
     }
 }

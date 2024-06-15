@@ -28,6 +28,7 @@ impl TagTrait for MemoryMapTag {
         size / mem::size_of::<MemoryArea>()
     }
 }
+
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct MemoryArea {
@@ -45,6 +46,7 @@ impl MemoryArea {
         self.length
     }
 }
+
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 struct MemoryAreaTypeId(u32);

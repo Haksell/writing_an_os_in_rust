@@ -10,7 +10,7 @@ pub struct ElfSectionsTag {
     pub size: u32,
     number_of_sections: u32,
     pub entry_size: u32,
-    pub shndx: u32, // string table
+    pub shndx: u32,
     sections: [u8],
 }
 
@@ -28,7 +28,7 @@ impl ElfSectionsTag {
     }
 
     fn first_section(&self) -> *const u8 {
-        &(self.sections[0]) as *const _
+        &self.sections[0]
     }
 }
 
@@ -62,7 +62,7 @@ impl Iterator for ElfSectionIter {
             self.current_section = unsafe { self.current_section.offset(self.entry_size as isize) };
             self.remaining_sections -= 1;
 
-            if section.section_type() != ElfSectionType::Unused {
+            if section.is_used() {
                 return Some(section);
             }
         }
@@ -118,32 +118,6 @@ struct ElfSectionInner64 {
 }
 
 impl ElfSection {
-    fn section_type(&self) -> ElfSectionType {
-        match self.get().typ() {
-            0 => ElfSectionType::Unused,
-            1 => ElfSectionType::ProgramSection,
-            2 => ElfSectionType::LinkerSymbolTable,
-            3 => ElfSectionType::StringTable,
-            4 => ElfSectionType::RelaRelocation,
-            5 => ElfSectionType::SymbolHashTable,
-            6 => ElfSectionType::DynamicLinkingTable,
-            7 => ElfSectionType::Note,
-            8 => ElfSectionType::Uninitialized,
-            9 => ElfSectionType::RelRelocation,
-            10 => ElfSectionType::Reserved,
-            11 => ElfSectionType::DynamicLoaderSymbolTable,
-            0x6000_0000..=0x6FFF_FFFF => ElfSectionType::EnvironmentSpecific,
-            0x7000_0000..=0x7FFF_FFFF => ElfSectionType::ProcessorSpecific,
-            e => {
-                println!(
-                    "Unknown section type {:x}. Treating as ElfSectionType::Unused",
-                    e
-                );
-                ElfSectionType::Unused
-            }
-        }
-    }
-
     pub fn start_address(&self) -> u64 {
         self.get().addr()
     }
@@ -162,6 +136,10 @@ impl ElfSection {
 
     pub fn is_allocated(&self) -> bool {
         self.flags().contains(ElfSectionFlags::ALLOCATED)
+    }
+
+    fn is_used(&self) -> bool {
+        self.get().typ() != 0
     }
 
     fn get(&self) -> &dyn ElfSectionInner {
@@ -214,25 +192,6 @@ impl ElfSectionInner for ElfSectionInner64 {
     fn size(&self) -> u64 {
         self.size
     }
-}
-
-#[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(u32)]
-enum ElfSectionType {
-    Unused = 0,
-    ProgramSection = 1,
-    LinkerSymbolTable = 2,
-    StringTable = 3,
-    RelaRelocation = 4,
-    SymbolHashTable = 5,
-    DynamicLinkingTable = 6,
-    Note = 7,
-    Uninitialized = 8,
-    RelRelocation = 9,
-    Reserved = 10,
-    DynamicLoaderSymbolTable = 11,
-    EnvironmentSpecific = 0x6000_0000,
-    ProcessorSpecific = 0x7000_0000,
 }
 
 bitflags! {

@@ -1,7 +1,6 @@
 mod elf_sections;
 mod memory_map;
 mod tag;
-mod tag_trait;
 mod tag_type;
 
 pub use elf_sections::{ElfSection, ElfSectionFlags};
@@ -9,8 +8,7 @@ pub use memory_map::MemoryArea;
 
 use self::elf_sections::{ElfSectionIter, ElfSectionsTag};
 use self::memory_map::MemoryMapTag;
-use self::tag::{Tag, TagIter};
-use self::tag_trait::TagTrait;
+use self::tag::{Tag, TagIter, TagTrait};
 use self::tag_type::{TagType, TagTypeId};
 use core::mem::size_of;
 
