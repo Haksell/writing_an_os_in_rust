@@ -1,11 +1,12 @@
-use super::{Tag, TagTrait, TagType, TagTypeId};
+use super::{Tag, TagTrait, TagType};
 use core::mem;
 
-const METADATA_SIZE: usize = mem::size_of::<TagTypeId>() + 3 * mem::size_of::<u32>();
+const METADATA_SIZE: usize = mem::size_of::<u32>() + 3 * mem::size_of::<u32>();
+
 #[derive(ptr_meta::Pointee, PartialEq, Eq)]
 #[repr(C)]
 pub struct MemoryMapTag {
-    typ: TagTypeId,
+    typ: u32,
     size: u32,
     entry_size: u32,
     entry_version: u32,

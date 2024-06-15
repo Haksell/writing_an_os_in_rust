@@ -1,13 +1,4 @@
 use core::hash::Hash;
-#[repr(transparent)]
-#[derive(Copy, Clone, Debug, PartialOrd, PartialEq, Eq, Ord, Hash)]
-pub struct TagTypeId(u32);
-
-impl TagTypeId {
-    pub fn new(val: u32) -> Self {
-        Self(val)
-    }
-}
 
 #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TagType {
@@ -34,19 +25,6 @@ pub enum TagType {
     Efi64Ih,
     LoadBaseAddr,
     Custom(u32),
-}
-
-impl From<u32> for TagTypeId {
-    fn from(value: u32) -> Self {
-        // SAFETY: the type has repr(transparent)
-        unsafe { core::mem::transmute(value) }
-    }
-}
-
-impl From<TagTypeId> for u32 {
-    fn from(value: TagTypeId) -> Self {
-        value.0 as _
-    }
 }
 
 impl From<u32> for TagType {
@@ -109,26 +87,13 @@ impl From<TagType> for u32 {
     }
 }
 
-impl From<TagTypeId> for TagType {
-    fn from(value: TagTypeId) -> Self {
-        let value = u32::from(value);
-        TagType::from(value)
-    }
-}
-
-impl From<TagType> for TagTypeId {
-    fn from(value: TagType) -> Self {
-        TagTypeId::from(u32::from(value))
-    }
-}
-
-impl PartialEq<TagTypeId> for TagType {
-    fn eq(&self, other: &TagTypeId) -> bool {
+impl PartialEq<u32> for TagType {
+    fn eq(&self, other: &u32) -> bool {
         u32::from(*self) == u32::from(*other)
     }
 }
 
-impl PartialEq<TagType> for TagTypeId {
+impl PartialEq<TagType> for u32 {
     fn eq(&self, other: &TagType) -> bool {
         other.eq(self)
     }

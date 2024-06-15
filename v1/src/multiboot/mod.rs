@@ -9,7 +9,7 @@ pub use memory_map::MemoryArea;
 use self::elf_sections::{ElfSectionIter, ElfSectionsTag};
 use self::memory_map::MemoryMapTag;
 use self::tag::{Tag, TagIter, TagTrait};
-use self::tag_type::{TagType, TagTypeId};
+use self::tag_type::TagType;
 use core::mem::size_of;
 
 #[derive(Copy, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]

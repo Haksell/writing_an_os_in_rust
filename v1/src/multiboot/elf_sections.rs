@@ -1,12 +1,12 @@
-use super::{Tag, TagTrait, TagType, TagTypeId};
+use super::{Tag, TagTrait, TagType};
 use core::mem::size_of;
 
-const METADATA_SIZE: usize = size_of::<TagTypeId>() + 4 * size_of::<u32>();
+const METADATA_SIZE: usize = size_of::<u32>() + 4 * size_of::<u32>();
 
 #[derive(ptr_meta::Pointee, PartialEq, Eq)]
 #[repr(C)]
 pub struct ElfSectionsTag {
-    typ: TagTypeId,
+    typ: u32,
     pub size: u32,
     number_of_sections: u32,
     pub entry_size: u32,

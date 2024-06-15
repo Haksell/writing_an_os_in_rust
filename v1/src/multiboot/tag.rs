@@ -1,11 +1,11 @@
-use super::{TagType, TagTypeId};
+use super::TagType;
 use core::marker::PhantomData;
 use ptr_meta::Pointee;
 
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct Tag {
-    pub typ: TagTypeId, // u32
+    pub typ: u32,
     pub size: u32,
     // followed by additional, tag specific fields
 }
@@ -14,6 +14,7 @@ impl Tag {
     fn typ(&self) -> TagType {
         self.typ.into()
     }
+
     pub fn cast_tag<'a, T: TagTrait + ?Sized + 'a>(&'a self) -> &'a T {
         assert_eq!(self.typ, T::ID);
         // Safety: At this point, we trust that "self.size" and the size hint
@@ -21,6 +22,7 @@ impl Tag {
         unsafe { TagTrait::from_base_tag(self) }
     }
 }
+
 #[derive(Clone)]
 pub struct TagIter<'a> {
     current: *const Tag,
