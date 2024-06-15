@@ -48,8 +48,7 @@ pub struct TagIter {
 
 impl TagIter {
     pub fn new(mem: &'static [u8]) -> Self {
-        assert_eq!(mem.as_ptr().align_offset(8), 0);
-        TagIter {
+        Self {
             current: mem.as_ptr().cast(),
         }
     }
