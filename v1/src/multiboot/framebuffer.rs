@@ -3,7 +3,6 @@
 use super::{Tag, TagTrait, TagType, TagTypeId};
 use core::fmt::Debug;
 use core::mem::size_of;
-use derive_more::Display;
 
 const METADATA_SIZE: usize = size_of::<TagTypeId>()
     + 4 * size_of::<u32>()
@@ -147,6 +146,5 @@ pub struct FramebufferColor {
 }
 
 /// Error when an unknown [`FramebufferTypeId`] is found.
-#[derive(Debug, Copy, Clone, Display, PartialEq, Eq)]
-#[display(fmt = "Unknown framebuffer type {}", _0)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
 pub struct UnknownFramebufferType(u8);

@@ -26,7 +26,6 @@ version = "0.1.0"
 dependencies = [
  "bit_field",
  "bitflags",
- "derive_more",
  "lazy_static",
  "log",
  "ptr_meta",
@@ -34,17 +33,6 @@ dependencies = [
  "uefi-raw",
  "volatile 0.3.0",
  "x86_64",
-]
-
-[[package]]
-name = "derive_more"
-version = "0.99.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fb810d30a7c1953f91334de7244731fc3f3c10d7fe163338a35b9f640960321"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
 ]
 
 [[package]]

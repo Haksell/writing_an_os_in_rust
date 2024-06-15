@@ -22,25 +22,14 @@ use tag_trait::TagTrait;
 use tag_type::{TagType, TagTypeId};
 
 use core::mem::size_of;
-use derive_more::Display;
-// Must be public so that custom tags can be DSTs.
 use tag::TagIter;
 
 /// Error type that describes errors while loading/parsing a multiboot2 information structure
 /// from a given address.
-#[derive(Display, Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum MbiLoadError {
-    /// The address is invalid. Make sure that the address is 8-byte aligned,
-    /// according to the spec.
-    #[display(fmt = "The address is invalid")]
     IllegalAddress,
-    /// The total size of the multiboot2 information structure must be not zero
-    /// and a multiple of 8.
-    #[display(fmt = "The size of the MBI is unexpected")]
     IllegalTotalSize(u32),
-    /// Missing end tag. Each multiboot2 boot information requires to have an
-    /// end tag.
-    #[display(fmt = "There is no end tag")]
     NoEndTag,
 }
 
