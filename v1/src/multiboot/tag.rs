@@ -1,3 +1,4 @@
+use core::ptr::addr_of;
 use ptr_meta::Pointee;
 
 pub enum TagType {
@@ -69,6 +70,6 @@ pub trait TagTrait: Pointee {
     fn dst_size(base_tag: &Tag) -> Self::Metadata;
 
     unsafe fn from_base_tag(tag: &Tag) -> &Self {
-        &*ptr_meta::from_raw_parts(core::ptr::addr_of!(*tag).cast(), Self::dst_size(tag))
+        &*ptr_meta::from_raw_parts(addr_of!(*tag).cast(), Self::dst_size(tag))
     }
 }
