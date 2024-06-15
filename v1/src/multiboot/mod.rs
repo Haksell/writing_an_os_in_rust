@@ -1,21 +1,16 @@
-// mod boot_loader_name;
-// mod command_line;
-// mod efi;
 mod elf_sections;
 mod end;
-// mod image_load_addr;
 mod memory_map;
-// mod module;
-// mod rsdp;
-// mod smbios;
 mod tag;
 mod tag_trait;
 mod tag_type;
-// mod vbe_info;
 
-pub use elf_sections::{ElfSection, ElfSectionFlags, ElfSectionIter, ElfSectionsTag};
+pub use elf_sections::{ElfSection, ElfSectionFlags};
+pub use memory_map::MemoryArea;
+
+use elf_sections::{ElfSectionIter, ElfSectionsTag};
 use end::EndTag;
-pub use memory_map::{MemoryArea, MemoryMapTag};
+use memory_map::MemoryMapTag;
 use tag::Tag;
 use tag_trait::TagTrait;
 use tag_type::{TagType, TagTypeId};
