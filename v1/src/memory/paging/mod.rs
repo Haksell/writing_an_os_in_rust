@@ -179,7 +179,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
                 continue;
             }
             println!(
-                "mapping section from {:#x} to {:#x}",
+                "Mapping section from {:#x} to {:#x}",
                 section.start_address(),
                 section.end_address()
             );
@@ -210,6 +210,6 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
     // TODO: stack probes (https://github.com/rust-lang/rust/issues/16012)
     let old_p4_page = Page::containing_address(old_table.p4_frame.start_address());
     active_table.unmap(old_p4_page, allocator);
-    println!("guard page at {:#x}", old_p4_page.start_address());
+    println!("Guard page at {:#x}", old_p4_page.start_address());
     active_table
 }

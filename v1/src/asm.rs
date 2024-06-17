@@ -5,7 +5,6 @@ use x86_64::{
         model_specific::Msr,
     },
     structures::{gdt::SegmentSelector, DescriptorTablePointer},
-    VirtAddr,
 };
 
 #[inline]
@@ -80,5 +79,21 @@ pub fn tlb_flush_all() {
 pub unsafe fn load_tss(sel: SegmentSelector) {
     unsafe {
         asm!("ltr {0:x}", in(reg) sel.0, options(nostack, preserves_flags));
+    }
+}
+
+#[inline]
+pub unsafe fn cs_set_reg(sel: SegmentSelector) {
+    unsafe {
+        asm!(
+            "push {sel}",
+            "lea {tmp}, [1f + rip]",
+            "push {tmp}",
+            "retfq",
+            "1:",
+            sel = in(reg) u64::from(sel.0),
+            tmp = lateout(reg) _,
+            options(preserves_flags),
+        );
     }
 }

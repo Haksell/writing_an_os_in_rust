@@ -1,11 +1,13 @@
 mod gdt;
 
 use self::gdt::Gdt;
-use crate::{asm::load_tss, memory::MemoryController};
+use crate::{
+    asm::{cs_set_reg, load_tss},
+    memory::MemoryController,
+};
 use lazy_static::lazy_static;
 use spin::Once;
 use x86_64::{
-    registers::segmentation::{Segment as _, CS},
     structures::{
         gdt::SegmentSelector,
         idt::{InterruptDescriptorTable, InterruptStackFrame},
@@ -51,7 +53,7 @@ pub fn init(memory_controller: &mut MemoryController) {
     });
     gdt.load();
     unsafe {
-        CS::set_reg(*code_selector);
+        cs_set_reg(*code_selector);
         load_tss(*tss_selector);
     }
     println!("GDT loaded.");

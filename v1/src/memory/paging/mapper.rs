@@ -109,7 +109,7 @@ impl Mapper {
         // let frame = p1[page.p1_index()].pointed_frame().unwrap();
         p1[page.p1_index()].set_unused();
         tlb_flush(page.start_address() as u64);
-        // TODO: free p1, p2, p3 tables if emptyx86_64
+        // TODO: free p1, p2, p3 tables if empty
         // allocator.deallocate_frame(frame)
     }
 }
