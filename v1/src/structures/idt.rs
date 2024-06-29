@@ -177,13 +177,9 @@ impl EntryOptions {
     }
 }
 
-#[repr(transparent)]
-#[derive(Debug)]
-pub struct InterruptStackFrame(InterruptStackFrameValue);
-
 #[derive(Debug, Clone, Copy)]
 #[repr(C)]
-pub struct InterruptStackFrameValue {
+pub struct InterruptStackFrame {
     instruction_pointer: VirtAddr,
     code_segment: SegmentSelector,
     _reserved1: [u8; 6],
