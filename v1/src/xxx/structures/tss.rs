@@ -27,10 +27,3 @@ impl TaskStateSegment {
         }
     }
 }
-
-impl Default for TaskStateSegment {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
