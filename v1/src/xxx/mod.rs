@@ -1,6 +1,6 @@
-pub mod addr;
 pub mod instructions;
 pub mod structures;
+pub mod virt_addr;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]

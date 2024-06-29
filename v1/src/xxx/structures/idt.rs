@@ -1,5 +1,5 @@
 use crate::asm::cs_get_reg;
-use crate::xxx::addr::VirtAddr;
+use crate::xxx::virt_addr::VirtAddr;
 use crate::xxx::SegmentSelector;
 use bit_field::BitField;
 use bitflags::bitflags;

@@ -1,4 +1,4 @@
-use crate::xxx::addr::VirtAddr;
+use crate::xxx::virt_addr::VirtAddr;
 
 pub mod gdt;
 pub mod idt;

@@ -1,4 +1,4 @@
-use crate::xxx::addr::VirtAddr;
+use crate::xxx::virt_addr::VirtAddr;
 use core::mem::size_of;
 
 #[derive(Clone, Copy)]
