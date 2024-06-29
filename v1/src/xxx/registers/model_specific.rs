@@ -82,12 +82,6 @@ bitflags! {
 mod x86_64 {
     use super::*;
     use crate::xxx::addr::VirtAddr;
-    use crate::xxx::registers::rflags::RFlags;
-    use crate::xxx::structures::gdt::SegmentSelector;
-    use crate::xxx::structures::paging::Page;
-    use crate::xxx::structures::paging::Size4KiB;
-    use crate::xxx::PrivilegeLevel;
-    use bit_field::BitField;
     use core::arch::asm;
     use core::fmt;
 
@@ -131,48 +125,6 @@ mod x86_64 {
                     options(nostack, preserves_flags),
                 );
             }
-        }
-    }
-
-    impl FsBase {
-        /// Read the current FsBase register.
-        ///
-        /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is set, the more efficient
-        /// [`FS::read_base`] can be used instead.
-        #[inline]
-        pub fn read() -> VirtAddr {
-            VirtAddr::new(unsafe { Self::MSR.read() })
-        }
-
-        /// Write a given virtual address to the FS.Base register.
-        ///
-        /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is set, the more efficient
-        /// [`FS::write_base`] can be used instead.
-        #[inline]
-        pub fn write(address: VirtAddr) {
-            let mut msr = Self::MSR;
-            unsafe { msr.write(address.as_u64()) };
-        }
-    }
-
-    impl GsBase {
-        /// Read the current GsBase register.
-        ///
-        /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is set, the more efficient
-        /// [`GS::read_base`] can be used instead.
-        #[inline]
-        pub fn read() -> VirtAddr {
-            VirtAddr::new(unsafe { Self::MSR.read() })
-        }
-
-        /// Write a given virtual address to the GS.Base register.
-        ///
-        /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is set, the more efficient
-        /// [`GS::write_base`] can be used instead.
-        #[inline]
-        pub fn write(address: VirtAddr) {
-            let mut msr = Self::MSR;
-            unsafe { msr.write(address.as_u64()) };
         }
     }
 
