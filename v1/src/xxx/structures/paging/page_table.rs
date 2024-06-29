@@ -9,16 +9,6 @@ use crate::xxx::addr::PhysAddr;
 
 use bitflags::bitflags;
 
-/// The error returned by the `PageTableEntry::frame` method.
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum FrameError {
-    /// The entry does not have the `PRESENT` flag set, so it isn't currently mapped to a frame.
-    FrameNotPresent,
-    /// The entry does have the `HUGE_PAGE` flag set. The `frame` method has a standard 4KiB frame
-    /// as return type, so a huge frame can't be returned.
-    HugeFrame,
-}
-
 /// A 64-bit page table entry.
 #[derive(Clone)]
 #[repr(transparent)]
@@ -55,44 +45,6 @@ impl PageTableEntry {
     #[inline]
     pub fn addr(&self) -> PhysAddr {
         PhysAddr::new(self.entry & 0x000f_ffff_ffff_f000)
-    }
-
-    /// Returns the physical frame mapped by this entry.
-    ///
-    /// Returns the following errors:
-    ///
-    /// - `FrameError::FrameNotPresent` if the entry doesn't have the `PRESENT` flag set.
-    /// - `FrameError::HugeFrame` if the entry has the `HUGE_PAGE` flag set (for huge pages the
-    ///    `addr` function must be used)
-    #[inline]
-    pub fn frame(&self) -> Result<PhysFrame, FrameError> {
-        if !self.flags().contains(PageTableFlags::PRESENT) {
-            Err(FrameError::FrameNotPresent)
-        } else if self.flags().contains(PageTableFlags::HUGE_PAGE) {
-            Err(FrameError::HugeFrame)
-        } else {
-            Ok(PhysFrame::containing_address(self.addr()))
-        }
-    }
-
-    /// Map the entry to the specified physical address with the specified flags.
-    #[inline]
-    pub fn set_addr(&mut self, addr: PhysAddr, flags: PageTableFlags) {
-        assert!(addr.is_aligned(Size4KiB::SIZE));
-        self.entry = (addr.as_u64()) | flags.bits();
-    }
-
-    /// Map the entry to the specified physical frame with the specified flags.
-    #[inline]
-    pub fn set_frame(&mut self, frame: PhysFrame, flags: PageTableFlags) {
-        assert!(!flags.contains(PageTableFlags::HUGE_PAGE));
-        self.set_addr(frame.start_address(), flags)
-    }
-
-    /// Sets the flags of this entry.
-    #[inline]
-    pub fn set_flags(&mut self, flags: PageTableFlags) {
-        self.entry = self.addr().as_u64() | flags.bits();
     }
 }
 

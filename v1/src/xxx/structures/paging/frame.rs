@@ -1,6 +1,3 @@
-//! Abstractions for default-sized and huge physical memory frames.
-
-use super::page::AddressNotAligned;
 use crate::xxx::structures::paging::page::{PageSize, Size4KiB};
 use crate::xxx::PhysAddr;
 use core::fmt;
@@ -17,32 +14,6 @@ pub struct PhysFrame<S: PageSize = Size4KiB> {
 }
 
 impl<S: PageSize> PhysFrame<S> {
-    /// Returns the frame that starts at the given virtual address.
-    ///
-    /// Returns an error if the address is not correctly aligned (i.e. is not a valid frame start).
-    #[inline]
-    pub fn from_start_address(address: PhysAddr) -> Result<Self, AddressNotAligned> {
-        if !address.is_aligned_u64(S::SIZE) {
-            return Err(AddressNotAligned);
-        }
-
-        // SAFETY: correct address alignment is checked above
-        Ok(unsafe { PhysFrame::from_start_address_unchecked(address) })
-    }
-
-    /// Returns the frame that starts at the given virtual address.
-    ///
-    /// ## Safety
-    ///
-    /// The address must be correctly aligned.
-    #[inline]
-    pub unsafe fn from_start_address_unchecked(start_address: PhysAddr) -> Self {
-        PhysFrame {
-            start_address,
-            size: PhantomData,
-        }
-    }
-
     /// Returns the frame that contains the given physical address.
     #[inline]
     pub fn containing_address(address: PhysAddr) -> Self {
