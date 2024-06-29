@@ -4,7 +4,6 @@ use core::ops::{Add, AddAssign, Sub, SubAssign};
 
 pub trait PageSize: Copy + Eq + PartialOrd + Ord {
     const SIZE: u64;
-    const DEBUG_STR: &'static str;
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -12,7 +11,6 @@ pub enum Size4KiB {}
 
 impl PageSize for Size4KiB {
     const SIZE: u64 = 4096;
-    const DEBUG_STR: &'static str = "4KiB";
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
