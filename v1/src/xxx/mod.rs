@@ -1,5 +1,3 @@
-pub use addr::{PhysAddr, VirtAddr};
-
 pub mod addr;
 pub mod instructions;
 pub mod registers;

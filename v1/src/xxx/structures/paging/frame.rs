@@ -1,5 +1,5 @@
+use crate::xxx::addr::PhysAddr;
 use crate::xxx::structures::paging::page::{PageSize, Size4KiB};
-use crate::xxx::PhysAddr;
 use core::marker::PhantomData;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]

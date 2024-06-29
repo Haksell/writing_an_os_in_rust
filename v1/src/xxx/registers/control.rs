@@ -1,4 +1,4 @@
-use crate::xxx::{structures::paging::PhysFrame, PhysAddr};
+use crate::xxx::{addr::PhysAddr, structures::paging::PhysFrame};
 use bitflags::bitflags;
 use core::arch::asm;
 

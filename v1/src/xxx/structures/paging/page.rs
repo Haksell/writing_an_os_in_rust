@@ -1,4 +1,4 @@
-use crate::xxx::VirtAddr;
+use crate::xxx::addr::VirtAddr;
 use core::marker::PhantomData;
 
 pub trait PageSize: Copy + Eq + PartialOrd + Ord {

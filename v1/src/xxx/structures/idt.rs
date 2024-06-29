@@ -1,6 +1,6 @@
 use super::gdt::SegmentSelector;
+use crate::xxx::addr::VirtAddr;
 use crate::xxx::registers::rflags::RFlags;
-use crate::xxx::VirtAddr;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
