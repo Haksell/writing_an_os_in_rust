@@ -198,9 +198,6 @@ macro_rules! impl_handler_func_type {
 }
 
 impl_handler_func_type!(HandlerFunc);
-impl_handler_func_type!(HandlerFuncWithErrCode);
-impl_handler_func_type!(PageFaultHandlerFunc);
-impl_handler_func_type!(DivergingHandlerFunc);
 impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
 #[repr(C)]
