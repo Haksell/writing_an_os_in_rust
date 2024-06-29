@@ -1,9 +1,6 @@
 //! Types for the Global Descriptor Table and segment selectors.
 
 pub use crate::xxx::registers::segmentation::SegmentSelector;
-use crate::xxx::structures::tss::TaskStateSegment;
-use crate::xxx::PrivilegeLevel;
-use bit_field::BitField;
 use bitflags::bitflags;
 use core::fmt;
 
@@ -49,44 +46,6 @@ impl fmt::Debug for Entry {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         // Display inner value as hex
         write!(f, "Entry({:#018x})", self.raw())
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct GlobalDescriptorTable<const MAX: usize = 8> {
-    table: [Entry; MAX],
-    len: usize,
-}
-
-impl GlobalDescriptorTable {
-    /// Creates an empty GDT with the default length of 8.
-    pub const fn new() -> Self {
-        Self::empty()
-    }
-}
-
-impl Default for GlobalDescriptorTable {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-impl<const MAX: usize> GlobalDescriptorTable<MAX> {
-    /// Creates an empty GDT which can hold `MAX` number of [`Entry`]s.
-    #[inline]
-    pub const fn empty() -> Self {
-        // TODO: Replace with compiler error when feature(generic_const_exprs) is stable.
-        assert!(MAX > 0, "A GDT cannot have 0 entries");
-        assert!(MAX <= (1 << 13), "A GDT can only have at most 2^13 entries");
-
-        // TODO: Replace with inline_const when it's stable.
-        #[allow(clippy::declare_interior_mutable_const)]
-        const NULL: Entry = Entry::new(0);
-        Self {
-            table: [NULL; MAX],
-            len: 1,
-        }
     }
 }
 
