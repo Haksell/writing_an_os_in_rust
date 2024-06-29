@@ -53,7 +53,6 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
     // fn stack_overflow() {
     //     stack_overflow();
     // }
-
     // stack_overflow();
 
     println!("No crash! \x02");
