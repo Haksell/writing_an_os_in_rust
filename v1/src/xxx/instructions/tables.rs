@@ -6,24 +6,6 @@ use core::arch::asm;
 
 pub use crate::xxx::structures::DescriptorTablePointer;
 
-/// Load a GDT.
-///
-/// Use the
-/// [`GlobalDescriptorTable`](crate::structures::gdt::GlobalDescriptorTable) struct for a high-level
-/// interface to loading a GDT.
-///
-/// ## Safety
-///
-/// This function is unsafe because the caller must ensure that the given
-/// `DescriptorTablePointer` points to a valid GDT and that loading this
-/// GDT is safe.
-#[inline]
-pub unsafe fn lgdt(gdt: &DescriptorTablePointer) {
-    unsafe {
-        asm!("lgdt [{}]", in(reg) gdt, options(readonly, nostack, preserves_flags));
-    }
-}
-
 /// Load an IDT.
 ///
 /// Use the

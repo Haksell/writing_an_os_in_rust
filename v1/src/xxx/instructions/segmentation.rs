@@ -94,18 +94,3 @@ segment_impl!(FS, "fs");
 segment64_impl!(FS, "fs", FsBase);
 segment_impl!(GS, "gs");
 segment64_impl!(GS, "gs", GsBase);
-
-impl GS {
-    /// Swap `KernelGsBase` MSR and `GsBase` MSR.
-    ///
-    /// ## Safety
-    ///
-    /// This function is unsafe because the caller must ensure that the
-    /// swap operation cannot lead to undefined behavior.
-    #[inline]
-    pub unsafe fn swap() {
-        unsafe {
-            asm!("swapgs", options(nostack, preserves_flags));
-        }
-    }
-}

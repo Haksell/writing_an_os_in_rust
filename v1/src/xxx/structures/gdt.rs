@@ -180,17 +180,6 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
     /// segment registers; you **must** (re)load them yourself using [the appropriate
     /// functions](crate::xxx::instructions::segmentation):
     /// [`SS::set_reg()`] and [`CS::set_reg()`].
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    #[inline]
-    pub fn load(&'static self) {
-        // SAFETY: static lifetime ensures no modification after loading.
-        unsafe { self.load_unsafe() };
-    }
-
-    /// Loads the GDT in the CPU using the `lgdt` instruction. This does **not** alter any of the
-    /// segment registers; you **must** (re)load them yourself using [the appropriate
-    /// functions](crate::xxx::instructions::segmentation):
-    /// [`SS::set_reg()`] and [`CS::set_reg()`].
     ///
     /// # Safety
     ///
@@ -198,14 +187,6 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
     /// this means its up to the user to ensure that there will be no modifications
     /// after loading and that the GDT will live for as long as it's loaded.
     ///
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    #[inline]
-    pub unsafe fn load_unsafe(&self) {
-        use crate::xxx::instructions::tables::lgdt;
-        unsafe {
-            lgdt(&self.pointer());
-        }
-    }
 
     #[inline]
     #[cfg_attr(feature = "const_fn", rustversion::attr(all(), const))]
