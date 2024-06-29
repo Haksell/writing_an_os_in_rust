@@ -1,9 +1,5 @@
-pub use crate::xxx::registers::segmentation::{Segment, Segment64, CS, DS, ES, FS, GS, SS};
-use crate::xxx::{
-    registers::model_specific::{FsBase, GsBase, Msr},
-    structures::gdt::SegmentSelector,
-    VirtAddr,
-};
+pub use crate::xxx::registers::segmentation::{Segment, CS, DS, ES, FS, GS, SS};
+use crate::xxx::structures::gdt::SegmentSelector;
 use core::arch::asm;
 
 macro_rules! get_reg_impl {
@@ -34,29 +30,6 @@ macro_rules! segment_impl {
     };
 }
 
-macro_rules! segment64_impl {
-    ($type:ty, $name:literal, $base:ty) => {
-        impl Segment64 for $type {
-            const BASE: Msr = <$base>::MSR;
-            #[inline]
-            fn read_base() -> VirtAddr {
-                unsafe {
-                    let val: u64;
-                    asm!(concat!("rd", $name, "base {}"), out(reg) val, options(nomem, nostack, preserves_flags));
-                    VirtAddr::new_unsafe(val)
-                }
-            }
-
-            #[inline]
-            unsafe fn write_base(base: VirtAddr) {
-                unsafe{
-                    asm!(concat!("wr", $name, "base {}"), in(reg) base.as_u64(), options(nostack, preserves_flags));
-                }
-            }
-        }
-    };
-}
-
 impl Segment for CS {
     get_reg_impl!("cs");
 
@@ -81,6 +54,4 @@ segment_impl!(SS, "ss");
 segment_impl!(DS, "ds");
 segment_impl!(ES, "es");
 segment_impl!(FS, "fs");
-segment64_impl!(FS, "fs", FsBase);
 segment_impl!(GS, "gs");
-segment64_impl!(GS, "gs", GsBase);

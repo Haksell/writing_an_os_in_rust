@@ -25,34 +25,6 @@ pub trait Segment {
     unsafe fn set_reg(sel: SegmentSelector);
 }
 
-/// An x86 segment which is actually used in 64-bit mode
-///
-/// While most segments are unused in 64-bit mode, the FS and GS segments are
-/// still partially used. Only the 64-bit segment base address is used, and this
-/// address can be set via the GDT, or by using the `FSGSBASE` instructions.
-pub trait Segment64: Segment {
-    /// MSR containing the segment base. This MSR can be used to set the base
-    /// when [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is **not** set.
-    const BASE: Msr;
-    /// Reads the segment base address
-    ///
-    /// ## Exceptions
-    ///
-    /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is not set, this instruction will throw a `#UD`.
-    fn read_base() -> VirtAddr;
-    /// Writes the segment base address
-    ///
-    /// ## Exceptions
-    ///
-    /// If [`CR4.FSGSBASE`][Cr4Flags::FSGSBASE] is not set, this instruction will throw a `#UD`.
-    ///
-    /// ## Safety
-    ///
-    /// The caller must ensure that this write operation has no unsafe side
-    /// effects, as the segment base address might be in use.
-    unsafe fn write_base(base: VirtAddr);
-}
-
 /// Specifies which element to load into a segment from
 /// descriptor tables (i.e., is a index to LDT or GDT table
 /// with some additional flags).
