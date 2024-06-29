@@ -1,12 +1,6 @@
-use core::ops::{Add, Sub};
-
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 pub struct VirtAddr(u64);
-
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-#[repr(transparent)]
-pub struct PhysAddr(u64);
 
 pub struct VirtAddrNotValid;
 
@@ -43,61 +37,5 @@ impl VirtAddr {
     #[inline]
     pub const fn as_u64(self) -> u64 {
         self.0
-    }
-}
-
-pub struct PhysAddrNotValid;
-
-impl PhysAddr {
-    #[inline]
-    pub const fn new(addr: u64) -> Self {
-        match Self::try_new(addr) {
-            Ok(p) => p,
-            Err(_) => panic!("physical addresses must not have any bits in the range 52 to 64 set"),
-        }
-    }
-
-    #[inline]
-    pub const fn new_truncate(addr: u64) -> PhysAddr {
-        PhysAddr(addr % (1 << 52))
-    }
-
-    #[inline]
-    pub const fn try_new(addr: u64) -> Result<Self, PhysAddrNotValid> {
-        let p = Self::new_truncate(addr);
-        if p.0 == addr {
-            Ok(p)
-        } else {
-            Err(PhysAddrNotValid)
-        }
-    }
-
-    #[inline]
-    pub const fn as_u64(self) -> u64 {
-        self.0
-    }
-}
-
-impl Add<u64> for PhysAddr {
-    type Output = Self;
-    #[inline]
-    fn add(self, rhs: u64) -> Self::Output {
-        PhysAddr::new(self.0 + rhs)
-    }
-}
-
-impl Sub<u64> for PhysAddr {
-    type Output = Self;
-    #[inline]
-    fn sub(self, rhs: u64) -> Self::Output {
-        PhysAddr::new(self.0.checked_sub(rhs).unwrap())
-    }
-}
-
-impl Sub<PhysAddr> for PhysAddr {
-    type Output = u64;
-    #[inline]
-    fn sub(self, rhs: PhysAddr) -> Self::Output {
-        self.as_u64().checked_sub(rhs.as_u64()).unwrap()
     }
 }
