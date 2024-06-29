@@ -3,7 +3,7 @@
 use bitflags::bitflags;
 // imports for intra doc links
 #[cfg(doc)]
-use crate::registers::segmentation::{FS, GS};
+use crate::xxx::registers::segmentation::{FS, GS};
 
 /// A model specific register.
 #[cfg_attr(
@@ -164,18 +164,18 @@ bitflags! {
 #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
 mod x86_64 {
     use super::*;
-    use crate::addr::VirtAddr;
-    use crate::registers::rflags::RFlags;
+    use crate::xxx::addr::VirtAddr;
+    use crate::xxx::registers::rflags::RFlags;
     use crate::xxx::structures::gdt::SegmentSelector;
     use crate::xxx::structures::paging::Page;
     use crate::xxx::structures::paging::Size4KiB;
-    use crate::PrivilegeLevel;
+    use crate::xxx::PrivilegeLevel;
     use bit_field::BitField;
     use core::convert::TryInto;
     use core::fmt;
     // imports for intra doc links
     #[cfg(doc)]
-    use crate::registers::{
+    use crate::xxx::registers::{
         control::Cr4Flags,
         segmentation::{Segment, Segment64, CS, SS},
     };

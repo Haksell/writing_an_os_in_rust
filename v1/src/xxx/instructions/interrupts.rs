@@ -5,7 +5,7 @@ use core::arch::asm;
 /// Returns whether interrupts are enabled.
 #[inline]
 pub fn are_enabled() -> bool {
-    use crate::registers::rflags::{self, RFlags};
+    use crate::xxx::registers::rflags::{self, RFlags};
 
     rflags::read().contains(RFlags::INTERRUPT_FLAG)
 }

@@ -85,7 +85,7 @@ mod x86_64 {
 
     #[cfg(test)]
     mod test {
-        use crate::registers::mxcsr::*;
+        use crate::xxx::registers::mxcsr::*;
 
         #[test]
         fn mxcsr_default() {

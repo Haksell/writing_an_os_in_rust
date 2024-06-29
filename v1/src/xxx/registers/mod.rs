@@ -9,4 +9,4 @@ pub mod segmentation;
 pub mod xcontrol;
 
 #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-pub use crate::instructions::read_rip;
+pub use crate::xxx::instructions::read_rip;

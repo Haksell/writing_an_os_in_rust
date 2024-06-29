@@ -3,7 +3,7 @@
 use core::fmt;
 
 use super::*;
-use crate::registers::control::Cr3;
+use crate::xxx::registers::control::Cr3;
 use crate::xxx::structures::paging::page_table::PageTableLevel;
 use crate::xxx::structures::paging::{
     page::{AddressNotAligned, NotGiantPageSize},

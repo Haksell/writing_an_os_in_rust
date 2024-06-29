@@ -2,6 +2,7 @@
 #![allow(internal_features)]
 #![allow(warnings)] // TODO: remove obv
 #![feature(abi_x86_interrupt, allocator_api, ptr_internals, ptr_metadata)]
+#![feature(asm_const, const_mut_refs, step_trait)] // TODO: remove?
 
 #[macro_use]
 mod vga_buffer;

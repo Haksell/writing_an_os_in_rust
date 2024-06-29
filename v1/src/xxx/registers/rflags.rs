@@ -128,7 +128,7 @@ mod x86_64 {
 
     #[cfg(test)]
     mod test {
-        use crate::registers::rflags::read;
+        use crate::xxx::registers::rflags::read;
 
         #[test]
         fn rflags_read() {

@@ -4,7 +4,7 @@ use core::arch::asm;
 use core::fmt;
 use core::marker::PhantomData;
 
-use crate::sealed::Sealed;
+use crate::xxx::sealed::Sealed;
 pub use crate::xxx::structures::port::{PortRead, PortWrite};
 
 impl PortRead for u8 {

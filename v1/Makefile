@@ -23,6 +23,9 @@ ASM_SRCS := $(wildcard arch/$(ARCH)/*.asm)
 ASM_OBJS := $(patsubst arch/$(ARCH)/%.asm, $(BUILD)/arch/$(ARCH)/%.o, $(ASM_SRCS))
 QEMU := qemu-system-$(ARCH)
 
+# TODO: remove
+FEATURES := --features abi_x86_interrupt,asm_const,const_fn,instructions,nightly,step_trait
+
 all: $(ISO)
 
 re: clean all
@@ -48,7 +51,7 @@ $(KERNEL): $(RUST_OS) $(ASM_OBJS) $(LINKER_SCRIPT)
 	@ld $(LD_FLAGS) -n --gc-sections -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASM_OBJS) $(RUST_OS)
 
 $(RUST_OS):
-	@export RUST_TARGET_PATH=$(shell pwd) ; cargo build --target $(TARGET) $(CARGO_FLAGS)
+	@export RUST_TARGET_PATH=$(shell pwd) ; cargo build --target $(TARGET) $(CARGO_FLAGS) $(FEATURES)
 
 $(ASM_OBJS): $(BUILD)/arch/$(ARCH)/%.o: arch/$(ARCH)/%.asm
 	@mkdir -p $(shell dirname $@)

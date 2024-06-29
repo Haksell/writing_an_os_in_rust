@@ -8,7 +8,7 @@ use bitflags::bitflags;
 use core::fmt;
 // imports for intra-doc links
 #[cfg(doc)]
-use crate::registers::segmentation::{Segment, CS, SS};
+use crate::xxx::registers::segmentation::{Segment, CS, SS};
 
 #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
 use core::sync::atomic::{AtomicU64 as EntryValue, Ordering};
@@ -108,7 +108,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
     /// This method allows for creation of a GDT with malformed or invalid
     /// entries. However, it is safe because loading a GDT with invalid
     /// entires doesn't do anything until those entries are used. For example,
-    /// [`CS::set_reg`] and [`load_tss`](crate::instructions::tables::load_tss)
+    /// [`CS::set_reg`] and [`load_tss`](crate::xxx::instructions::tables::load_tss)
     /// are both unsafe for this reason.
     ///
     /// Panics if:
@@ -178,7 +178,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
 
     /// Loads the GDT in the CPU using the `lgdt` instruction. This does **not** alter any of the
     /// segment registers; you **must** (re)load them yourself using [the appropriate
-    /// functions](crate::instructions::segmentation):
+    /// functions](crate::xxx::instructions::segmentation):
     /// [`SS::set_reg()`] and [`CS::set_reg()`].
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
@@ -189,7 +189,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
 
     /// Loads the GDT in the CPU using the `lgdt` instruction. This does **not** alter any of the
     /// segment registers; you **must** (re)load them yourself using [the appropriate
-    /// functions](crate::instructions::segmentation):
+    /// functions](crate::xxx::instructions::segmentation):
     /// [`SS::set_reg()`] and [`CS::set_reg()`].
     ///
     /// # Safety
@@ -201,7 +201,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub unsafe fn load_unsafe(&self) {
-        use crate::instructions::tables::lgdt;
+        use crate::xxx::instructions::tables::lgdt;
         unsafe {
             lgdt(&self.pointer());
         }
@@ -229,7 +229,7 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     fn pointer(&self) -> super::DescriptorTablePointer {
         super::DescriptorTablePointer {
-            base: crate::VirtAddr::new(self.table.as_ptr() as u64),
+            base: crate::xxx::VirtAddr::new(self.table.as_ptr() as u64),
             limit: self.limit(),
         }
     }

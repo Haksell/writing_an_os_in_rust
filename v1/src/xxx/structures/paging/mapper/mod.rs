@@ -266,7 +266,7 @@ impl<S: PageSize> MapperFlush<S> {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub fn flush(self) {
-        crate::instructions::tlb::flush(self.0.start_address());
+        crate::xxx::instructions::tlb::flush(self.0.start_address());
     }
 
     /// Don't flush the TLB and silence the “must be used” warning.
@@ -297,7 +297,7 @@ impl MapperFlushAll {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub fn flush_all(self) {
-        crate::instructions::tlb::flush_all()
+        crate::xxx::instructions::tlb::flush_all()
     }
 
     /// Don't flush the TLB and silence the “must be used” warning.

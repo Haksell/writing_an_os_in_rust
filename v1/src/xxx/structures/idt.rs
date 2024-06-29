@@ -508,7 +508,7 @@ impl InterruptDescriptorTable {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub unsafe fn load_unsafe(&self) {
-        use crate::instructions::tables::lidt;
+        use crate::xxx::instructions::tables::lidt;
         unsafe {
             lidt(&self.pointer());
         }
@@ -517,9 +517,9 @@ impl InterruptDescriptorTable {
     /// Creates the descriptor pointer for this table. This pointer can only be
     /// safely used if the table is never modified or destroyed while in use.
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    fn pointer(&self) -> crate::structures::DescriptorTablePointer {
+    fn pointer(&self) -> crate::xxx::structures::DescriptorTablePointer {
         use core::mem::size_of;
-        crate::structures::DescriptorTablePointer {
+        crate::xxx::structures::DescriptorTablePointer {
             base: VirtAddr::new(self as *const _ as u64),
             limit: (size_of::<Self>() - 1) as u16,
         }
@@ -795,7 +795,7 @@ impl<F> Entry<F> {
     #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub unsafe fn set_handler_addr(&mut self, addr: VirtAddr) -> &mut EntryOptions {
-        use crate::instructions::segmentation::{Segment, CS};
+        use crate::xxx::instructions::segmentation::{Segment, CS};
 
         let addr = addr.as_u64();
         self.pointer_low = addr as u16;

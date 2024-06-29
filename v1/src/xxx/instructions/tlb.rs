@@ -2,7 +2,7 @@
 
 use bit_field::BitField;
 
-use crate::{
+use crate::xxx::{
     instructions::segmentation::{Segment, CS},
     structures::paging::{
         page::{NotGiantPageSize, PageRange},
@@ -23,7 +23,7 @@ pub fn flush(addr: VirtAddr) {
 /// Invalidate the TLB completely by reloading the CR3 register.
 #[inline]
 pub fn flush_all() {
-    use crate::registers::control::Cr3;
+    use crate::xxx::registers::control::Cr3;
     let (frame, flags) = Cr3::read();
     unsafe { Cr3::write(frame, flags) }
 }

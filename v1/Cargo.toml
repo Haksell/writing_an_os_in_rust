@@ -14,3 +14,13 @@ rustversion = "1.0.5"                                           # TODO: remove
 spin = "0.9.8"
 volatile = { version = "0.3.0", default-features = false }
 x86_64 = "0.15.1"
+
+# TODO: remove
+[features]
+default = []
+abi_x86_interrupt = []
+asm_const = []
+const_fn = []
+instructions = []
+nightly = []
+step_trait = []
