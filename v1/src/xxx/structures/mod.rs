@@ -3,11 +3,8 @@
 use crate::xxx::VirtAddr;
 
 pub mod gdt;
-
 pub mod idt;
-
 pub mod paging;
-pub mod port;
 pub mod tss;
 
 /// A struct describing a pointer to a descriptor table (GDT / IDT).
