@@ -1,5 +1,3 @@
-//! Provides a type for the task state segment structure.
-
 use crate::xxx::VirtAddr;
 use core::mem::size_of;
 

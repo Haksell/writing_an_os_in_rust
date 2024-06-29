@@ -1,5 +1,3 @@
-//! Types for the Global Descriptor Table and segment selectors.
-
 pub use crate::xxx::registers::segmentation::SegmentSelector;
 use bitflags::bitflags;
 use core::sync::atomic::{AtomicU64 as EntryValue, Ordering};

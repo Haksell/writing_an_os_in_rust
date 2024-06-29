@@ -1,5 +1,3 @@
-//! Representations of various x86 specific structures and descriptor tables.
-
 use crate::xxx::VirtAddr;
 
 pub mod gdt;

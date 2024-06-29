@@ -1,5 +1,3 @@
-//! Processor state stored in the RFLAGS register.
-
 use bitflags::bitflags;
 
 bitflags! {

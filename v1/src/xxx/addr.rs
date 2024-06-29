@@ -1,5 +1,3 @@
-//! Physical and virtual addresses manipulation
-
 use bit_field::BitField;
 use core::convert::TryFrom;
 use core::fmt;

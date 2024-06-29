@@ -1,6 +1,3 @@
-//! This crate provides x86_64 specific functions and data structures,
-//! and access to various system registers.
-
 #![deny(missing_debug_implementations)]
 #![deny(unsafe_op_in_unsafe_fn)]
 

@@ -1,5 +1,3 @@
-//! Functions to read and write MXCSR register.
-
 use bitflags::bitflags;
 
 bitflags! {

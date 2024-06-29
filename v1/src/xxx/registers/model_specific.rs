@@ -1,5 +1,3 @@
-//! Functions to read and write model specific registers.
-
 use bitflags::bitflags;
 
 #[derive(Debug)]
