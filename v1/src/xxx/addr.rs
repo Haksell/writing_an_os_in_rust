@@ -1,12 +1,10 @@
 //! Physical and virtual addresses manipulation
 
+use bit_field::BitField;
 use core::convert::TryFrom;
 use core::fmt;
 use core::iter::Step;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
-
-use crate::xxx::structures::paging::{PageOffset, PageTableIndex};
-use bit_field::BitField;
 
 const ADDRESS_SPACE_SIZE: u64 = 0x1_0000_0000_0000;
 
@@ -117,65 +115,8 @@ impl VirtAddr {
     }
 
     #[inline]
-    pub const fn as_ptr<T>(self) -> *const T {
-        self.as_u64() as *const T
-    }
-
-    #[inline]
-    pub const fn as_mut_ptr<T>(self) -> *mut T {
-        self.as_ptr::<T>() as *mut T
-    }
-
-    #[inline]
-    pub fn align_down<U>(self, align: U) -> Self
-    where
-        U: Into<u64>,
-    {
-        self.align_down_u64(align.into())
-    }
-
-    /// Aligns the virtual address downwards to the given alignment.
-    ///
-    /// See the `align_down` function for more information.
-    #[inline]
     pub(crate) const fn align_down_u64(self, align: u64) -> Self {
         VirtAddr::new_truncate(align_down(self.0, align))
-    }
-
-    /// Checks whether the virtual address has the demanded alignment.
-    #[inline]
-    pub(crate) const fn is_aligned_u64(self, align: u64) -> bool {
-        self.align_down_u64(align).as_u64() == self.as_u64()
-    }
-
-    /// Returns the 12-bit page offset of this virtual address.
-    #[inline]
-    pub const fn page_offset(self) -> PageOffset {
-        PageOffset::new_truncate(self.0 as u16)
-    }
-
-    /// Returns the 9-bit level 1 page table index.
-    #[inline]
-    pub const fn p1_index(self) -> PageTableIndex {
-        PageTableIndex::new_truncate((self.0 >> 12) as u16)
-    }
-
-    /// Returns the 9-bit level 2 page table index.
-    #[inline]
-    pub const fn p2_index(self) -> PageTableIndex {
-        PageTableIndex::new_truncate((self.0 >> 12 >> 9) as u16)
-    }
-
-    /// Returns the 9-bit level 3 page table index.
-    #[inline]
-    pub const fn p3_index(self) -> PageTableIndex {
-        PageTableIndex::new_truncate((self.0 >> 12 >> 9 >> 9) as u16)
-    }
-
-    /// Returns the 9-bit level 4 page table index.
-    #[inline]
-    pub const fn p4_index(self) -> PageTableIndex {
-        PageTableIndex::new_truncate((self.0 >> 12 >> 9 >> 9 >> 9) as u16)
     }
 
     pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
@@ -379,21 +320,6 @@ impl PhysAddr {
     #[inline]
     pub(crate) const fn align_down_u64(self, align: u64) -> Self {
         PhysAddr(align_down(self.0, align))
-    }
-
-    /// Checks whether the physical address has the demanded alignment.
-    #[inline]
-    pub fn is_aligned<U>(self, align: U) -> bool
-    where
-        U: Into<u64>,
-    {
-        self.is_aligned_u64(align.into())
-    }
-
-    /// Checks whether the physical address has the demanded alignment.
-    #[inline]
-    pub(crate) const fn is_aligned_u64(self, align: u64) -> bool {
-        self.align_down_u64(align).as_u64() == self.as_u64()
     }
 }
 

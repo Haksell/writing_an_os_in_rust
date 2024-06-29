@@ -1,7 +1,6 @@
 //! Abstractions for default-sized and huge virtual memory pages.
 
 use crate::xxx::sealed::Sealed;
-use crate::xxx::structures::paging::PageTableIndex;
 use crate::xxx::VirtAddr;
 use core::fmt;
 use core::iter::Step;
@@ -16,9 +15,6 @@ pub trait PageSize: Copy + Eq + PartialOrd + Ord + Sealed {
     /// A string representation of the page size for debug output.
     const DEBUG_STR: &'static str;
 }
-
-/// This trait is implemented for 4KiB and 2MiB pages, but not for 1GiB pages.
-pub trait NotGiantPageSize: PageSize {}
 
 /// A standard 4KiB page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
@@ -39,16 +35,12 @@ impl PageSize for Size4KiB {
     const DEBUG_STR: &'static str = "4KiB";
 }
 
-impl NotGiantPageSize for Size4KiB {}
-
 impl Sealed for super::Size4KiB {}
 
 impl PageSize for Size2MiB {
     const SIZE: u64 = Size4KiB::SIZE * 512;
     const DEBUG_STR: &'static str = "2MiB";
 }
-
-impl NotGiantPageSize for Size2MiB {}
 
 impl Sealed for super::Size2MiB {}
 
@@ -68,17 +60,6 @@ pub struct Page<S: PageSize = Size4KiB> {
 }
 
 impl<S: PageSize> Page<S> {
-    /// Returns the page that starts at the given virtual address.
-    ///
-    /// Returns an error if the address is not correctly aligned (i.e. is not a valid page start).
-    #[inline]
-    pub fn from_start_address(address: VirtAddr) -> Result<Self, AddressNotAligned> {
-        if !address.is_aligned_u64(S::SIZE) {
-            return Err(AddressNotAligned);
-        }
-        Ok(Page::containing_address(address))
-    }
-
     /// Returns the page that contains the given virtual address.
     #[inline]
     pub fn containing_address(address: VirtAddr) -> Self {
@@ -94,24 +75,6 @@ impl<S: PageSize> Page<S> {
         self.start_address
     }
 
-    /// Returns the level 4 page table index of this page.
-    #[inline]
-    pub fn p4_index(self) -> PageTableIndex {
-        self.start_address().p4_index()
-    }
-
-    /// Returns the level 3 page table index of this page.
-    #[inline]
-    pub fn p3_index(self) -> PageTableIndex {
-        self.start_address().p3_index()
-    }
-
-    /// Returns a range of pages, inclusive `end`.
-    #[inline]
-    pub fn range_inclusive(start: Self, end: Self) -> PageRangeInclusive<S> {
-        PageRangeInclusive { start, end }
-    }
-
     pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
         VirtAddr::steps_between_impl(&start.start_address, &end.start_address)
             .map(|steps| steps / S::SIZE as usize)
@@ -124,22 +87,6 @@ impl<S: PageSize> Page<S> {
             start_address,
             size: PhantomData,
         })
-    }
-}
-
-impl<S: NotGiantPageSize> Page<S> {
-    /// Returns the level 2 page table index of this page.
-    #[inline]
-    pub fn p2_index(self) -> PageTableIndex {
-        self.start_address().p2_index()
-    }
-}
-
-impl Page<Size4KiB> {
-    /// Returns the level 1 page table index of this page.
-    #[inline]
-    pub const fn p1_index(self) -> PageTableIndex {
-        self.start_address.p1_index()
     }
 }
 
@@ -233,14 +180,6 @@ pub struct PageRangeInclusive<S: PageSize = Size4KiB> {
     pub start: Page<S>,
     /// The end of the range, inclusive.
     pub end: Page<S>,
-}
-
-impl<S: PageSize> PageRangeInclusive<S> {
-    /// Returns whether this range contains no pages.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.start > self.end
-    }
 }
 
 impl<S: PageSize> Iterator for PageRangeInclusive<S> {
