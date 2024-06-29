@@ -1,5 +1,3 @@
-//! Provides functions to read and write segment registers.
-
 pub use crate::xxx::registers::segmentation::{Segment, Segment64, CS, DS, ES, FS, GS, SS};
 use crate::xxx::{
     registers::model_specific::{FsBase, GsBase, Msr},
@@ -62,14 +60,6 @@ macro_rules! segment64_impl {
 impl Segment for CS {
     get_reg_impl!("cs");
 
-    /// Note this is special since we cannot directly move to [`CS`]; x86 requires the instruction
-    /// pointer and [`CS`] to be set at the same time. To do this, we push the new segment selector
-    /// and return value onto the stack and use a "far return" (`retfq`) to reload [`CS`] and
-    /// continue at the end of our function.
-    ///
-    /// Note we cannot use a "far call" (`lcall`) or "far jmp" (`ljmp`) to do this because then we
-    /// would only be able to jump to 32-bit instruction pointers. Only Intel implements support
-    /// for 64-bit far calls/jumps in long-mode, AMD does not.
     #[inline]
     unsafe fn set_reg(sel: SegmentSelector) {
         unsafe {
