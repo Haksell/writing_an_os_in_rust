@@ -18,9 +18,7 @@ pub struct Entry(EntryValue);
 
 impl Entry {
     const fn new(raw: u64) -> Self {
-        #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-        let raw = EntryValue::new(raw);
-        Self(raw)
+        Self(EntryValue::new(raw))
     }
 
     pub fn raw(&self) -> u64 {

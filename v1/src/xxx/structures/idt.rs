@@ -482,41 +482,18 @@ impl InterruptDescriptorTable {
         }
     }
 
-    /// Resets all entries of this IDT in place.
-    #[inline]
-    pub fn reset(&mut self) {
-        *self = Self::new();
-    }
-
-    /// Loads the IDT in the CPU using the `lidt` command.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub fn load(&'static self) {
         unsafe { self.load_unsafe() }
     }
 
-    /// Loads the IDT in the CPU using the `lidt` command.
-    ///
-    /// # Safety
-    ///
-    /// As long as it is the active IDT, you must ensure that:
-    ///
-    /// - `self` is never destroyed.
-    /// - `self` always stays at the same memory location. It is recommended to wrap it in
-    ///   a `Box`.
-    ///
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub unsafe fn load_unsafe(&self) {
-        use crate::xxx::instructions::tables::lidt;
         unsafe {
-            lidt(&self.pointer());
+            crate::xxx::instructions::tables::lidt(&self.pointer());
         }
     }
 
-    /// Creates the descriptor pointer for this table. This pointer can only be
-    /// safely used if the table is never modified or destroyed while in use.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     fn pointer(&self) -> crate::xxx::structures::DescriptorTablePointer {
         use core::mem::size_of;
         crate::xxx::structures::DescriptorTablePointer {
@@ -525,9 +502,6 @@ impl InterruptDescriptorTable {
         }
     }
 
-    /// Returns a normalized and ranged check slice range from a RangeBounds trait object.
-    ///
-    /// Panics if the entry is an exception.
     fn condition_slice_bounds(&self, bounds: impl RangeBounds<u8>) -> (usize, usize) {
         let lower_idx = match bounds.start_bound() {
             Included(start) => usize::from(*start),
@@ -745,7 +719,6 @@ impl<F> Entry<F> {
     ///
     /// The caller must ensure that `addr` is the address of a valid interrupt handler function,
     /// and the signature of such a function is correct for the entry type.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
     #[inline]
     pub unsafe fn set_handler_addr(&mut self, addr: VirtAddr) -> &mut EntryOptions {
         use crate::xxx::instructions::segmentation::{Segment, CS};
@@ -774,20 +747,7 @@ impl<F> Entry<F> {
     }
 }
 
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
 impl<F: HandlerFuncType> Entry<F> {
-    /// Sets the handler function for the IDT entry and sets the following defaults:
-    ///   - The code selector is the code segment currently active in the CPU
-    ///   - The present bit is set
-    ///   - Interrupts are disabled on handler invocation
-    ///   - The privilege level (DPL) is [`PrivilegeLevel::Ring0`]
-    ///   - No IST is configured (existing stack will be used)
-    ///
-    /// The function returns a mutable reference to the entry's options that allows
-    /// further customization.
-    ///
-    /// This method is only usable with the `abi_x86_interrupt` feature enabled. Without it, the
-    /// unsafe [`Entry::set_handler_addr`] method has to be used instead.
     #[inline]
     pub fn set_handler_fn(&mut self, handler: F) -> &mut EntryOptions {
         unsafe { self.set_handler_addr(handler.to_virt_addr()) }
@@ -1011,38 +971,6 @@ impl InterruptStackFrameValue {
             stack_pointer,
             stack_segment,
             _reserved2: Default::default(),
-        }
-    }
-
-    /// Call the `iretq` (interrupt return) instruction.
-    ///
-    /// This function doesn't have to be called in an interrupt handler.
-    /// By manually construction a new [`InterruptStackFrameValue`] it's possible to transition
-    /// from a higher privilege level to a lower one.
-    ///
-    /// ## Safety
-    ///
-    /// Calling `iretq` is unsafe because setting the instruction pointer, stack pointer, RFlags,
-    /// CS and SS register can all cause undefined behaviour when done incorrectly.
-    ///
-    #[inline(always)]
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    pub unsafe fn iretq(&self) -> ! {
-        unsafe {
-            core::arch::asm!(
-                "push {stack_segment:r}",
-                "push {new_stack_pointer}",
-                "push {rflags}",
-                "push {code_segment:r}",
-                "push {new_instruction_pointer}",
-                "iretq",
-                rflags = in(reg) self.cpu_flags.bits(),
-                new_instruction_pointer = in(reg) self.instruction_pointer.as_u64(),
-                new_stack_pointer = in(reg) self.stack_pointer.as_u64(),
-                code_segment = in(reg) self.code_segment.0,
-                stack_segment = in(reg) self.stack_segment.0,
-                options(noreturn)
-            )
         }
     }
 }

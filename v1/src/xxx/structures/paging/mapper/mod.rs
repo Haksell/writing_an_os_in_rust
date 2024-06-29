@@ -187,17 +187,6 @@ impl MapperFlushAll {
     pub fn new() -> Self {
         MapperFlushAll(())
     }
-
-    /// Flush all pages from the TLB to ensure that the newest mapping is used.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    #[inline]
-    pub fn flush_all(self) {
-        crate::xxx::instructions::tlb::flush_all()
-    }
-
-    /// Don't flush the TLB and silence the “must be used” warning.
-    #[inline]
-    pub fn ignore(self) {}
 }
 
 /// This error is returned from `map_to` and similar methods.
