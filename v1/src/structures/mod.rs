@@ -7,8 +7,8 @@ use crate::virt_addr::VirtAddr;
 #[derive(Clone, Copy)]
 #[repr(C, packed(2))]
 pub struct DescriptorTablePointer {
-    pub limit: u16,
-    pub base: VirtAddr,
+    limit: u16,
+    base: VirtAddr,
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
