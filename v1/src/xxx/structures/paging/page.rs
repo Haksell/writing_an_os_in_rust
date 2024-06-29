@@ -1,32 +1,20 @@
-//! Abstractions for default-sized and huge virtual memory pages.
-
-use crate::xxx::sealed::Sealed;
 use crate::xxx::VirtAddr;
 use core::fmt;
 use core::iter::Step;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
-/// Trait for abstracting over the three possible page sizes on x86_64, 4KiB, 2MiB, 1GiB.
-pub trait PageSize: Copy + Eq + PartialOrd + Ord + Sealed {
-    /// The page size in bytes.
+pub trait PageSize: Copy + Eq + PartialOrd + Ord {
     const SIZE: u64;
-
-    /// A string representation of the page size for debug output.
     const DEBUG_STR: &'static str;
 }
 
-/// A standard 4KiB page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Size4KiB {}
 
-/// A “huge” 2MiB page.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Size2MiB {}
 
-/// A “giant” 1GiB page.
-///
-/// (Only available on newer x86_64 CPUs.)
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Size1GiB {}
 
@@ -35,23 +23,16 @@ impl PageSize for Size4KiB {
     const DEBUG_STR: &'static str = "4KiB";
 }
 
-impl Sealed for super::Size4KiB {}
-
 impl PageSize for Size2MiB {
     const SIZE: u64 = Size4KiB::SIZE * 512;
     const DEBUG_STR: &'static str = "2MiB";
 }
-
-impl Sealed for super::Size2MiB {}
 
 impl PageSize for Size1GiB {
     const SIZE: u64 = Size2MiB::SIZE * 512;
     const DEBUG_STR: &'static str = "1GiB";
 }
 
-impl Sealed for super::Size1GiB {}
-
-/// A virtual memory page.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct Page<S: PageSize = Size4KiB> {

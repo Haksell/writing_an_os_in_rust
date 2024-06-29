@@ -32,7 +32,3 @@ impl PrivilegeLevel {
         }
     }
 }
-
-pub(crate) mod sealed {
-    pub trait Sealed {}
-}
