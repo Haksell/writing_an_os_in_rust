@@ -1,6 +1,6 @@
 # todo
 
-- [ ] remove rustversion
+- [ ] remove useless fmt
 - [ ] remove x86_64 dead code
 - [ ] remove x86_64 warnings
 - [ ] remove x86_64 comments
