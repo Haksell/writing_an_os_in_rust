@@ -12,13 +12,3 @@ bitflags = "2.5.0"
 lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 spin = "0.9.8"
 volatile = { version = "0.3.0", default-features = false }
-
-# TODO: remove
-[features]
-default = []
-abi_x86_interrupt = []
-asm_const = []
-const_fn = []
-instructions = []
-nightly = []
-step_trait = []
