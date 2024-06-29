@@ -806,7 +806,6 @@ pub unsafe trait HandlerFuncType {
 
 macro_rules! impl_handler_func_type {
     ($f:ty) => {
-        #[cfg(feature = "abi_x86_interrupt")]
         unsafe impl HandlerFuncType for $f {
             #[inline]
             fn to_virt_addr(self) -> VirtAddr {

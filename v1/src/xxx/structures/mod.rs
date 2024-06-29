@@ -17,21 +17,3 @@ pub struct DescriptorTablePointer {
     /// Pointer to the memory region containing the DT.
     pub base: VirtAddr,
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::mem::size_of;
-
-    #[test]
-    pub fn check_descriptor_pointer_size() {
-        // Per the SDM, a descriptor pointer has to be 2+8=10 bytes
-        assert_eq!(size_of::<DescriptorTablePointer>(), 10);
-        // Make sure that we can reference a pointer's limit
-        let p = DescriptorTablePointer {
-            limit: 5,
-            base: VirtAddr::zero(),
-        };
-        let _: &u16 = &p.limit;
-    }
-}

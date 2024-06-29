@@ -1,8 +1,5 @@
 //! Processor state stored in the RFLAGS register.
 
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-pub use self::x86_64::*;
-
 use bitflags::bitflags;
 
 bitflags! {
@@ -61,79 +58,5 @@ bitflags! {
         /// Set by hardware if last arithmetic operation generated a carry out of the
         /// most-significant bit of the result.
         const CARRY_FLAG = 1;
-    }
-}
-
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-mod x86_64 {
-    use super::*;
-    use core::arch::asm;
-
-    /// Returns the current value of the RFLAGS register.
-    ///
-    /// Drops any unknown bits.
-    #[inline]
-    pub fn read() -> RFlags {
-        RFlags::from_bits_truncate(read_raw())
-    }
-
-    /// Returns the raw current value of the RFLAGS register.
-    #[inline]
-    pub fn read_raw() -> u64 {
-        let r: u64;
-
-        unsafe {
-            asm!("pushfq; pop {}", out(reg) r, options(nomem, preserves_flags));
-        }
-
-        r
-    }
-
-    /// Writes the RFLAGS register, preserves reserved bits.
-    ///
-    /// ## Safety
-    ///
-    /// Unsafe because undefined becavior can occur if certain flags are modified. For example,
-    /// the `DF` flag must be unset in all Rust code. Also, modifying `CF`, `PF`, or any other
-    /// flags also used by Rust/LLVM can result in undefined behavior too.
-    #[inline]
-    pub unsafe fn write(flags: RFlags) {
-        let old_value = read_raw();
-        let reserved = old_value & !(RFlags::all().bits());
-        let new_value = reserved | flags.bits();
-
-        unsafe {
-            write_raw(new_value);
-        }
-    }
-
-    /// Writes the RFLAGS register.
-    ///
-    /// Does not preserve any bits, including reserved bits.
-    ///
-    ///
-    /// ## Safety
-    ///
-    /// Unsafe because undefined becavior can occur if certain flags are modified. For example,
-    /// the `DF` flag must be unset in all Rust code. Also, modifying `CF`, `PF`, or any other
-    /// flags also used by Rust/LLVM can result in undefined behavior too.
-    #[inline]
-    pub unsafe fn write_raw(val: u64) {
-        // HACK: we mark this function as preserves_flags to prevent Rust from restoring
-        // saved flags after the "popf" below. See above note on safety.
-        unsafe {
-            asm!("push {}; popfq", in(reg) val, options(nomem, preserves_flags));
-        }
-    }
-
-    #[cfg(test)]
-    mod test {
-        use crate::xxx::registers::rflags::read;
-
-        #[test]
-        fn rflags_read() {
-            let rflags = read();
-            println!("{:#?}", rflags);
-        }
     }
 }

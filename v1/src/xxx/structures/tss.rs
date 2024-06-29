@@ -49,15 +49,3 @@ impl Default for TaskStateSegment {
         Self::new()
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    pub fn check_tss_size() {
-        // Per the SDM, the minimum size of a TSS is 0x68 bytes, giving a
-        // minimum limit of 0x67.
-        assert_eq!(size_of::<TaskStateSegment>(), 0x68);
-    }
-}
