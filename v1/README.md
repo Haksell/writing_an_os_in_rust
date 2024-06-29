@@ -2,9 +2,10 @@
 
 ## x86_64
 
-- [ ] remove warnings
-- [ ] remove features
 - [ ] remove dead code
+- [ ] remove warnings
+- [ ] remove comments
+- [ ] remove features
 
 - [ ] simplify `Makefile`
 - [ ] fix todo
