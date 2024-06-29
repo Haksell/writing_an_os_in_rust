@@ -1,4 +1,3 @@
-use crate::xxx::registers::model_specific::Msr;
 use crate::xxx::registers::segmentation::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
@@ -43,21 +42,32 @@ pub fn hlt_loop() -> ! {
 #[inline]
 pub fn enable_nxe_bit() {
     const IA32_EFER: u32 = 0xC0000080;
-    const NXE_BIT: u64 = 1 << 11;
+    const NXE_BIT: u32 = 1 << 11;
+    let (high, low): (u32, u32);
 
-    let mut ia32_efer = Msr::new(IA32_EFER);
     unsafe {
-        ia32_efer.write(ia32_efer.read() | NXE_BIT);
+        asm!(
+            "rdmsr",
+            in("ecx") IA32_EFER,
+            out("eax") low, out("edx") high,
+            options(nomem, nostack, preserves_flags),
+        );
+        asm!(
+            "wrmsr",
+            in("ecx") IA32_EFER,
+            in("eax") (low | NXE_BIT), in("edx") high,
+            options(nostack, preserves_flags),
+        );
     }
 }
 
 #[inline]
 pub fn enable_write_protect_bit() {
-    let value: u64;
-
+    const WRITE_PROTECT_BIT: u64 = 1 << 16;
     unsafe {
+        let value: u64;
         asm!("mov {}, cr0", out(reg) value, options(nomem, nostack, preserves_flags));
-        asm!("mov cr0, {}", in(reg) (value | 1 << 16), options(nostack, preserves_flags));
+        asm!("mov cr0, {}", in(reg) (value | WRITE_PROTECT_BIT), options(nostack, preserves_flags));
     }
 }
 
@@ -74,12 +84,7 @@ pub fn tlb_flush_all() {
 
     unsafe {
         asm!("mov {}, cr3", out(reg) value, options(nomem, nostack, preserves_flags));
-    }
-
-    let value = value & 0x_000f_ffff_ffff_ffff;
-
-    unsafe {
-        asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
+        asm!("mov cr3, {}", in(reg) (value & 0x_000f_ffff_ffff_ffff), options(nostack, preserves_flags));
     }
 }
 
