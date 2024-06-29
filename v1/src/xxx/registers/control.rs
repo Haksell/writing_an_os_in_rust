@@ -289,15 +289,6 @@ mod x86_64 {
             (frame, (value & 0xFFF) as u16)
         }
 
-        /// Read the current P4 table address from the CR3 register along with PCID.
-        /// The correct functioning of this requires CR4.PCIDE = 1.
-        /// See [`Cr4Flags::PCID`]
-        #[inline]
-        pub fn read_pcid() -> (PhysFrame, Pcid) {
-            let (frame, value) = Cr3::read_raw();
-            (frame, Pcid::new(value).unwrap())
-        }
-
         /// Write a new P4 table address into the CR3 register.
         ///
         /// ## Safety
@@ -308,35 +299,6 @@ mod x86_64 {
         pub unsafe fn write(frame: PhysFrame, flags: Cr3Flags) {
             unsafe {
                 Cr3::write_raw_impl(false, frame, flags.bits() as u16);
-            }
-        }
-
-        /// Write a new P4 table address into the CR3 register.
-        ///
-        /// ## Safety
-        ///
-        /// Changing the level 4 page table is unsafe, because it's possible to violate memory safety by
-        /// changing the page mapping.
-        /// [`Cr4Flags::PCID`] must be set before calling this method.
-        #[inline]
-        pub unsafe fn write_pcid(frame: PhysFrame, pcid: Pcid) {
-            unsafe {
-                Cr3::write_raw_impl(false, frame, pcid.value());
-            }
-        }
-
-        /// Write a new P4 table address into the CR3 register without flushing existing TLB entries for
-        /// the PCID.
-        ///
-        /// ## Safety
-        ///
-        /// Changing the level 4 page table is unsafe, because it's possible to violate memory safety by
-        /// changing the page mapping.
-        /// [`Cr4Flags::PCID`] must be set before calling this method.
-        #[inline]
-        pub unsafe fn write_pcid_no_flush(frame: PhysFrame, pcid: Pcid) {
-            unsafe {
-                Cr3::write_raw_impl(true, frame, pcid.value());
             }
         }
 
