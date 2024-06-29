@@ -1,23 +1,22 @@
 NAME := blog_v1
-ARCH := x86_64
-BUILD := build
-ISOFILES := $(BUILD)/isofiles
-KERNEL := $(BUILD)/kernel-$(ARCH).bin
-ISO := $(BUILD)/os-$(ARCH).iso
-TARGET := arch/$(ARCH)/$(NAME)
+BUILD_DIR := build
+ASM_DIR := asm
+ASM_SRCS := $(wildcard $(ASM_DIR)/*.asm)
+ASM_OBJS := $(patsubst $(ASM_DIR)/%.asm, $(BUILD_DIR)/$(ASM_DIR)/%.o, $(ASM_SRCS))
+ISOFILES := $(BUILD_DIR)/isofiles
+KERNEL := $(BUILD_DIR)/kernel.bin
+ISO := $(BUILD_DIR)/os.iso
+TARGET := $(ASM_DIR)/$(NAME)
 RUST_OS := target/$(NAME)/debug/lib$(NAME).a
 LINKER_SCRIPT := linker.ld
 GRUB_CFG := grub.cfg
-ASM_SRCS := $(wildcard arch/$(ARCH)/*.asm)
-ASM_OBJS := $(patsubst arch/$(ARCH)/%.asm, $(BUILD)/arch/$(ARCH)/%.o, $(ASM_SRCS))
-QEMU := qemu-system-$(ARCH)
 
 all: $(ISO)
 
 re: clean all
 
 run: all
-	@$(QEMU) -cdrom $(ISO)
+	@qemu-system-x86_64 -cdrom $(ISO)
 
 rerun: clean run
 
@@ -39,7 +38,7 @@ $(KERNEL): $(RUST_OS) $(ASM_OBJS) $(LINKER_SCRIPT)
 $(RUST_OS):
 	@export RUST_TARGET_PATH=$(shell pwd) ; cargo build --target $(NAME) $(CARGO_FLAGS)
 
-$(ASM_OBJS): $(BUILD)/arch/$(ARCH)/%.o: arch/$(ARCH)/%.asm
+$(ASM_OBJS): $(BUILD_DIR)/$(ASM_DIR)/%.o: $(ASM_DIR)/%.asm
 	@mkdir -p $(shell dirname $@)
 	@nasm -f elf64 $< -o $@
 
