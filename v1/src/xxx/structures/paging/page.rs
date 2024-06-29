@@ -10,25 +10,9 @@ pub trait PageSize: Copy + Eq + PartialOrd + Ord {
 #[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 pub enum Size4KiB {}
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Size2MiB {}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
-pub enum Size1GiB {}
-
 impl PageSize for Size4KiB {
     const SIZE: u64 = 4096;
     const DEBUG_STR: &'static str = "4KiB";
-}
-
-impl PageSize for Size2MiB {
-    const SIZE: u64 = Size4KiB::SIZE * 512;
-    const DEBUG_STR: &'static str = "2MiB";
-}
-
-impl PageSize for Size1GiB {
-    const SIZE: u64 = Size2MiB::SIZE * 512;
-    const DEBUG_STR: &'static str = "1GiB";
 }
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -80,14 +64,6 @@ impl<S: PageSize> SubAssign<u64> for Page<S> {
     #[inline]
     fn sub_assign(&mut self, rhs: u64) {
         *self = *self - rhs;
-    }
-}
-
-impl<S: PageSize> Sub<Self> for Page<S> {
-    type Output = u64;
-    #[inline]
-    fn sub(self, rhs: Self) -> Self::Output {
-        (self.start_address - rhs.start_address) / S::SIZE
     }
 }
 
