@@ -1,5 +1,5 @@
 use core::fmt;
-use core::ops::{Add, AddAssign, Sub, SubAssign};
+use core::ops::{Add, Sub};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
@@ -75,25 +75,11 @@ impl Add<u64> for VirtAddr {
     }
 }
 
-impl AddAssign<u64> for VirtAddr {
-    #[inline]
-    fn add_assign(&mut self, rhs: u64) {
-        *self = *self + rhs;
-    }
-}
-
 impl Sub<u64> for VirtAddr {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: u64) -> Self::Output {
         VirtAddr::new(self.0.checked_sub(rhs).unwrap())
-    }
-}
-
-impl SubAssign<u64> for VirtAddr {
-    #[inline]
-    fn sub_assign(&mut self, rhs: u64) {
-        *self = *self - rhs;
     }
 }
 
@@ -150,25 +136,11 @@ impl Add<u64> for PhysAddr {
     }
 }
 
-impl AddAssign<u64> for PhysAddr {
-    #[inline]
-    fn add_assign(&mut self, rhs: u64) {
-        *self = *self + rhs;
-    }
-}
-
 impl Sub<u64> for PhysAddr {
     type Output = Self;
     #[inline]
     fn sub(self, rhs: u64) -> Self::Output {
         PhysAddr::new(self.0.checked_sub(rhs).unwrap())
-    }
-}
-
-impl SubAssign<u64> for PhysAddr {
-    #[inline]
-    fn sub_assign(&mut self, rhs: u64) {
-        *self = *self - rhs;
     }
 }
 
