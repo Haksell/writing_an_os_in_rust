@@ -178,17 +178,6 @@ pub struct EntryOptions {
     bits: u16,
 }
 
-impl fmt::Debug for EntryOptions {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("EntryOptions")
-            .field("code_selector", &self.cs)
-            .field("stack_index", &self.stack_index())
-            .field("type", &format_args!("{:#04b}", self.bits.get_bits(8..12)))
-            .field("present", &self.present())
-            .finish()
-    }
-}
-
 impl EntryOptions {
     #[inline]
     const fn minimal() -> Self {
@@ -209,24 +198,12 @@ impl EntryOptions {
         self
     }
 
-    fn present(&self) -> bool {
-        self.bits.get_bit(15)
-    }
-
-    // fn privilege_level(&self) -> PrivilegeLevel {
-    //     PrivilegeLevel::from_u16(self.bits.get_bits(13..15))
-    // }
-
     #[inline]
     pub unsafe fn set_stack_index(&mut self, index: u16) -> &mut Self {
         // The hardware IST index starts at 1, but our software IST index
         // starts at 0. Therefore we need to add 1 here.
         self.bits.set_bits(0..3, index + 1);
         self
-    }
-
-    fn stack_index(&self) -> u16 {
-        self.bits.get_bits(0..3) - 1
     }
 }
 
