@@ -44,11 +44,6 @@ impl VirtAddr {
     pub const fn as_u64(self) -> u64 {
         self.0
     }
-
-    #[inline]
-    pub(crate) const fn align_down_u64(self, align: u64) -> Self {
-        VirtAddr::new_truncate(align_down(self.0, align))
-    }
 }
 
 impl Add<u64> for VirtAddr {
