@@ -1,22 +1,10 @@
-DEBUG ?= true
-
-ifeq ($(DEBUG),true)
-BUILD_MODE := debug
-else ifeq ($(DEBUG),false)
-BUILD_MODE := release
-CARGO_FLAGS := --release
-GRUB_FLAGS := --compress xz
-else
-$(error DEBUG must be either true or false)
-endif
-
 ARCH := x86_64
-BUILD := build/$(ARCH)/$(BUILD_MODE)
+BUILD := build/$(ARCH)/debug
 ISOFILES := $(BUILD)/isofiles
 KERNEL := $(BUILD)/kernel-$(ARCH).bin
 ISO := $(BUILD)/os-$(ARCH).iso
 TARGET := arch/$(ARCH)/blog_v1
-RUST_OS := target/$(TARGET)/$(BUILD_MODE)/libblog_v1.a
+RUST_OS := target/$(TARGET)/debug/libblog_v1.a
 LINKER_SCRIPT := arch/linker.ld
 GRUB_CFG := arch/grub.cfg
 ASM_SRCS := $(wildcard arch/$(ARCH)/*.asm)
