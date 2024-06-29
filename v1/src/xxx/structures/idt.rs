@@ -1,16 +1,11 @@
+use super::gdt::SegmentSelector;
 use crate::xxx::registers::rflags::RFlags;
 use crate::xxx::{PrivilegeLevel, VirtAddr};
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::fmt;
 use core::marker::PhantomData;
-use core::ops::Bound::{Excluded, Included, Unbounded};
-use core::ops::{
-    Bound, Deref, Index, IndexMut, Range, RangeBounds, RangeFrom, RangeFull, RangeInclusive,
-    RangeTo, RangeToInclusive,
-};
-
-use super::gdt::SegmentSelector;
+use core::ops::Deref;
 
 #[derive(Clone, Debug)]
 #[repr(C)]
@@ -100,128 +95,7 @@ impl InterruptDescriptorTable {
             limit: (size_of::<Self>() - 1) as u16,
         }
     }
-
-    fn condition_slice_bounds(&self, bounds: impl RangeBounds<u8>) -> (usize, usize) {
-        let lower_idx = match bounds.start_bound() {
-            Included(start) => usize::from(*start),
-            Excluded(start) => usize::from(*start) + 1,
-            Unbounded => 0,
-        };
-        let upper_idx = match bounds.end_bound() {
-            Included(end) => usize::from(*end) + 1,
-            Excluded(end) => usize::from(*end),
-            Unbounded => 256,
-        };
-
-        if lower_idx < 32 {
-            panic!("Cannot return slice from traps, faults, and exception handlers");
-        }
-        (lower_idx, upper_idx)
-    }
-
-    #[inline]
-    pub fn slice(&self, bounds: impl RangeBounds<u8>) -> &[Entry<HandlerFunc>] {
-        let (lower_idx, upper_idx) = self.condition_slice_bounds(bounds);
-        &self.interrupts[(lower_idx - 32)..(upper_idx - 32)]
-    }
-
-    #[inline]
-    pub fn slice_mut(&mut self, bounds: impl RangeBounds<u8>) -> &mut [Entry<HandlerFunc>] {
-        let (lower_idx, upper_idx) = self.condition_slice_bounds(bounds);
-        &mut self.interrupts[(lower_idx - 32)..(upper_idx - 32)]
-    }
 }
-
-impl Index<u8> for InterruptDescriptorTable {
-    type Output = Entry<HandlerFunc>;
-
-    #[inline]
-    fn index(&self, index: u8) -> &Self::Output {
-        match index {
-            0 => &self.divide_error,
-            1 => &self.debug,
-            2 => &self.non_maskable_interrupt,
-            3 => &self.breakpoint,
-            4 => &self.overflow,
-            5 => &self.bound_range_exceeded,
-            6 => &self.invalid_opcode,
-            7 => &self.device_not_available,
-            9 => &self.coprocessor_segment_overrun,
-            16 => &self.x87_floating_point,
-            19 => &self.simd_floating_point,
-            20 => &self.virtualization,
-            28 => &self.hv_injection_exception,
-            i @ 32..=255 => &self.interrupts[usize::from(i) - 32],
-            i @ 15 | i @ 31 | i @ 22..=27 => panic!("entry {} is reserved", i),
-            i @ 8 | i @ 10..=14 | i @ 17 | i @ 21 | i @ 29 | i @ 30 => {
-                panic!("entry {} is an exception with error code", i)
-            }
-            i @ 18 => panic!("entry {} is an diverging exception (must not return)", i),
-        }
-    }
-}
-
-impl IndexMut<u8> for InterruptDescriptorTable {
-    #[inline]
-    fn index_mut(&mut self, index: u8) -> &mut Self::Output {
-        match index {
-            0 => &mut self.divide_error,
-            1 => &mut self.debug,
-            2 => &mut self.non_maskable_interrupt,
-            3 => &mut self.breakpoint,
-            4 => &mut self.overflow,
-            5 => &mut self.bound_range_exceeded,
-            6 => &mut self.invalid_opcode,
-            7 => &mut self.device_not_available,
-            9 => &mut self.coprocessor_segment_overrun,
-            16 => &mut self.x87_floating_point,
-            19 => &mut self.simd_floating_point,
-            20 => &mut self.virtualization,
-            28 => &mut self.hv_injection_exception,
-            i @ 32..=255 => &mut self.interrupts[usize::from(i) - 32],
-            i @ 15 | i @ 31 | i @ 22..=27 => panic!("entry {} is reserved", i),
-            i @ 8 | i @ 10..=14 | i @ 17 | i @ 21 | i @ 29 | i @ 30 => {
-                panic!("entry {} is an exception with error code", i)
-            }
-            i @ 18 => panic!("entry {} is an diverging exception (must not return)", i),
-        }
-    }
-}
-
-macro_rules! impl_index_for_idt {
-    ($ty:ty) => {
-        impl Index<$ty> for InterruptDescriptorTable {
-            type Output = [Entry<HandlerFunc>];
-
-            #[inline]
-            fn index(&self, index: $ty) -> &Self::Output {
-                self.slice(index)
-            }
-        }
-
-        impl IndexMut<$ty> for InterruptDescriptorTable {
-            #[inline]
-            fn index_mut(&mut self, index: $ty) -> &mut Self::Output {
-                self.slice_mut(index)
-            }
-        }
-    };
-}
-
-// this list was stolen from the list of implementors in https://doc.rust-lang.org/core/ops/trait.RangeBounds.html
-impl_index_for_idt!((Bound<&u8>, Bound<&u8>));
-impl_index_for_idt!((Bound<u8>, Bound<u8>));
-impl_index_for_idt!(Range<&u8>);
-impl_index_for_idt!(Range<u8>);
-impl_index_for_idt!(RangeFrom<&u8>);
-impl_index_for_idt!(RangeFrom<u8>);
-impl_index_for_idt!(RangeInclusive<&u8>);
-impl_index_for_idt!(RangeInclusive<u8>);
-impl_index_for_idt!(RangeTo<u8>);
-impl_index_for_idt!(RangeTo<&u8>);
-impl_index_for_idt!(RangeToInclusive<&u8>);
-impl_index_for_idt!(RangeToInclusive<u8>);
-impl_index_for_idt!(RangeFull);
 
 #[derive(Clone, Copy)]
 #[repr(C)]
