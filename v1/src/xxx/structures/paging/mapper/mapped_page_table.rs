@@ -18,38 +18,6 @@ pub struct MappedPageTable<'a, P: PageTableFrameMapping> {
 }
 
 impl<'a, P: PageTableFrameMapping> MappedPageTable<'a, P> {
-    /// Creates a new `MappedPageTable` that uses the passed `PageTableFrameMapping` for converting virtual
-    /// to physical addresses.
-    ///
-    /// ## Safety
-    ///
-    /// This function is unsafe because the caller must guarantee that the passed `page_table_frame_mapping`
-    /// `PageTableFrameMapping` is correct. Also, the passed `level_4_table` must point to the level 4 page table
-    /// of a valid page table hierarchy. Otherwise this function might break memory safety, e.g.
-    /// by writing to an illegal memory location.
-    #[inline]
-    pub unsafe fn new(level_4_table: &'a mut PageTable, page_table_frame_mapping: P) -> Self {
-        Self {
-            level_4_table,
-            page_table_walker: unsafe { PageTableWalker::new(page_table_frame_mapping) },
-        }
-    }
-
-    /// Returns an immutable reference to the wrapped level 4 `PageTable` instance.
-    pub fn level_4_table(&self) -> &PageTable {
-        self.level_4_table
-    }
-
-    /// Returns a mutable reference to the wrapped level 4 `PageTable` instance.
-    pub fn level_4_table_mut(&mut self) -> &mut PageTable {
-        self.level_4_table
-    }
-
-    /// Returns the `PageTableFrameMapping` used for converting virtual to physical addresses.
-    pub fn page_table_frame_mapping(&self) -> &P {
-        &self.page_table_walker.page_table_frame_mapping
-    }
-
     /// Helper function for implementing Mapper. Safe to limit the scope of unsafe, see
     /// https://github.com/rust-lang/rfcs/pull/2585.
     fn map_to_1gib<A>(

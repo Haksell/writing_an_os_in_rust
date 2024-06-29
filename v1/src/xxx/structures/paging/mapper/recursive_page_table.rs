@@ -34,66 +34,6 @@ pub struct RecursivePageTable<'a> {
 }
 
 impl<'a> RecursivePageTable<'a> {
-    /// Creates a new RecursivePageTable from the passed level 4 PageTable.
-    ///
-    /// The page table must be recursively mapped, that means:
-    ///
-    /// - The page table must have one recursive entry, i.e. an entry that points to the table
-    ///   itself.
-    ///     - The reference must use that “loop”, i.e. be of the form `0o_xxx_xxx_xxx_xxx_0000`
-    ///       where `xxx` is the recursive entry.
-    /// - The page table must be active, i.e. the CR3 register must contain its physical address.
-    ///
-    /// Otherwise `Err(())` is returned.
-    ///
-    /// ## Safety
-    ///
-    /// Note that creating a `PageTable` with recursive index 511 is unsound
-    /// because allocating the last byte of the address space can lead to pointer
-    /// overflows and undefined behavior. For more details, see the discussions
-    /// [on Zulip](https://rust-lang.zulipchat.com/#narrow/stream/136281-t-opsem/topic/end-of-address-space)
-    /// and [in the `unsafe-code-guidelines ` repo](https://github.com/rust-lang/unsafe-code-guidelines/issues/420).
-    #[inline]
-    pub fn new(table: &'a mut PageTable) -> Result<Self, InvalidPageTable> {
-        let page = Page::containing_address(VirtAddr::new(table as *const _ as u64));
-        let recursive_index = page.p4_index();
-
-        if page.p3_index() != recursive_index
-            || page.p2_index() != recursive_index
-            || page.p1_index() != recursive_index
-        {
-            return Err(InvalidPageTable::NotRecursive);
-        }
-        if Ok(Cr3::read().0) != table[recursive_index].frame() {
-            return Err(InvalidPageTable::NotActive);
-        }
-
-        Ok(RecursivePageTable {
-            p4: table,
-            recursive_index,
-        })
-    }
-
-    /// Creates a new RecursivePageTable without performing any checks.
-    ///
-    /// ## Safety
-    ///
-    /// The given page table must be a level 4 page table that is active in the
-    /// CPU (i.e. loaded in the CR3 register). The `recursive_index` parameter
-    /// must be the index of the recursively mapped entry of that page table.
-    #[inline]
-    pub unsafe fn new_unchecked(table: &'a mut PageTable, recursive_index: PageTableIndex) -> Self {
-        RecursivePageTable {
-            p4: table,
-            recursive_index,
-        }
-    }
-
-    /// Returns an immutable reference to the wrapped level 4 `PageTable` instance.
-    pub fn level_4_table(&self) -> &PageTable {
-        self.p4
-    }
-
     /// Returns a mutable reference to the wrapped level 4 `PageTable` instance.
     pub fn level_4_table_mut(&mut self) -> &mut PageTable {
         self.p4
