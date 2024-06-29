@@ -4,14 +4,8 @@ use core::fmt;
 
 pub trait Segment {
     fn get_reg() -> SegmentSelector;
-    unsafe fn set_reg(sel: SegmentSelector);
 }
 
-/// Specifies which element to load into a segment from
-/// descriptor tables (i.e., is a index to LDT or GDT table
-/// with some additional flags).
-///
-/// See Intel 3a, Section 3.4.2 "Segment Selectors"
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 pub struct SegmentSelector(pub u16);
