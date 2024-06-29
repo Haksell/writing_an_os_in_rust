@@ -9,7 +9,7 @@
 #![deny(missing_debug_implementations)]
 #![deny(unsafe_op_in_unsafe_fn)]
 
-pub use addr::{align_down, align_up, PhysAddr, VirtAddr};
+pub use addr::{PhysAddr, VirtAddr};
 
 pub mod addr;
 pub mod instructions;
