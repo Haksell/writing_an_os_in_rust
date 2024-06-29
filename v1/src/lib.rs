@@ -1,5 +1,6 @@
 #![no_std]
 #![allow(internal_features)]
+#![allow(warnings)] // TODO: remove obv
 #![feature(abi_x86_interrupt, allocator_api, ptr_internals, ptr_metadata)]
 
 #[macro_use]
@@ -9,6 +10,7 @@ mod asm;
 mod interrupts;
 mod memory;
 mod multiboot;
+mod xxx; // TODO: better name
 
 extern crate alloc;
 

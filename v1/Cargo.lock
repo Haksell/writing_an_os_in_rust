@@ -27,6 +27,7 @@ dependencies = [
  "bit_field",
  "bitflags",
  "lazy_static",
+ "rustversion",
  "spin",
  "volatile 0.3.0",
  "x86_64",
