@@ -119,26 +119,18 @@ impl<F> Entry<F> {
             phantom: PhantomData,
         }
     }
-
-    #[inline]
-    pub unsafe fn set_handler_addr(&mut self, addr: VirtAddr) -> &mut EntryOptions {
-        let addr = addr.as_u64();
-        self.pointer_low = addr as u16;
-        self.pointer_middle = (addr >> 16) as u16;
-        self.pointer_high = (addr >> 32) as u32;
-
-        self.options = EntryOptions::minimal();
-        // SAFETY: The current CS is a valid, long-mode code segment.
-        unsafe { self.options.set_code_selector(cs_get_reg()) };
-        self.options.set_present(true);
-        &mut self.options
-    }
 }
 
 impl<F: HandlerFuncType> Entry<F> {
-    #[inline]
     pub fn set_handler_fn(&mut self, handler: F) -> &mut EntryOptions {
-        unsafe { self.set_handler_addr(handler.to_virt_addr()) }
+        let addr = handler.to_virt_addr().as_u64();
+        self.pointer_low = addr as u16;
+        self.pointer_middle = (addr >> 16) as u16;
+        self.pointer_high = (addr >> 32) as u32;
+        self.options = EntryOptions::minimal();
+        unsafe { self.options.set_code_selector(cs_get_reg()) };
+        self.options.set_present(true);
+        &mut self.options
     }
 }
 
@@ -158,6 +150,9 @@ macro_rules! impl_handler_func_type {
 }
 
 impl_handler_func_type!(HandlerFunc);
+impl_handler_func_type!(HandlerFuncWithErrCode);
+impl_handler_func_type!(PageFaultHandlerFunc);
+impl_handler_func_type!(DivergingHandlerFunc);
 impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
 #[repr(C)]
