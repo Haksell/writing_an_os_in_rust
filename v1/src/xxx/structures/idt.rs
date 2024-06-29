@@ -7,7 +7,7 @@ use core::fmt;
 use core::marker::PhantomData;
 use core::ops::Deref;
 
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 #[repr(C)]
 #[repr(align(16))]
 pub struct InterruptDescriptorTable {
@@ -108,25 +108,6 @@ pub struct Entry<F> {
     phantom: PhantomData<F>,
 }
 
-impl<T> fmt::Debug for Entry<T> {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Entry")
-            .field("handler_addr", &format_args!("{:#x}", self.handler_addr()))
-            .field("options", &self.options)
-            .finish()
-    }
-}
-
-impl<T> PartialEq for Entry<T> {
-    fn eq(&self, other: &Self) -> bool {
-        self.pointer_low == other.pointer_low
-            && self.options == other.options
-            && self.pointer_middle == other.pointer_middle
-            && self.pointer_high == other.pointer_high
-            && self.reserved == other.reserved
-    }
-}
-
 pub type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
 pub type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
 pub type PageFaultHandlerFunc =
@@ -162,16 +143,6 @@ impl<F> Entry<F> {
         unsafe { self.options.set_code_selector(CS::get_reg()) };
         self.options.set_present(true);
         &mut self.options
-    }
-
-    #[inline]
-    pub fn handler_addr(&self) -> VirtAddr {
-        let addr = self.pointer_low as u64
-            | (self.pointer_middle as u64) << 16
-            | (self.pointer_high as u64) << 32;
-        // addr is a valid VirtAddr, as the pointer members are either all zero,
-        // or have been set by set_handler_addr (which takes a VirtAddr).
-        VirtAddr::new_truncate(addr)
     }
 }
 
