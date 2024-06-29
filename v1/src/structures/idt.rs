@@ -121,13 +121,14 @@ impl<F> Entry<F> {
 
 impl<F: HandlerFuncType> Entry<F> {
     pub fn set_handler_fn(&mut self, handler: F) -> &mut EntryOptions {
+        const PRESENT_BIT: usize = 15;
         let addr = handler.to_virt_addr().as_u64();
         self.pointer_low = addr as u16;
         self.pointer_middle = (addr >> 16) as u16;
         self.pointer_high = (addr >> 32) as u32;
         self.options = EntryOptions::minimal();
         unsafe { self.options.cs = cs_get_reg() };
-        self.options.set_present(true);
+        self.options.bits.set_bit(PRESENT_BIT, true);
         &mut self.options
     }
 }
@@ -166,12 +167,6 @@ impl EntryOptions {
             cs: SegmentSelector(0),
             bits: 0b1110_0000_0000, // Default to a 64-bit Interrupt Gate
         }
-    }
-
-    #[inline]
-    pub fn set_present(&mut self, present: bool) -> &mut Self {
-        self.bits.set_bit(15, present);
-        self
     }
 
     #[inline]
