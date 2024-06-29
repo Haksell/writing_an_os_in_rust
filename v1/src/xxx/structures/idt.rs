@@ -17,59 +17,32 @@ use super::gdt::SegmentSelector;
 #[repr(align(16))]
 pub struct InterruptDescriptorTable {
     pub divide_error: Entry<HandlerFunc>,
-
     pub debug: Entry<HandlerFunc>,
-
     pub non_maskable_interrupt: Entry<HandlerFunc>,
-
     pub breakpoint: Entry<HandlerFunc>,
-
     pub overflow: Entry<HandlerFunc>,
-
     pub bound_range_exceeded: Entry<HandlerFunc>,
-
     pub invalid_opcode: Entry<HandlerFunc>,
-
     pub device_not_available: Entry<HandlerFunc>,
-
     pub double_fault: Entry<DivergingHandlerFuncWithErrCode>,
-
     coprocessor_segment_overrun: Entry<HandlerFunc>,
-
     pub invalid_tss: Entry<HandlerFuncWithErrCode>,
-
     pub segment_not_present: Entry<HandlerFuncWithErrCode>,
-
     pub stack_segment_fault: Entry<HandlerFuncWithErrCode>,
-
     pub general_protection_fault: Entry<HandlerFuncWithErrCode>,
-
     pub page_fault: Entry<PageFaultHandlerFunc>,
-
     reserved_1: Entry<HandlerFunc>,
-
     pub x87_floating_point: Entry<HandlerFunc>,
-
     pub alignment_check: Entry<HandlerFuncWithErrCode>,
-
     pub machine_check: Entry<DivergingHandlerFunc>,
-
     pub simd_floating_point: Entry<HandlerFunc>,
-
     pub virtualization: Entry<HandlerFunc>,
-
     pub cp_protection_exception: Entry<HandlerFuncWithErrCode>,
-
     reserved_2: [Entry<HandlerFunc>; 6],
-
     pub hv_injection_exception: Entry<HandlerFunc>,
-
     pub vmm_communication_exception: Entry<HandlerFuncWithErrCode>,
-
     pub security_exception: Entry<HandlerFuncWithErrCode>,
-
     reserved_3: Entry<HandlerFunc>,
-
     interrupts: [Entry<HandlerFunc>; 256 - 32],
 }
 
@@ -471,21 +444,13 @@ bitflags! {
     #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Clone, Copy)]
     pub struct PageFaultErrorCode: u64 {
         const PROTECTION_VIOLATION = 1;
-
         const CAUSED_BY_WRITE = 1 << 1;
-
         const USER_MODE = 1 << 2;
-
         const MALFORMED_TABLE = 1 << 3;
-
         const INSTRUCTION_FETCH = 1 << 4;
-
         const PROTECTION_KEY = 1 << 5;
-
         const SHADOW_STACK = 1 << 6;
-
         const SGX = 1 << 15;
-
         const RMP = 1 << 31;
     }
 }
