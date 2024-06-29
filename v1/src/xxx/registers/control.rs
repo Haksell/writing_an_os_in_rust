@@ -1,6 +1,5 @@
 //! Functions to read and write control registers.
 
-pub use super::model_specific::{Efer, EferFlags};
 use bitflags::bitflags;
 
 /// Various control flags modifying the basic operation of the CPU.
@@ -51,12 +50,6 @@ bitflags! {
     }
 }
 
-/// Contains the Page Fault Linear Address (PFLA).
-///
-/// When a page fault occurs, the CPU sets this register to the faulting virtual address.
-#[derive(Debug)]
-pub struct Cr2;
-
 /// Contains the physical address of the highest-level page table.
 #[derive(Debug)]
 pub struct Cr3;
@@ -73,11 +66,6 @@ bitflags! {
         const PAGE_LEVEL_CACHE_DISABLE = 1 << 4;
     }
 }
-
-/// Contains various control flags that enable architectural extensions, and
-/// indicate support for specific processor capabilities.
-#[derive(Debug)]
-pub struct Cr4;
 
 bitflags! {
     /// Configuration flags of the [`Cr4`] register.
@@ -161,10 +149,7 @@ bitflags! {
 
 mod x86_64 {
     use super::*;
-    use crate::xxx::{
-        addr::VirtAddrNotValid, instructions::tlb::Pcid, structures::paging::PhysFrame, PhysAddr,
-        VirtAddr,
-    };
+    use crate::xxx::{structures::paging::PhysFrame, PhysAddr};
     use core::arch::asm;
 
     impl Cr0 {
@@ -219,51 +204,6 @@ mod x86_64 {
                 asm!("mov cr0, {}", in(reg) value, options(nostack, preserves_flags));
             }
         }
-
-        /// Updates CR0 flags.
-        ///
-        /// Preserves the value of reserved fields.
-        ///
-        /// ## Safety
-        ///
-        /// This function is unsafe because it's possible to violate memory
-        /// safety through it, e.g. by disabling paging.
-        #[inline]
-        pub unsafe fn update<F>(f: F)
-        where
-            F: FnOnce(&mut Cr0Flags),
-        {
-            let mut flags = Self::read();
-            f(&mut flags);
-            unsafe {
-                Self::write(flags);
-            }
-        }
-    }
-
-    impl Cr2 {
-        /// Read the current page fault linear address from the CR2 register.
-        ///
-        /// # Errors
-        ///
-        /// This method returns a [`VirtAddrNotValid`] error if the CR2 register contains a
-        /// non-canonical address. Call [`Cr2::read_raw`] to handle such cases.
-        #[inline]
-        pub fn read() -> Result<VirtAddr, VirtAddrNotValid> {
-            VirtAddr::try_new(Self::read_raw())
-        }
-
-        /// Read the current page fault linear address from the CR2 register as a raw `u64`.
-        #[inline]
-        pub fn read_raw() -> u64 {
-            let value: u64;
-
-            unsafe {
-                asm!("mov {}, cr2", out(reg) value, options(nomem, nostack, preserves_flags));
-            }
-
-            value
-        }
     }
 
     impl Cr3 {
@@ -302,17 +242,6 @@ mod x86_64 {
             }
         }
 
-        /// Write a new P4 table address into the CR3 register.
-        ///
-        /// ## Safety
-        ///
-        /// Changing the level 4 page table is unsafe, because it's possible to violate memory safety by
-        /// changing the page mapping.
-        #[inline]
-        pub unsafe fn write_raw(frame: PhysFrame, val: u16) {
-            unsafe { Self::write_raw_impl(false, frame, val) }
-        }
-
         #[inline]
         unsafe fn write_raw_impl(top_bit: bool, frame: PhysFrame, val: u16) {
             let addr = frame.start_address();
@@ -320,83 +249,6 @@ mod x86_64 {
 
             unsafe {
                 asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
-            }
-        }
-    }
-
-    impl Cr4 {
-        /// Read the current set of CR4 flags.
-        #[inline]
-        pub fn read() -> Cr4Flags {
-            Cr4Flags::from_bits_truncate(Self::read_raw())
-        }
-
-        /// Read the current raw CR4 value.
-        #[inline]
-        pub fn read_raw() -> u64 {
-            let value: u64;
-
-            unsafe {
-                asm!("mov {}, cr4", out(reg) value, options(nomem, nostack, preserves_flags));
-            }
-
-            value
-        }
-
-        /// Write CR4 flags.
-        ///
-        /// Preserves the value of reserved fields.
-        ///
-        /// ## Safety
-        ///
-        /// This function is unsafe because it's possible to violate memory
-        /// safety through it, e.g. by overwriting the physical address extension
-        /// flag.
-        #[inline]
-        pub unsafe fn write(flags: Cr4Flags) {
-            let old_value = Self::read_raw();
-            let reserved = old_value & !(Cr4Flags::all().bits());
-            let new_value = reserved | flags.bits();
-
-            unsafe {
-                Self::write_raw(new_value);
-            }
-        }
-
-        /// Write raw CR4 flags.
-        ///
-        /// Does _not_ preserve any values, including reserved fields.
-        ///
-        /// ## Safety
-        ///
-        /// This function is unsafe because it's possible to violate memory
-        /// safety through it, e.g. by overwriting the physical address extension
-        /// flag.
-        #[inline]
-        pub unsafe fn write_raw(value: u64) {
-            unsafe {
-                asm!("mov cr4, {}", in(reg) value, options(nostack, preserves_flags));
-            }
-        }
-
-        /// Updates CR4 flags.
-        ///
-        /// Preserves the value of reserved fields.
-        ///
-        /// ## Safety
-        ///
-        /// This function is unsafe because it's possible to violate memory
-        /// safety through it, e.g. by overwriting the physical address extension
-        /// flag.
-        #[inline]
-        pub unsafe fn update<F>(f: F)
-        where
-            F: FnOnce(&mut Cr4Flags),
-        {
-            let mut flags = Self::read();
-            f(&mut flags);
-            unsafe {
-                Self::write(flags);
             }
         }
     }
