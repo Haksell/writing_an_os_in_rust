@@ -1,27 +1,9 @@
-//! Abstractions for segment registers.
-
-use super::model_specific::Msr;
-use crate::xxx::{PrivilegeLevel, VirtAddr};
+use crate::xxx::PrivilegeLevel;
 use bit_field::BitField;
 use core::fmt;
 
-/// An x86 segment
-///
-/// Segment registers on x86 are 16-bit [`SegmentSelector`]s, which index into
-/// the [`GlobalDescriptorTable`]. The corresponding GDT entry is used to
-/// configure the segment itself. Note that most segmentation functionality is
-/// disabled in 64-bit mode. See the individual segments for more information.
 pub trait Segment {
-    /// Returns the current value of the segment register.
     fn get_reg() -> SegmentSelector;
-    /// Reload the segment register. Depending on the segment, this may also
-    /// reconfigure the corresponding segment.
-    ///
-    /// ## Safety
-    ///
-    /// This function is unsafe because the caller must ensure that `sel`
-    /// is a valid segment descriptor, and that reconfiguring the segment will
-    /// not cause undefined behavior.
     unsafe fn set_reg(sel: SegmentSelector);
 }
 

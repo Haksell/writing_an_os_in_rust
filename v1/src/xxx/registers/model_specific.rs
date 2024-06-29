@@ -13,23 +13,6 @@ impl Msr {
     }
 }
 
-/// [FS].Base Model Specific Register.
-#[derive(Debug)]
-pub struct FsBase;
-
-#[derive(Debug)]
-pub struct GsBase;
-
-impl FsBase {
-    /// The underlying model specific register.
-    pub const MSR: Msr = Msr(0xC000_0100);
-}
-
-impl GsBase {
-    /// The underlying model specific register.
-    pub const MSR: Msr = Msr(0xC000_0101);
-}
-
 bitflags! {
     /// Flags of the Extended Feature Enable Register.
     #[repr(transparent)]
