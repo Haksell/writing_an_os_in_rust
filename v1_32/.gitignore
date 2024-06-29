@@ -1,0 +1,6 @@
+build
+rust_analyzer
+target
+.vagrant
+output.log
+*VBox*.log
