@@ -1,13 +1,5 @@
 {
     "rust-analyzer.cargo.target": "arch/x86_64/blog_v1.json",
     "rust-analyzer.checkOnSave.allTargets": false,
-    "rust-analyzer.showUnlinkedFileNotification": false,
-    "rust-analyzer.cargo.features": [
-        "abi_x86_interrupt",
-        "asm_const",
-        "const_fn",
-        "instructions",
-        "nightly",
-        "step_trait"
-    ]
+    "rust-analyzer.showUnlinkedFileNotification": false
 }
