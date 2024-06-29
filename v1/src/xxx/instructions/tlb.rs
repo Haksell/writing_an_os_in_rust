@@ -11,12 +11,6 @@ pub struct Pcid(u16);
 #[derive(Debug)]
 pub struct PcidTooBig(u16);
 
-impl fmt::Display for PcidTooBig {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "PCID should be < 4096, got {}", self.0)
-    }
-}
-
 /// An error returned when trying to use an invalid ASID.
 #[derive(Debug)]
 pub struct AsidOutOfRangeError {
