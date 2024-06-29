@@ -1,10 +1,6 @@
 //! Abstractions for reading and modifying the mapping of pages.
 
 pub use self::mapped_page_table::{MappedPageTable, PageTableFrameMapping};
-#[cfg(target_pointer_width = "64")]
-pub use self::offset_page_table::OffsetPageTable;
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-pub use self::recursive_page_table::{InvalidPageTable, RecursivePageTable};
 
 use crate::xxx::structures::paging::{
     frame_alloc::{FrameAllocator, FrameDeallocator},
@@ -16,8 +12,6 @@ use crate::xxx::{PhysAddr, VirtAddr};
 
 mod mapped_page_table;
 mod offset_page_table;
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-mod recursive_page_table;
 
 /// An empty convencience trait that requires the `Mapper` trait for all page sizes.
 pub trait MapperAllSizes: Mapper<Size4KiB> + Mapper<Size2MiB> + Mapper<Size1GiB> {}

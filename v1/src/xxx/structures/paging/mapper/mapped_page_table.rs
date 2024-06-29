@@ -662,15 +662,8 @@ struct PageTableWalker<P: PageTableFrameMapping> {
 }
 
 impl<P: PageTableFrameMapping> PageTableWalker<P> {
-    #[inline]
-    pub unsafe fn new(page_table_frame_mapping: P) -> Self {
-        Self {
-            page_table_frame_mapping,
-        }
-    }
-
-    /// Internal helper function to get a reference to the page table of the next level.
     ///
+    /// Internal helper function to get a reference to the page table of the next level.
     /// Returns `PageTableWalkError::NotMapped` if the entry is unused. Returns
     /// `PageTableWalkError::MappedToHugePage` if the `HUGE_PAGE` flag is set
     /// in the passed entry.
