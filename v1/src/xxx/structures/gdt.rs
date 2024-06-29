@@ -20,22 +20,14 @@ use core::sync::atomic::{AtomicU64 as EntryValue, Ordering};
 pub struct Entry(EntryValue);
 
 impl Entry {
-    // Create a new Entry from a raw value.
     const fn new(raw: u64) -> Self {
         #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
         let raw = EntryValue::new(raw);
         Self(raw)
     }
 
-    /// The raw bits for this entry. Depending on the [`Descriptor`] type, these
-    /// bits may correspond to those in [`DescriptorFlags`].
     pub fn raw(&self) -> u64 {
-        // TODO: Make this const fn when AtomicU64::load is const.
-        #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-        let raw = self.0.load(Ordering::SeqCst);
-        #[cfg(not(all(feature = "instructions", target_arch = "x86_64")))]
-        let raw = self.0;
-        raw
+        self.0.load(Ordering::SeqCst)
     }
 }
 
@@ -94,118 +86,6 @@ impl<const MAX: usize> GlobalDescriptorTable<MAX> {
         Self {
             table: [NULL; MAX],
             len: 1,
-        }
-    }
-
-    /// Forms a GDT from a slice of `u64`.
-    ///
-    /// This method allows for creation of a GDT with malformed or invalid
-    /// entries. However, it is safe because loading a GDT with invalid
-    /// entires doesn't do anything until those entries are used. For example,
-    /// [`CS::set_reg`] and [`load_tss`](crate::xxx::instructions::tables::load_tss)
-    /// are both unsafe for this reason.
-    ///
-    /// Panics if:
-    /// * the provided slice has more than `MAX` entries
-    /// * the provided slice is empty
-    /// * the first entry is not zero
-    #[cfg_attr(
-        not(all(feature = "instructions", target_arch = "x86_64")),
-        allow(rustdoc::broken_intra_doc_links)
-    )]
-    #[inline]
-    pub const fn from_raw_entries(slice: &[u64]) -> Self {
-        let len = slice.len();
-        let mut table = Self::empty().table;
-        let mut idx = 0;
-
-        assert!(len > 0, "cannot initialize GDT with empty slice");
-        assert!(slice[0] == 0, "first GDT entry must be zero");
-        assert!(
-            len <= MAX,
-            "cannot initialize GDT with slice exceeding the maximum length"
-        );
-
-        while idx < len {
-            table[idx] = Entry::new(slice[idx]);
-            idx += 1;
-        }
-
-        Self { table, len }
-    }
-
-    /// Get a reference to the internal [`Entry`] table.
-    ///
-    /// The resulting slice may contain system descriptors, which span two [`Entry`]s.
-    #[inline]
-    pub fn entries(&self) -> &[Entry] {
-        &self.table[..self.len]
-    }
-
-    /// Appends the given segment descriptor to the GDT, returning the segment selector.
-    ///
-    /// Note that depending on the type of the [`Descriptor`] this may append
-    /// either one or two new [`Entry`]s to the table.
-    ///
-    /// Panics if the GDT doesn't have enough free entries.
-    #[inline]
-    #[cfg_attr(feature = "const_fn", rustversion::attr(all(), const))]
-    pub fn append(&mut self, entry: Descriptor) -> SegmentSelector {
-        let index = match entry {
-            Descriptor::UserSegment(value) => {
-                if self.len > self.table.len().saturating_sub(1) {
-                    panic!("GDT full")
-                }
-                self.push(value)
-            }
-            Descriptor::SystemSegment(value_low, value_high) => {
-                if self.len > self.table.len().saturating_sub(2) {
-                    panic!("GDT requires two free spaces to hold a SystemSegment")
-                }
-                let index = self.push(value_low);
-                self.push(value_high);
-                index
-            }
-        };
-        SegmentSelector::new(index as u16, entry.dpl())
-    }
-
-    /// Loads the GDT in the CPU using the `lgdt` instruction. This does **not** alter any of the
-    /// segment registers; you **must** (re)load them yourself using [the appropriate
-    /// functions](crate::xxx::instructions::segmentation):
-    /// [`SS::set_reg()`] and [`CS::set_reg()`].
-    ///
-    /// # Safety
-    ///
-    /// Unlike `load` this function will not impose a static lifetime constraint
-    /// this means its up to the user to ensure that there will be no modifications
-    /// after loading and that the GDT will live for as long as it's loaded.
-    ///
-
-    #[inline]
-    #[cfg_attr(feature = "const_fn", rustversion::attr(all(), const))]
-    fn push(&mut self, value: u64) -> usize {
-        let index = self.len;
-        self.table[index] = Entry::new(value);
-        self.len += 1;
-        index
-    }
-
-    /// Returns the value of the limit for a gdt pointer. It is one less than the number of bytes of the table.
-    pub const fn limit(&self) -> u16 {
-        use core::mem::size_of;
-        // 0 < self.next_free <= MAX <= 2^13, so the limit calculation
-        // will not underflow or overflow.
-        (self.len * size_of::<u64>() - 1) as u16
-    }
-
-    /// Creates the descriptor pointer for this table. This pointer can only be
-    /// safely used if the table is never modified or destroyed while in use.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    fn pointer(&self) -> super::DescriptorTablePointer {
-        super::DescriptorTablePointer {
-            base: crate::xxx::VirtAddr::new(self.table.as_ptr() as u64),
-            limit: self.limit(),
         }
     }
 }

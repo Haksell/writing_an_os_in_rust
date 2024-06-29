@@ -224,28 +224,8 @@ impl PageTable {
     /// Returns an iterator that allows modifying the entries of the page table.
     #[inline]
     pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut PageTableEntry> {
-        // Note that we intentionally don't just return `self.entries.iter()`:
-        // Some users may choose to create a reference to a page table at
-        // `0xffff_ffff_ffff_f000`. This causes problems because calculating
-        // the end pointer of the page tables causes an overflow. Therefore
-        // creating page tables at that address is unsound and must be avoided.
-        // Unfortunately creating such page tables is quite common when
-        // recursive page tables are used, so we try to avoid calculating the
-        // end pointer if possible. `core::slice::Iter` calculates the end
-        // pointer to determine when it should stop yielding elements. Because
-        // we want to avoid calculating the end pointer, we don't use
-        // `core::slice::Iter`, we implement our own iterator that doesn't
-        // calculate the end pointer. This doesn't make creating page tables at
-        // that address sound, but it avoids some easy to trigger
-        // miscompilations.
         let ptr = self.entries.as_mut_ptr();
         (0..512).map(move |i| unsafe { &mut *ptr.add(i) })
-    }
-
-    /// Checks if the page table is empty (all entries are zero).
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.iter().all(|entry| entry.is_unused())
     }
 }
 
@@ -442,16 +422,6 @@ impl PageTableLevel {
             PageTableLevel::Three => Some(PageTableLevel::Two),
             PageTableLevel::Two => Some(PageTableLevel::One),
             PageTableLevel::One => None,
-        }
-    }
-
-    /// Returns the next higher level or `None` for level 4
-    pub const fn next_higher_level(self) -> Option<Self> {
-        match self {
-            PageTableLevel::Four => None,
-            PageTableLevel::Three => Some(PageTableLevel::Four),
-            PageTableLevel::Two => Some(PageTableLevel::Three),
-            PageTableLevel::One => Some(PageTableLevel::Two),
         }
     }
 

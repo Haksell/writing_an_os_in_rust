@@ -156,10 +156,6 @@ pub trait Mapper<S: PageSize> {
 /// changed the mapping of a page to ensure that the TLB flush is not forgotten.
 #[derive(Debug)]
 #[must_use = "Page Table changes must be flushed or ignored."]
-#[cfg_attr(
-    not(all(feature = "instructions", target_arch = "x86_64")),
-    allow(dead_code)
-)] // FIXME
 pub struct MapperFlush<S: PageSize>(Page<S>);
 
 impl<S: PageSize> MapperFlush<S> {
@@ -171,17 +167,6 @@ impl<S: PageSize> MapperFlush<S> {
     pub fn new(page: Page<S>) -> Self {
         MapperFlush(page)
     }
-
-    /// Flush the page from the TLB to ensure that the newest mapping is used.
-    #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    #[inline]
-    pub fn flush(self) {
-        crate::xxx::instructions::tlb::flush(self.0.start_address());
-    }
-
-    /// Don't flush the TLB and silence the “must be used” warning.
-    #[inline]
-    pub fn ignore(self) {}
 }
 
 /// This type represents a change of a page table requiring a complete TLB flush
