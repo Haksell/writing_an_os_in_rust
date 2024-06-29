@@ -16,7 +16,7 @@ pub struct VirtAddr(u64);
 #[repr(transparent)]
 pub struct PhysAddr(u64);
 
-pub struct VirtAddrNotValid(pub u64);
+pub struct VirtAddrNotValid;
 
 impl VirtAddr {
     #[inline]
@@ -34,7 +34,7 @@ impl VirtAddr {
         if v.0 == addr {
             Ok(v)
         } else {
-            Err(VirtAddrNotValid(addr))
+            Err(VirtAddrNotValid)
         }
     }
 
@@ -209,7 +209,7 @@ impl Step for VirtAddr {
     }
 }
 
-pub struct PhysAddrNotValid(pub u64);
+pub struct PhysAddrNotValid;
 
 impl PhysAddr {
     #[inline]
@@ -231,7 +231,7 @@ impl PhysAddr {
         if p.0 == addr {
             Ok(p)
         } else {
-            Err(PhysAddrNotValid(addr))
+            Err(PhysAddrNotValid)
         }
     }
 
