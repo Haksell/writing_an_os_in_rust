@@ -1,6 +1,9 @@
-pub mod gdt;
+mod gdt;
 pub mod idt;
-pub mod tss;
+mod tss;
+
+pub use gdt::{Gdt, GdtDescriptor};
+pub use tss::TaskStateSegment;
 
 use crate::virt_addr::VirtAddr;
 

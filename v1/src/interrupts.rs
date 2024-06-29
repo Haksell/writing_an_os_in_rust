@@ -1,9 +1,7 @@
 use crate::instructions::{cs_set_reg, load_tss};
 use crate::memory::MemoryController;
-use crate::structures::gdt::{Descriptor, Gdt};
 use crate::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
-use crate::structures::tss::TaskStateSegment;
-use crate::structures::SegmentSelector;
+use crate::structures::{Gdt, GdtDescriptor, SegmentSelector, TaskStateSegment};
 use crate::virt_addr::VirtAddr;
 use lazy_static::lazy_static;
 use spin::Once;
@@ -39,8 +37,8 @@ pub fn init(memory_controller: &mut MemoryController) {
 
     let (gdt, code_selector, tss_selector) = GDT.call_once(|| {
         let mut gdt = Gdt::new();
-        let code_selector = gdt.add_entry(Descriptor::kernel_code_segment());
-        let tss_selector = gdt.add_entry(Descriptor::tss_segment(&tss));
+        let code_selector = gdt.add_entry(GdtDescriptor::kernel_code_segment());
+        let tss_selector = gdt.add_entry(GdtDescriptor::tss_segment(&tss));
         (gdt, code_selector, tss_selector)
     });
     gdt.load();

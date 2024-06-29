@@ -7,7 +7,7 @@ use bitflags::bitflags;
 use core::mem::size_of;
 
 bitflags! {
-    struct DescriptorFlags: u64 {
+    struct GdtDescriptorFlags: u64 {
         const CONFORMING   = 1 << 42;
         const EXECUTABLE   = 1 << 43;
         const USER_SEGMENT = 1 << 44;
@@ -16,24 +16,24 @@ bitflags! {
     }
 }
 
-pub enum Descriptor {
+pub enum GdtDescriptor {
     UserSegment(u64),
     SystemSegment(u64, u64),
 }
 
-impl Descriptor {
+impl GdtDescriptor {
     pub fn kernel_code_segment() -> Self {
-        let flags = DescriptorFlags::USER_SEGMENT
-            | DescriptorFlags::PRESENT
-            | DescriptorFlags::EXECUTABLE
-            | DescriptorFlags::LONG_MODE;
+        let flags = GdtDescriptorFlags::USER_SEGMENT
+            | GdtDescriptorFlags::PRESENT
+            | GdtDescriptorFlags::EXECUTABLE
+            | GdtDescriptorFlags::LONG_MODE;
         Self::UserSegment(flags.bits())
     }
 
     /// segment segment?
     pub fn tss_segment(tss: &'static TaskStateSegment) -> Self {
         let ptr = tss as *const _ as u64;
-        let mut low = DescriptorFlags::PRESENT.bits();
+        let mut low = GdtDescriptorFlags::PRESENT.bits();
         low.set_bits(16..40, ptr.get_bits(0..24));
         low.set_bits(56..64, ptr.get_bits(24..32));
         low.set_bits(0..16, (size_of::<TaskStateSegment>() - 1) as u64);
@@ -57,10 +57,10 @@ impl Gdt {
         }
     }
 
-    pub fn add_entry(&mut self, entry: Descriptor) -> SegmentSelector {
+    pub fn add_entry(&mut self, entry: GdtDescriptor) -> SegmentSelector {
         let index = match entry {
-            Descriptor::UserSegment(value) => self.push(value),
-            Descriptor::SystemSegment(low, high) => {
+            GdtDescriptor::UserSegment(value) => self.push(value),
+            GdtDescriptor::SystemSegment(low, high) => {
                 let index = self.push(low);
                 self.push(high);
                 index
