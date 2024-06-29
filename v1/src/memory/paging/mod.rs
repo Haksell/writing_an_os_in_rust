@@ -8,7 +8,7 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use crate::{
-    asm::{cr3_read, cr3_write, tlb_flush_all},
+    instructions::{cr3_read, cr3_write, tlb_flush_all},
     vga_buffer::VGA_ADDRESS,
     MULTIBOOT,
 };

@@ -1,4 +1,4 @@
-use crate::asm::cs_get_reg;
+use crate::instructions::cs_get_reg;
 use crate::structures::{DescriptorTablePointer, SegmentSelector};
 use crate::virt_addr::VirtAddr;
 use bit_field::BitField;
@@ -75,7 +75,7 @@ impl InterruptDescriptorTable {
     #[inline]
     pub fn load(&'static self) {
         unsafe {
-            crate::asm::lidt(&self.pointer());
+            crate::instructions::lidt(&self.pointer());
         }
     }
 

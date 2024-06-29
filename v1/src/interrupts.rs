@@ -1,4 +1,4 @@
-use crate::asm::{cs_set_reg, load_tss};
+use crate::instructions::{cs_set_reg, load_tss};
 use crate::memory::MemoryController;
 use crate::structures::gdt::{Descriptor, Gdt};
 use crate::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};

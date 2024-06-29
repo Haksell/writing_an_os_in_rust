@@ -1,7 +1,7 @@
 use super::entry::EntryFlags;
 use super::table::{Level4, Table, P4};
 use super::{Page, PhysicalAddress, VirtualAddress};
-use crate::asm::tlb_flush;
+use crate::instructions::tlb_flush;
 use crate::memory::{paging::ENTRY_COUNT, Frame, FrameAllocator, PAGE_SIZE};
 use core::ptr::Unique;
 

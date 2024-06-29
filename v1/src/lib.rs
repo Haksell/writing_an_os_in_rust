@@ -5,7 +5,7 @@
 #[macro_use]
 mod vga_buffer;
 
-mod asm;
+mod instructions;
 mod interrupts;
 mod memory;
 mod multiboot;
@@ -15,7 +15,7 @@ mod virt_addr;
 extern crate alloc;
 
 use self::{
-    asm::{enable_nxe_bit, enable_write_protect_bit, hlt_loop},
+    instructions::{enable_nxe_bit, enable_write_protect_bit, hlt_loop},
     multiboot::MultiBoot,
 };
 use alloc::{string::String, vec};
