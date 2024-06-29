@@ -1,25 +1,3 @@
-// Copyright 2017 Philipp Oppermann. See the README.md
-// file at the top-level directory of this distribution.
-//
-// Licensed under the Apache License, Version 2.0 <LICENSE-APACHE or
-// http://www.apache.org/licenses/LICENSE-2.0> or the MIT license
-// <LICENSE-MIT or http://opensource.org/licenses/MIT>, at your
-// option. This file may not be copied, modified, or distributed
-// except according to those terms.
-
-//! Provides types for the Interrupt Descriptor Table and its entries.
-//!
-//! # For the builds without the `abi_x86_interrupt` feature
-//! The following types are opaque and non-constructable instead of function pointers.
-//!
-//! - [`DivergingHandlerFunc`]
-//! - [`DivergingHandlerFuncWithErrCode`]
-//! - [`HandlerFunc`]
-//! - [`HandlerFuncWithErrCode`]
-//! - [`PageFaultHandlerFunc`]
-//!
-//! These types are defined for the compatibility with the Nightly Rust build.
-
 use crate::xxx::registers::rflags::RFlags;
 use crate::xxx::{PrivilegeLevel, VirtAddr};
 use bit_field::BitField;
@@ -31,7 +9,6 @@ use core::ops::{
     Bound, Deref, Index, IndexMut, Range, RangeBounds, RangeFrom, RangeFull, RangeInclusive,
     RangeTo, RangeToInclusive,
 };
-use volatile::Volatile;
 
 use super::gdt::SegmentSelector;
 
@@ -831,22 +808,6 @@ impl EntryOptions {
         self.bits.get_bit(15)
     }
 
-    /// Let the CPU disable hardware interrupts when the handler is invoked. By default,
-    /// interrupts are disabled on handler invocation.
-    #[inline]
-    pub fn disable_interrupts(&mut self, disable: bool) -> &mut Self {
-        self.bits.set_bit(8, !disable);
-        self
-    }
-
-    /// Set the required privilege level (DPL) for invoking the handler. The DPL can be 0, 1, 2,
-    /// or 3, the default is 0. If CPL < DPL, a general protection fault occurs.
-    #[inline]
-    pub fn set_privilege_level(&mut self, dpl: PrivilegeLevel) -> &mut Self {
-        self.bits.set_bits(13..15, dpl as u16);
-        self
-    }
-
     fn privilege_level(&self) -> PrivilegeLevel {
         PrivilegeLevel::from_u16(self.bits.get_bits(13..15))
     }
@@ -886,26 +847,6 @@ impl EntryOptions {
 /// method for more information).
 #[repr(transparent)]
 pub struct InterruptStackFrame(InterruptStackFrameValue);
-
-impl InterruptStackFrame {
-    /// Creates a new interrupt stack frame with the given values.
-    #[inline]
-    pub fn new(
-        instruction_pointer: VirtAddr,
-        code_segment: SegmentSelector,
-        cpu_flags: RFlags,
-        stack_pointer: VirtAddr,
-        stack_segment: SegmentSelector,
-    ) -> Self {
-        Self(InterruptStackFrameValue::new(
-            instruction_pointer,
-            code_segment,
-            cpu_flags,
-            stack_pointer,
-            stack_segment,
-        ))
-    }
-}
 
 impl Deref for InterruptStackFrame {
     type Target = InterruptStackFrameValue;
@@ -1035,22 +976,6 @@ pub struct SelectorErrorCode {
 }
 
 impl SelectorErrorCode {
-    /// Create a SelectorErrorCode. Returns None is any of the reserved bits (16-64) are set.
-    pub const fn new(value: u64) -> Option<Self> {
-        if value > u16::MAX as u64 {
-            None
-        } else {
-            Some(Self { flags: value })
-        }
-    }
-
-    /// Create a new SelectorErrorCode dropping any reserved bits (16-64).
-    pub const fn new_truncate(value: u64) -> Self {
-        Self {
-            flags: (value as u16) as u64,
-        }
-    }
-
     /// If true, indicates that the exception occurred during delivery of an event
     /// external to the program, such as an interrupt or an earlier exception.
     pub fn external(&self) -> bool {
@@ -1071,11 +996,6 @@ impl SelectorErrorCode {
     /// The index of the selector which caused the error.
     pub fn index(&self) -> u64 {
         self.flags.get_bits(3..16)
-    }
-
-    /// If true, the #SS or #GP has returned zero as opposed to a SelectorErrorCode.
-    pub fn is_null(&self) -> bool {
-        self.flags == 0
     }
 }
 
@@ -1100,83 +1020,4 @@ pub enum DescriptorTable {
     Idt,
     /// Logical Descriptor Table.
     Ldt,
-}
-
-/// This structure defines the CPU-internal exception vector numbers.
-///
-/// The values are defined by the following manual sections:
-///   * AMD Volume 2: 8.2
-///   * Intel Volume 3A: 6.3.1
-#[repr(u8)]
-#[non_exhaustive]
-#[derive(Copy, Clone, Debug, PartialEq)]
-pub enum ExceptionVector {
-    /// Error during Division
-    Division = 0x00,
-
-    /// Debug
-    Debug = 0x01,
-
-    /// Non-Maskable Interrupt
-    NonMaskableInterrupt = 0x02,
-
-    /// Breakpoint
-    Breakpoint = 0x03,
-
-    /// Overflow
-    Overflow = 0x04,
-
-    /// Bound Range Exceeded
-    BoundRange = 0x05,
-
-    /// Invalid Opcode
-    InvalidOpcode = 0x06,
-
-    /// Device Not Available
-    DeviceNotAvailable = 0x07,
-
-    /// Double Fault
-    Double = 0x08,
-
-    /// Invalid TSS
-    InvalidTss = 0x0A,
-
-    /// Segment Not Present
-    SegmentNotPresent = 0x0B,
-
-    /// Stack Fault
-    Stack = 0x0C,
-
-    /// General Protection Fault
-    GeneralProtection = 0x0D,
-
-    /// Page Fault
-    Page = 0x0E,
-
-    /// x87 Floating-Point Exception
-    X87FloatingPoint = 0x10,
-
-    /// Alignment Check
-    AlignmentCheck = 0x11,
-
-    /// Machine Check
-    MachineCheck = 0x12,
-
-    /// SIMD Floating-Point Exception
-    SimdFloatingPoint = 0x13,
-
-    /// Virtualization Exception (Intel-only)
-    Virtualization = 0x14,
-
-    /// Control Protection Exception
-    ControlProtection = 0x15,
-
-    /// Hypervisor Injection (AMD-only)
-    HypervisorInjection = 0x1C,
-
-    /// VMM Communication (AMD-only)
-    VmmCommunication = 0x1D,
-
-    /// Security Exception
-    Security = 0x1E,
 }
