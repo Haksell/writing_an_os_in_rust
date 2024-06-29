@@ -1,6 +1,3 @@
-#![deny(missing_debug_implementations)]
-#![deny(unsafe_op_in_unsafe_fn)]
-
 pub use addr::{PhysAddr, VirtAddr};
 
 pub mod addr;
