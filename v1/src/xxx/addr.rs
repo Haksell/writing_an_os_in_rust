@@ -193,18 +193,12 @@ impl VirtAddr {
         PageTableIndex::new_truncate((self.0 >> 12 >> ((level as u8 - 1) * 9)) as u16)
     }
 
-    // FIXME: Move this into the `Step` impl, once `Step` is stabilized.
-    #[cfg(any(feature = "instructions", feature = "step_trait"))]
     pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
         let mut steps = end.0.checked_sub(start.0)?;
-
-        // Mask away extra bits that appear while jumping the gap.
         steps &= 0xffff_ffff_ffff;
-
         usize::try_from(steps).ok()
     }
 
-    // FIXME: Move this into the `Step` impl, once `Step` is stabilized.
     #[inline]
     pub(crate) fn forward_checked_impl(start: Self, count: usize) -> Option<Self> {
         let offset = u64::try_from(count).ok()?;

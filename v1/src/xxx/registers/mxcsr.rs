@@ -1,8 +1,5 @@
 //! Functions to read and write MXCSR register.
 
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-pub use self::x86_64::*;
-
 use bitflags::bitflags;
 
 bitflags! {
@@ -57,53 +54,5 @@ impl Default for MxCsr {
             | MxCsr::OVERFLOW_MASK
             | MxCsr::UNDERFLOW_MASK
             | MxCsr::PRECISION_MASK
-    }
-}
-
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-mod x86_64 {
-    use super::*;
-    use core::arch::asm;
-
-    /// Read the value of MXCSR.
-    #[inline]
-    pub fn read() -> MxCsr {
-        let mut mxcsr: u32 = 0;
-        unsafe {
-            asm!("stmxcsr [{}]", in(reg) &mut mxcsr, options(nostack, preserves_flags));
-        }
-        MxCsr::from_bits_truncate(mxcsr)
-    }
-
-    /// Write MXCSR.
-    #[inline]
-    pub fn write(mxcsr: MxCsr) {
-        unsafe {
-            asm!("ldmxcsr [{}]", in(reg) &mxcsr, options(nostack, readonly));
-        }
-    }
-
-    #[cfg(test)]
-    mod test {
-        use crate::xxx::registers::mxcsr::*;
-
-        #[test]
-        fn mxcsr_default() {
-            let mxcsr = read();
-            assert_eq!(mxcsr, MxCsr::from_bits_truncate(0x1F80));
-        }
-
-        #[test]
-        fn mxcsr_read() {
-            let mxcsr = read();
-            assert_eq!(mxcsr, MxCsr::default());
-        }
-
-        #[test]
-        fn mxcsr_write() {
-            let mxcsr = read();
-            write(mxcsr);
-            assert_eq!(mxcsr, read());
-        }
     }
 }
