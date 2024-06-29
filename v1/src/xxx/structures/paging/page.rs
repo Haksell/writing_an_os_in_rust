@@ -1,5 +1,4 @@
 use crate::xxx::VirtAddr;
-use core::fmt;
 use core::iter::Step;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
@@ -176,14 +175,5 @@ impl<S: PageSize> Iterator for PageRangeInclusive<S> {
         } else {
             None
         }
-    }
-}
-
-#[derive(Debug)]
-pub struct AddressNotAligned;
-
-impl fmt::Display for AddressNotAligned {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "the given address was not sufficiently aligned")
     }
 }
