@@ -178,9 +178,10 @@ impl EntryOptions {
 }
 
 #[repr(transparent)]
+#[derive(Debug)]
 pub struct InterruptStackFrame(InterruptStackFrameValue);
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[repr(C)]
 pub struct InterruptStackFrameValue {
     instruction_pointer: VirtAddr,

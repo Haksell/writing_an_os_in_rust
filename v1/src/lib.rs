@@ -36,7 +36,6 @@ static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
 pub extern "C" fn kernel_main(multiboot_start: usize) {
     MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
 
-    // TODO: enable bits directly in asm?
     enable_nxe_bit();
     enable_write_protect_bit();
 
