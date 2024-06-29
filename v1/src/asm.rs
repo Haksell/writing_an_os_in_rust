@@ -1,7 +1,5 @@
 use crate::xxx::registers::control::Cr0;
 use crate::xxx::registers::control::Cr0Flags;
-use crate::xxx::registers::control::Cr3;
-use crate::xxx::registers::control::Cr3Flags;
 use crate::xxx::registers::model_specific::Msr;
 use crate::xxx::registers::segmentation::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
@@ -71,9 +69,17 @@ pub fn tlb_flush(addr: u64) {
 
 #[inline]
 pub fn tlb_flush_all() {
-    let (frame, value) = Cr3::read_raw();
-    let flags = Cr3Flags::from_bits_truncate(value.into());
-    unsafe { Cr3::write(frame, flags) }
+    let value: u64;
+
+    unsafe {
+        asm!("mov {}, cr3", out(reg) value, options(nomem, nostack, preserves_flags));
+    }
+
+    let value = value & 0x_000f_ffff_ffff_ffff;
+
+    unsafe {
+        asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
+    }
 }
 
 #[inline]

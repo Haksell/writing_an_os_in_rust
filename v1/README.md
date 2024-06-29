@@ -1,5 +1,6 @@
 # todo
 
+- [ ] rm `Cr0`
 - [ ] remove pub everywhere
 - [ ] simplify `asm.rs`
 - [ ] remove `PhysFrame`

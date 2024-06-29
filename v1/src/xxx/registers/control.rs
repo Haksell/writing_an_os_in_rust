@@ -1,4 +1,3 @@
-use crate::xxx::{addr::PhysAddr, structures::paging::frame::PhysFrame};
 use bitflags::bitflags;
 use core::arch::asm;
 
@@ -55,49 +54,6 @@ impl Cr0 {
     pub unsafe fn write_raw(value: u64) {
         unsafe {
             asm!("mov cr0, {}", in(reg) value, options(nostack, preserves_flags));
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct Cr3;
-
-bitflags! {
-    #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Clone, Copy)]
-    pub struct Cr3Flags: u64 {
-        const PAGE_LEVEL_WRITETHROUGH = 1 << 3;
-        const PAGE_LEVEL_CACHE_DISABLE = 1 << 4;
-    }
-}
-
-impl Cr3 {
-    #[inline]
-    pub fn read_raw() -> (PhysFrame, u16) {
-        let value: u64;
-
-        unsafe {
-            asm!("mov {}, cr3", out(reg) value, options(nomem, nostack, preserves_flags));
-        }
-
-        let addr = PhysAddr::new(value & 0x_000f_ffff_ffff_f000);
-        let frame = PhysFrame::containing_address(addr);
-        (frame, (value & 0xFFF) as u16)
-    }
-
-    #[inline]
-    pub unsafe fn write(frame: PhysFrame, flags: Cr3Flags) {
-        unsafe {
-            Cr3::write_raw_impl(false, frame, flags.bits() as u16);
-        }
-    }
-
-    #[inline]
-    unsafe fn write_raw_impl(top_bit: bool, frame: PhysFrame, val: u16) {
-        let addr = frame.start_address();
-        let value = ((top_bit as u64) << 63) | addr.as_u64() | val as u64;
-
-        unsafe {
-            asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
         }
     }
 }
