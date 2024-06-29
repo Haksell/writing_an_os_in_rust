@@ -66,44 +66,6 @@ impl fmt::Debug for Entry {
     }
 }
 
-/// A 64-bit mode global descriptor table (GDT).
-///
-/// In 64-bit mode, segmentation is not supported. The GDT is used nonetheless, for example for
-/// switching between user and kernel mode or for loading a TSS.
-///
-/// The GDT has a fixed maximum size given by the `MAX` const generic parameter.
-/// Overflowing this limit by adding too many [`Descriptor`]s via
-/// [`GlobalDescriptorTable::append`] will panic.
-///
-/// You do **not** need to add a null segment descriptor yourself - this is already done
-/// internally. This means you can add up to `MAX - 1` additional [`Entry`]s to
-/// this table. Note that some [`Descriptor`]s may take up 2 [`Entry`]s.
-///
-/// Data segment registers in ring 0 can be loaded with the null segment selector. When running in
-/// ring 3, the `ss` register must point to a valid data segment which can be obtained through the
-/// [`Descriptor::user_data_segment()`](Descriptor::user_data_segment) function. Code segments must
-/// be valid and non-null at all times and can be obtained through the
-/// [`Descriptor::kernel_code_segment()`](Descriptor::kernel_code_segment) and
-/// [`Descriptor::user_code_segment()`](Descriptor::user_code_segment) in rings 0 and 3
-/// respectively.
-///
-/// For more info, see:
-/// [x86 Instruction Reference for `mov`](https://www.felixcloutier.com/x86/mov#64-bit-mode-exceptions),
-/// [Intel Manual](https://software.intel.com/sites/default/files/managed/39/c5/325462-sdm-vol-1-2abcd-3abcd.pdf),
-/// [AMD Manual](https://www.amd.com/system/files/TechDocs/24593.pdf)
-///
-/// # Example
-/// ```
-/// use x86_64::structures::gdt::{GlobalDescriptorTable, Descriptor};
-///
-/// let mut gdt = GlobalDescriptorTable::new();
-/// gdt.append(Descriptor::kernel_code_segment());
-/// gdt.append(Descriptor::user_code_segment());
-/// gdt.append(Descriptor::user_data_segment());
-///
-/// // Add entry for TSS, call gdt.load() then update segment registers
-/// ```
-
 #[derive(Debug, Clone)]
 pub struct GlobalDescriptorTable<const MAX: usize = 8> {
     table: [Entry; MAX],

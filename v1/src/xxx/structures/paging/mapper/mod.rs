@@ -108,73 +108,6 @@ impl MappedFrame {
 
 /// A trait for common page table operations on pages of size `S`.
 pub trait Mapper<S: PageSize> {
-    /// Creates a new mapping in the page table.
-    ///
-    /// This function might need additional physical frames to create new page tables. These
-    /// frames are allocated from the `allocator` argument. At most three frames are required.
-    ///
-    /// Parent page table entries are automatically updated with `PRESENT | WRITABLE | USER_ACCESSIBLE`
-    /// if present in the `PageTableFlags`. Depending on the used mapper implementation
-    /// the `PRESENT` and `WRITABLE` flags might be set for parent tables,
-    /// even if they are not set in `PageTableFlags`.
-    ///
-    /// The `map_to_with_table_flags` method gives explicit control over the parent page table flags.
-    ///
-    /// ## Safety
-    ///
-    /// Creating page table mappings is a fundamentally unsafe operation because
-    /// there are various ways to break memory safety through it. For example,
-    /// re-mapping an in-use page to a different frame changes and invalidates
-    /// all values stored in that page, resulting in undefined behavior on the
-    /// next use.
-    ///
-    /// The caller must ensure that no undefined behavior or memory safety
-    /// violations can occur through the new mapping. Among other things, the
-    /// caller must prevent the following:
-    ///
-    /// - Aliasing of `&mut` references, i.e. two `&mut` references that point to
-    ///   the same physical address. This is undefined behavior in Rust.
-    ///     - This can be ensured by mapping each page to an individual physical
-    ///       frame that is not mapped anywhere else.
-    /// - Creating uninitialized or invalid values: Rust requires that all values
-    ///   have a correct memory layout. For example, a `bool` must be either a 0
-    ///   or a 1 in memory, but not a 3 or 4. An exception is the `MaybeUninit`
-    ///   wrapper type, which abstracts over possibly uninitialized memory.
-    ///     - This is only a problem when re-mapping pages to different physical
-    ///       frames. Mapping a page that is not in use yet is fine.
-    ///
-    /// Special care must be taken when sharing pages with other address spaces,
-    /// e.g. by setting the `GLOBAL` flag. For example, a global mapping must be
-    /// the same in all address spaces, otherwise undefined behavior can occur
-    /// because of TLB races. It's worth noting that all the above requirements
-    /// also apply to shared mappings, including the aliasing requirements.
-    ///
-    /// # Examples
-    ///
-    /// Create a USER_ACCESSIBLE mapping:
-    ///
-    /// ```
-    /// # #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    /// # use x86_64::structures::paging::{
-    /// #    Mapper, Page, PhysFrame, FrameAllocator,
-    /// #    Size4KiB, OffsetPageTable, page_table::PageTableFlags
-    /// # };
-    /// # #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    /// # unsafe fn test(mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>,
-    /// #         page: Page<Size4KiB>, frame: PhysFrame) {
-    ///         mapper
-    ///           .map_to(
-    ///               page,
-    ///               frame,
-    ///              PageTableFlags::PRESENT
-    ///                   | PageTableFlags::WRITABLE
-    ///                   | PageTableFlags::USER_ACCESSIBLE,
-    ///               frame_allocator,
-    ///           )
-    ///           .unwrap()
-    ///           .flush();
-    /// # }
-    /// ```
     #[inline]
     unsafe fn map_to<A>(
         &mut self,
@@ -197,76 +130,6 @@ pub trait Mapper<S: PageSize> {
         }
     }
 
-    /// Creates a new mapping in the page table.
-    ///
-    /// This function might need additional physical frames to create new page tables. These
-    /// frames are allocated from the `allocator` argument. At most three frames are required.
-    ///
-    /// The flags of the parent table(s) can be explicitly specified. Those flags are used for
-    /// newly created table entries, and for existing entries the flags are added.
-    ///
-    /// Depending on the used mapper implementation, the `PRESENT` and `WRITABLE` flags might
-    /// be set for parent tables, even if they are not specified in `parent_table_flags`.
-    ///
-    /// ## Safety
-    ///
-    /// Creating page table mappings is a fundamentally unsafe operation because
-    /// there are various ways to break memory safety through it. For example,
-    /// re-mapping an in-use page to a different frame changes and invalidates
-    /// all values stored in that page, resulting in undefined behavior on the
-    /// next use.
-    ///
-    /// The caller must ensure that no undefined behavior or memory safety
-    /// violations can occur through the new mapping. Among other things, the
-    /// caller must prevent the following:
-    ///
-    /// - Aliasing of `&mut` references, i.e. two `&mut` references that point to
-    ///   the same physical address. This is undefined behavior in Rust.
-    ///     - This can be ensured by mapping each page to an individual physical
-    ///       frame that is not mapped anywhere else.
-    /// - Creating uninitialized or invalid values: Rust requires that all values
-    ///   have a correct memory layout. For example, a `bool` must be either a 0
-    ///   or a 1 in memory, but not a 3 or 4. An exception is the `MaybeUninit`
-    ///   wrapper type, which abstracts over possibly uninitialized memory.
-    ///     - This is only a problem when re-mapping pages to different physical
-    ///       frames. Mapping a page that is not in use yet is fine.
-    ///
-    /// Special care must be taken when sharing pages with other address spaces,
-    /// e.g. by setting the `GLOBAL` flag. For example, a global mapping must be
-    /// the same in all address spaces, otherwise undefined behavior can occur
-    /// because of TLB races. It's worth noting that all the above requirements
-    /// also apply to shared mappings, including the aliasing requirements.
-    ///
-    /// # Examples
-    ///
-    /// Create USER_ACCESSIBLE | NO_EXECUTE | NO_CACHE mapping and update
-    /// the top hierarchy only with USER_ACCESSIBLE:
-    ///
-    /// ```
-    /// # #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    /// # use x86_64::structures::paging::{
-    /// #    Mapper, PhysFrame, Page, FrameAllocator,
-    /// #    Size4KiB, OffsetPageTable, page_table::PageTableFlags
-    /// # };
-    /// # #[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-    /// # unsafe fn test(mapper: &mut OffsetPageTable, frame_allocator: &mut impl FrameAllocator<Size4KiB>,
-    /// #         page: Page<Size4KiB>, frame: PhysFrame) {
-    ///         mapper
-    ///           .map_to_with_table_flags(
-    ///               page,
-    ///               frame,
-    ///              PageTableFlags::PRESENT
-    ///                   | PageTableFlags::WRITABLE
-    ///                   | PageTableFlags::USER_ACCESSIBLE
-    ///                   | PageTableFlags::NO_EXECUTE
-    ///                   | PageTableFlags::NO_CACHE,
-    ///              PageTableFlags::USER_ACCESSIBLE,
-    ///               frame_allocator,
-    ///           )
-    ///           .unwrap()
-    ///           .flush();
-    /// # }
-    /// ```
     unsafe fn map_to_with_table_flags<A>(
         &mut self,
         page: Page<S>,
@@ -504,27 +367,6 @@ pub trait CleanUp {
     where
         D: FrameDeallocator<Size4KiB>;
 
-    /// Remove all empty P1-P3 tables in a certain range
-    /// ```
-    /// # use core::ops::RangeInclusive;
-    /// # use x86_64::{VirtAddr, structures::paging::{
-    /// #    FrameDeallocator, Size4KiB, mapper::CleanUp, page::Page,
-    /// # }};
-    /// # unsafe fn test(page_table: &mut impl CleanUp, frame_deallocator: &mut impl FrameDeallocator<Size4KiB>) {
-    /// // clean up all page tables in the lower half of the address space
-    /// let lower_half = Page::range_inclusive(
-    ///     Page::containing_address(VirtAddr::new(0)),
-    ///     Page::containing_address(VirtAddr::new(0x0000_7fff_ffff_ffff)),
-    /// );
-    /// page_table.clean_up_addr_range(lower_half, frame_deallocator);
-    /// # }
-    /// ```
-    ///
-    /// ## Safety
-    ///
-    /// The caller has to guarantee that it's safe to free page table frames:
-    /// All page table frames must only be used once and only in this page table
-    /// (e.g. no reference counted page tables or reusing the same page tables for different virtual addresses ranges in the same page table).
     unsafe fn clean_up_addr_range<D>(
         &mut self,
         range: PageRangeInclusive,
