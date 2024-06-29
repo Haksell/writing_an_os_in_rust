@@ -1,6 +1,6 @@
 use crate::asm::cs_get_reg;
 use crate::xxx::addr::VirtAddr;
-use crate::xxx::registers::SegmentSelector;
+use crate::xxx::SegmentSelector;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;

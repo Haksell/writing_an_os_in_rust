@@ -2,7 +2,7 @@ mod gdt;
 
 use self::gdt::Gdt;
 use crate::xxx::addr::VirtAddr;
-use crate::xxx::registers::SegmentSelector;
+use crate::xxx::SegmentSelector;
 use crate::xxx::structures::idt::InterruptDescriptorTable;
 use crate::xxx::structures::idt::InterruptStackFrame;
 use crate::xxx::structures::tss::TaskStateSegment;
