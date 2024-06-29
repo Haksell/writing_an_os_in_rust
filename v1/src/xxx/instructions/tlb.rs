@@ -119,24 +119,6 @@ pub unsafe fn flush_pcid(command: InvPicdCommand) {
     }
 }
 
-/// Used to broadcast flushes to all logical processors.
-///
-/// ```no_run
-/// use x86_64::VirtAddr;
-/// use x86_64::structures::paging::Page;
-/// use x86_64::instructions::tlb::Invlpgb;
-///
-/// // Check that `invlpgb` and `tlbsync` are supported.
-/// let invlpgb = Invlpgb::new().unwrap();
-///
-/// // Broadcast flushing some pages to all logical processors.
-/// let start: Page = Page::from_start_address(VirtAddr::new(0xf000_0000)).unwrap();
-/// let pages = Page::range(start, start + 3);
-/// invlpgb.build().pages(pages).include_global().flush();
-///
-/// // Wait for all logical processors to respond.
-/// invlpgb.tlbsync();
-/// ```
 #[derive(Debug, Clone, Copy)]
 pub struct Invlpgb {
     invlpgb_count_max: u16,
