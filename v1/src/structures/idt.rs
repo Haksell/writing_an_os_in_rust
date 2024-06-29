@@ -183,7 +183,7 @@ impl EntryOptions {
         }
     }
 
-    pub unsafe fn set_code_selector(&mut self, cs: SegmentSelector) -> &mut Self {
+    unsafe fn set_code_selector(&mut self, cs: SegmentSelector) -> &mut Self {
         self.cs = cs;
         self
     }

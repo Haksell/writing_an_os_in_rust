@@ -1,12 +1,7 @@
 # todo
 
-- [ ] rm `RFlags`
 - [ ] remove pub everywhere
-- [ ] simplify `asm.rs`
-- [ ] remove `PhysFrame`
-- [ ] remove useless fmt
-- [ ] remove x86_64 dead code
-- [ ] remove x86_64 comments
+- [ ] remove useless `impl`
 - [ ] simplify `Makefile`
 - [ ] fix todo
 - [ ] v1 -> v1_64
