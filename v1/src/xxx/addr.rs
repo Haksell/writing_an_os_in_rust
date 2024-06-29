@@ -46,30 +46,6 @@ impl VirtAddr {
     }
 }
 
-impl Add<u64> for VirtAddr {
-    type Output = Self;
-    #[inline]
-    fn add(self, rhs: u64) -> Self::Output {
-        VirtAddr::new(self.0 + rhs)
-    }
-}
-
-impl Sub<u64> for VirtAddr {
-    type Output = Self;
-    #[inline]
-    fn sub(self, rhs: u64) -> Self::Output {
-        VirtAddr::new(self.0.checked_sub(rhs).unwrap())
-    }
-}
-
-impl Sub<VirtAddr> for VirtAddr {
-    type Output = u64;
-    #[inline]
-    fn sub(self, rhs: VirtAddr) -> Self::Output {
-        self.as_u64().checked_sub(rhs.as_u64()).unwrap()
-    }
-}
-
 pub struct PhysAddrNotValid;
 
 impl PhysAddr {
