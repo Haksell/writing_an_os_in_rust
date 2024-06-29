@@ -441,63 +441,7 @@ pub struct Dr7;
 mod x86_64 {
     use super::*;
 
-    impl Dr6 {
-        /// Read the current set of DR6 flags.
-        #[inline]
-        pub fn read() -> Dr6Flags {
-            Dr6Flags::from_bits_truncate(Self::read_raw())
-        }
+    impl Dr6 {}
 
-        /// Read the current raw DR6 value.
-        #[inline]
-        pub fn read_raw() -> u64 {
-            let value;
-
-            unsafe {
-                asm!("mov {}, dr6", out(reg) value, options(nomem, nostack, preserves_flags));
-            }
-
-            value
-        }
-    }
-
-    impl Dr7 {
-        /// Read the current set of DR7 flags.
-        #[inline]
-        pub fn read() -> Dr7Value {
-            Dr7Value::from_bits_truncate(Self::read_raw())
-        }
-
-        /// Read the current raw DR7 value.
-        #[inline]
-        pub fn read_raw() -> u64 {
-            let value;
-
-            unsafe {
-                asm!("mov {}, dr7", out(reg) value, options(nomem, nostack, preserves_flags));
-            }
-
-            value
-        }
-
-        /// Write DR7 value.
-        ///
-        /// Preserves the value of reserved fields.
-        #[inline]
-        pub fn write(value: Dr7Value) {
-            let old_value = Self::read_raw();
-            let reserved = old_value & !Dr7Value::valid_bits();
-            let new_value = reserved | value.bits();
-
-            Self::write_raw(new_value)
-        }
-
-        /// Write raw DR7 value.
-        #[inline]
-        pub fn write_raw(value: u64) {
-            unsafe {
-                asm!("mov dr7, {}", in(reg) value, options(nomem, nostack, preserves_flags));
-            }
-        }
-    }
+    impl Dr7 {}
 }
