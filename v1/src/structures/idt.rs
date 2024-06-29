@@ -23,7 +23,7 @@ pub struct InterruptDescriptorTable {
     segment_not_present: Entry<HandlerFuncWithErrCode>,
     stack_segment_fault: Entry<HandlerFuncWithErrCode>,
     general_protection_fault: Entry<HandlerFuncWithErrCode>,
-    page_fault: Entry<PageFaultHandlerFunc>,
+    page_fault: Entry<HandlerFuncWithErrCode>,
     reserved_1: Entry<HandlerFunc>,
     x87_floating_point: Entry<HandlerFunc>,
     alignment_check: Entry<HandlerFuncWithErrCode>,
@@ -101,8 +101,6 @@ pub struct Entry<F> {
 
 pub type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
 pub type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
-pub type PageFaultHandlerFunc =
-    extern "x86-interrupt" fn(InterruptStackFrame, error_code: PageFaultErrorCode);
 pub type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
 pub type DivergingHandlerFuncWithErrCode =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
@@ -128,7 +126,7 @@ impl<F: HandlerFuncType> Entry<F> {
         self.pointer_middle = (addr >> 16) as u16;
         self.pointer_high = (addr >> 32) as u32;
         self.options = EntryOptions::minimal();
-        unsafe { self.options.set_code_selector(cs_get_reg()) };
+        unsafe { self.options.cs = cs_get_reg() };
         self.options.set_present(true);
         &mut self.options
     }
@@ -151,7 +149,6 @@ macro_rules! impl_handler_func_type {
 
 impl_handler_func_type!(HandlerFunc);
 impl_handler_func_type!(HandlerFuncWithErrCode);
-impl_handler_func_type!(PageFaultHandlerFunc);
 impl_handler_func_type!(DivergingHandlerFunc);
 impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
@@ -169,11 +166,6 @@ impl EntryOptions {
             cs: SegmentSelector(0),
             bits: 0b1110_0000_0000, // Default to a 64-bit Interrupt Gate
         }
-    }
-
-    unsafe fn set_code_selector(&mut self, cs: SegmentSelector) -> &mut Self {
-        self.cs = cs;
-        self
     }
 
     #[inline]
