@@ -32,37 +32,6 @@ bitflags! {
     }
 }
 
-bitflags! {
-    #[repr(transparent)]
-    #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Clone, Copy)]
-    pub struct Cr4Flags: u64 {
-        const VIRTUAL_8086_MODE_EXTENSIONS = 1;
-        const PROTECTED_MODE_VIRTUAL_INTERRUPTS = 1 << 1;
-        const TIMESTAMP_DISABLE = 1 << 2;
-        const DEBUGGING_EXTENSIONS = 1 << 3;
-        const PAGE_SIZE_EXTENSION = 1 << 4;
-        const PHYSICAL_ADDRESS_EXTENSION = 1 << 5;
-        const MACHINE_CHECK_EXCEPTION = 1 << 6;
-        const PAGE_GLOBAL = 1 << 7;
-        const PERFORMANCE_MONITOR_COUNTER = 1 << 8;
-        const OSFXSR = 1 << 9;
-        const OSXMMEXCPT_ENABLE = 1 << 10;
-        const USER_MODE_INSTRUCTION_PREVENTION = 1 << 11;
-        const L5_PAGING = 1 << 12;
-        const VIRTUAL_MACHINE_EXTENSIONS = 1 << 13;
-        const SAFER_MODE_EXTENSIONS = 1 << 14;
-        const FSGSBASE = 1 << 16;
-        const PCID = 1 << 17;
-        const OSXSAVE = 1 << 18;
-        const KEY_LOCKER = 1 << 19;
-        const SUPERVISOR_MODE_EXECUTION_PROTECTION = 1 << 20;
-        const SUPERVISOR_MODE_ACCESS_PREVENTION = 1 << 21;
-        const PROTECTION_KEY_USER = 1 << 22;
-        const CONTROL_FLOW_ENFORCEMENT = 1 << 23;
-        const PROTECTION_KEY_SUPERVISOR = 1 << 24;
-    }
-}
-
 mod x86_64 {
     use super::*;
     use crate::xxx::{structures::paging::PhysFrame, PhysAddr};
