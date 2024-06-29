@@ -76,7 +76,6 @@ impl<S: PageSize> Page<S> {
     ///
     /// Returns an error if the address is not correctly aligned (i.e. is not a valid page start).
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn from_start_address(address: VirtAddr) -> Result<Self, AddressNotAligned> {
         if !address.is_aligned_u64(S::SIZE) {
             return Err(AddressNotAligned);
@@ -90,7 +89,6 @@ impl<S: PageSize> Page<S> {
     ///
     /// The address must be correctly aligned.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub unsafe fn from_start_address_unchecked(start_address: VirtAddr) -> Self {
         Page {
             start_address,
@@ -100,7 +98,6 @@ impl<S: PageSize> Page<S> {
 
     /// Returns the page that contains the given virtual address.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn containing_address(address: VirtAddr) -> Self {
         Page {
             start_address: address.align_down_u64(S::SIZE),
@@ -110,49 +107,42 @@ impl<S: PageSize> Page<S> {
 
     /// Returns the start address of the page.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn start_address(self) -> VirtAddr {
         self.start_address
     }
 
     /// Returns the size the page (4KB, 2MB or 1GB).
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn size(self) -> u64 {
         S::SIZE
     }
 
     /// Returns the level 4 page table index of this page.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn p4_index(self) -> PageTableIndex {
         self.start_address().p4_index()
     }
 
     /// Returns the level 3 page table index of this page.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn p3_index(self) -> PageTableIndex {
         self.start_address().p3_index()
     }
 
     /// Returns the table index of this page at the specified level.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn page_table_index(self, level: PageTableLevel) -> PageTableIndex {
         self.start_address().page_table_index(level)
     }
 
     /// Returns a range of pages, exclusive `end`.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn range(start: Self, end: Self) -> PageRange<S> {
         PageRange { start, end }
     }
 
     /// Returns a range of pages, inclusive `end`.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn range_inclusive(start: Self, end: Self) -> PageRangeInclusive<S> {
         PageRangeInclusive { start, end }
     }
@@ -175,7 +165,6 @@ impl<S: PageSize> Page<S> {
 impl<S: NotGiantPageSize> Page<S> {
     /// Returns the level 2 page table index of this page.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn p2_index(self) -> PageTableIndex {
         self.start_address().p2_index()
     }
@@ -184,7 +173,6 @@ impl<S: NotGiantPageSize> Page<S> {
 impl Page<Size1GiB> {
     /// Returns the 1GiB memory page with the specified page table indices.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn from_page_table_indices_1gib(
         p4_index: PageTableIndex,
         p3_index: PageTableIndex,
@@ -199,7 +187,6 @@ impl Page<Size1GiB> {
 impl Page<Size2MiB> {
     /// Returns the 2MiB memory page with the specified page table indices.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn from_page_table_indices_2mib(
         p4_index: PageTableIndex,
         p3_index: PageTableIndex,
@@ -216,7 +203,6 @@ impl Page<Size2MiB> {
 impl Page<Size4KiB> {
     /// Returns the 4KiB memory page with the specified page table indices.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn from_page_table_indices(
         p4_index: PageTableIndex,
         p3_index: PageTableIndex,

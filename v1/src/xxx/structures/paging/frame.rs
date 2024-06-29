@@ -21,7 +21,6 @@ impl<S: PageSize> PhysFrame<S> {
     ///
     /// Returns an error if the address is not correctly aligned (i.e. is not a valid frame start).
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn from_start_address(address: PhysAddr) -> Result<Self, AddressNotAligned> {
         if !address.is_aligned_u64(S::SIZE) {
             return Err(AddressNotAligned);
@@ -37,7 +36,6 @@ impl<S: PageSize> PhysFrame<S> {
     ///
     /// The address must be correctly aligned.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub unsafe fn from_start_address_unchecked(start_address: PhysAddr) -> Self {
         PhysFrame {
             start_address,
@@ -47,7 +45,6 @@ impl<S: PageSize> PhysFrame<S> {
 
     /// Returns the frame that contains the given physical address.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn containing_address(address: PhysAddr) -> Self {
         PhysFrame {
             start_address: address.align_down_u64(S::SIZE),
@@ -57,7 +54,6 @@ impl<S: PageSize> PhysFrame<S> {
 
     /// Returns the start address of the frame.
     #[inline]
-    #[rustversion::attr(since(1.61), const)]
     pub fn start_address(self) -> PhysAddr {
         self.start_address
     }
