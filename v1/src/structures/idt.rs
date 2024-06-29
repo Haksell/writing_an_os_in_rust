@@ -220,7 +220,7 @@ pub struct InterruptStackFrameValue {
 
 bitflags! {
     #[repr(transparent)]
-    #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Clone, Copy)]
+    #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
     pub struct PageFaultErrorCode: u64 {
         const PROTECTION_VIOLATION = 1;
         const CAUSED_BY_WRITE = 1 << 1;
@@ -234,7 +234,7 @@ bitflags! {
     }
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq)]
 #[repr(transparent)]
 pub struct SelectorErrorCode {
     flags: u64,

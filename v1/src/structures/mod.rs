@@ -11,7 +11,7 @@ pub struct DescriptorTablePointer {
     pub base: VirtAddr,
 }
 
-#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
+#[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord)]
 #[repr(transparent)]
 pub struct SegmentSelector(pub u16);
 
