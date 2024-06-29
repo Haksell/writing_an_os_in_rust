@@ -1,4 +1,4 @@
 pub mod addr;
-pub mod instructions;
+mod instructions;
 pub mod registers;
 pub mod structures;

@@ -82,7 +82,7 @@ impl InterruptDescriptorTable {
     #[inline]
     pub unsafe fn load_unsafe(&self) {
         unsafe {
-            crate::xxx::instructions::tables::lidt(&self.pointer());
+            super::super::instructions::tables::lidt(&self.pointer());
         }
     }
 
@@ -129,7 +129,7 @@ impl<F> Entry<F> {
 
     #[inline]
     pub unsafe fn set_handler_addr(&mut self, addr: VirtAddr) -> &mut EntryOptions {
-        use crate::xxx::instructions::segmentation::{Segment, CS};
+        use super::super::instructions::segmentation::{Segment, CS};
 
         let addr = addr.as_u64();
         self.pointer_low = addr as u16;
