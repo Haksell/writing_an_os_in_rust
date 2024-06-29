@@ -244,35 +244,6 @@ impl PhysAddr {
     }
 }
 
-impl fmt::Debug for PhysAddr {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("PhysAddr")
-            .field(&format_args!("{:#x}", self.0))
-            .finish()
-    }
-}
-
-impl fmt::Binary for PhysAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Binary::fmt(&self.0, f)
-    }
-}
-
-impl fmt::LowerHex for PhysAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::LowerHex::fmt(&self.0, f)
-    }
-}
-
-impl fmt::Octal for PhysAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Octal::fmt(&self.0, f)
-    }
-}
-
 impl Add<u64> for PhysAddr {
     type Output = Self;
     #[inline]
