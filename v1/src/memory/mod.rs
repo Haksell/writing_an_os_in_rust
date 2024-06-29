@@ -4,8 +4,6 @@ mod locked;
 mod paging;
 mod stack_allocator;
 
-use crate::MULTIBOOT;
-
 pub use self::{
     area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel, stack_allocator::Stack,
 };
@@ -18,6 +16,7 @@ use self::{
     },
     stack_allocator::StackAllocator,
 };
+use crate::MULTIBOOT;
 
 const HEAP_START: usize = 0o_000_001_000_000_0000;
 const HEAP_SIZE: usize = 100 * 1024;
