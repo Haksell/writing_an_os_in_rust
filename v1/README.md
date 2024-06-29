@@ -1,5 +1,6 @@
 # todo
 
+- [ ] remove pub everywhere
 - [ ] simplify `asm.rs`
 - [ ] remove useless fmt
 - [ ] remove x86_64 dead code

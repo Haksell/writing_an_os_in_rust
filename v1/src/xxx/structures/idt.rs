@@ -4,7 +4,6 @@ use crate::xxx::VirtAddr;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
-use core::ops::Deref;
 
 #[derive(Clone)]
 #[repr(C)]
@@ -209,24 +208,15 @@ impl EntryOptions {
 #[repr(transparent)]
 pub struct InterruptStackFrame(InterruptStackFrameValue);
 
-impl Deref for InterruptStackFrame {
-    type Target = InterruptStackFrameValue;
-
-    #[inline]
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct InterruptStackFrameValue {
-    pub instruction_pointer: VirtAddr,
-    pub code_segment: SegmentSelector,
+    instruction_pointer: VirtAddr,
+    code_segment: SegmentSelector,
     _reserved1: [u8; 6],
-    pub cpu_flags: RFlags,
-    pub stack_pointer: VirtAddr,
-    pub stack_segment: SegmentSelector,
+    cpu_flags: RFlags, // TODO: placeholder
+    stack_pointer: VirtAddr,
+    stack_segment: SegmentSelector,
     _reserved2: [u8; 6],
 }
 
