@@ -48,14 +48,6 @@ pub struct PhysAddr(u64);
 /// Contains the invalid address.
 pub struct VirtAddrNotValid(pub u64);
 
-impl core::fmt::Debug for VirtAddrNotValid {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("VirtAddrNotValid")
-            .field(&format_args!("{:#x}", self.0))
-            .finish()
-    }
-}
-
 impl VirtAddr {
     /// Creates a new canonical virtual address.
     ///

@@ -242,15 +242,6 @@ impl<S: PageSize> Iterator for PageRange<S> {
     }
 }
 
-impl<S: PageSize> fmt::Debug for PageRange<S> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("PageRange")
-            .field("start", &self.start)
-            .field("end", &self.end)
-            .finish()
-    }
-}
-
 /// A range of pages with inclusive upper bound.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(C)]
