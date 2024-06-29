@@ -1,6 +1,6 @@
 use super::gdt::SegmentSelector;
 use crate::xxx::registers::rflags::RFlags;
-use crate::xxx::{PrivilegeLevel, VirtAddr};
+use crate::xxx::VirtAddr;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::fmt;
@@ -184,7 +184,6 @@ impl fmt::Debug for EntryOptions {
             .field("code_selector", &self.cs)
             .field("stack_index", &self.stack_index())
             .field("type", &format_args!("{:#04b}", self.bits.get_bits(8..12)))
-            .field("privilege_level", &self.privilege_level())
             .field("present", &self.present())
             .finish()
     }
@@ -214,9 +213,9 @@ impl EntryOptions {
         self.bits.get_bit(15)
     }
 
-    fn privilege_level(&self) -> PrivilegeLevel {
-        PrivilegeLevel::from_u16(self.bits.get_bits(13..15))
-    }
+    // fn privilege_level(&self) -> PrivilegeLevel {
+    //     PrivilegeLevel::from_u16(self.bits.get_bits(13..15))
+    // }
 
     #[inline]
     pub unsafe fn set_stack_index(&mut self, index: u16) -> &mut Self {
