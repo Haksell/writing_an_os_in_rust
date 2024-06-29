@@ -61,27 +61,6 @@ impl<S: PageSize> PhysFrame<S> {
     pub fn start_address(self) -> PhysAddr {
         self.start_address
     }
-
-    /// Returns the size the frame (4KB, 2MB or 1GB).
-    #[inline]
-    #[rustversion::attr(since(1.61), const)]
-    pub fn size(self) -> u64 {
-        S::SIZE
-    }
-
-    /// Returns a range of frames, exclusive `end`.
-    #[inline]
-    #[rustversion::attr(since(1.61), const)]
-    pub fn range(start: PhysFrame<S>, end: PhysFrame<S>) -> PhysFrameRange<S> {
-        PhysFrameRange { start, end }
-    }
-
-    /// Returns a range of frames, inclusive `end`.
-    #[inline]
-    #[rustversion::attr(since(1.61), const)]
-    pub fn range_inclusive(start: PhysFrame<S>, end: PhysFrame<S>) -> PhysFrameRangeInclusive<S> {
-        PhysFrameRangeInclusive { start, end }
-    }
 }
 
 impl<S: PageSize> fmt::Debug for PhysFrame<S> {
