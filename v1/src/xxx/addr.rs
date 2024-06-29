@@ -273,20 +273,6 @@ impl fmt::Octal for PhysAddr {
     }
 }
 
-impl fmt::UpperHex for PhysAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::UpperHex::fmt(&self.0, f)
-    }
-}
-
-impl fmt::Pointer for PhysAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Pointer::fmt(&(self.0 as *const ()), f)
-    }
-}
-
 impl Add<u64> for PhysAddr {
     type Output = Self;
     #[inline]
