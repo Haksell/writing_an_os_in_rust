@@ -72,13 +72,6 @@ bitflags! {
 
 impl Cr3 {
     #[inline]
-    pub fn read() -> (PhysFrame, Cr3Flags) {
-        let (frame, value) = Cr3::read_raw();
-        let flags = Cr3Flags::from_bits_truncate(value.into());
-        (frame, flags)
-    }
-
-    #[inline]
     pub fn read_raw() -> (PhysFrame, u16) {
         let value: u64;
 
