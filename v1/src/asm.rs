@@ -1,5 +1,3 @@
-use crate::xxx::registers::control::Cr0;
-use crate::xxx::registers::control::Cr0Flags;
 use crate::xxx::registers::model_specific::Msr;
 use crate::xxx::registers::segmentation::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
@@ -55,8 +53,11 @@ pub fn enable_nxe_bit() {
 
 #[inline]
 pub fn enable_write_protect_bit() {
+    let value: u64;
+
     unsafe {
-        Cr0::write(Cr0::read() | Cr0Flags::WRITE_PROTECT);
+        asm!("mov {}, cr0", out(reg) value, options(nomem, nostack, preserves_flags));
+        asm!("mov cr0, {}", in(reg) (value | 1 << 16), options(nostack, preserves_flags));
     }
 }
 
