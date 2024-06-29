@@ -1,4 +1,4 @@
-pub use crate::xxx::structures::DescriptorTablePointer;
+use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
 
 #[inline]

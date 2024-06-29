@@ -1,6 +1,7 @@
 use super::gdt::SegmentSelector;
 use crate::xxx::addr::VirtAddr;
 use crate::xxx::registers::rflags::RFlags;
+use crate::xxx::registers::segmentation::{Segment as _, CS};
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
@@ -129,8 +130,6 @@ impl<F> Entry<F> {
 
     #[inline]
     pub unsafe fn set_handler_addr(&mut self, addr: VirtAddr) -> &mut EntryOptions {
-        use super::super::instructions::segmentation::{Segment, CS};
-
         let addr = addr.as_u64();
         self.pointer_low = addr as u16;
         self.pointer_middle = (addr >> 16) as u16;

@@ -1,4 +1,4 @@
-pub use crate::xxx::registers::segmentation::{Segment, CS};
+use crate::xxx::registers::segmentation::{Segment, CS};
 use crate::xxx::structures::gdt::SegmentSelector;
 use core::arch::asm;
 
