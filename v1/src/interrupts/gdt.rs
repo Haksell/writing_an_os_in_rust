@@ -1,11 +1,10 @@
-use bit_field::BitField as _;
-use bitflags::bitflags;
-use core::mem::size_of;
 use crate::xxx::structures::gdt::SegmentSelector;
 use crate::xxx::structures::tss::TaskStateSegment;
 use crate::xxx::structures::DescriptorTablePointer;
-use crate::xxx::PrivilegeLevel;
 use crate::xxx::VirtAddr;
+use bit_field::BitField as _;
+use bitflags::bitflags;
+use core::mem::size_of;
 
 pub enum Descriptor {
     UserSegment(u64),
@@ -67,7 +66,7 @@ impl Gdt {
                 index
             }
         };
-        SegmentSelector::new(index as u16, PrivilegeLevel::Ring0)
+        SegmentSelector::new(index as u16, 0)
     }
 
     fn push(&mut self, value: u64) -> usize {

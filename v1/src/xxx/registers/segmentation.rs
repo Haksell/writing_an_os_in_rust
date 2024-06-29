@@ -1,5 +1,3 @@
-use crate::xxx::PrivilegeLevel;
-
 pub trait Segment {
     fn get_reg() -> SegmentSelector;
 }
@@ -10,7 +8,7 @@ pub struct SegmentSelector(pub u16);
 
 impl SegmentSelector {
     #[inline]
-    pub const fn new(index: u16, rpl: PrivilegeLevel) -> SegmentSelector {
+    pub const fn new(index: u16, rpl: u8) -> SegmentSelector {
         SegmentSelector(index << 3 | (rpl as u16))
     }
 }
