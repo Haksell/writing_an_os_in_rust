@@ -1,8 +1,9 @@
 mod gdt;
-pub mod idt;
+mod idt;
 mod tss;
 
 pub use gdt::{Gdt, GdtDescriptor};
+pub use idt::{InterruptDescriptorTable, InterruptStackFrame};
 pub use tss::TaskStateSegment;
 
 use crate::virt_addr::VirtAddr;
