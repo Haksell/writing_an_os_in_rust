@@ -13,11 +13,6 @@ use crate::xxx::{PhysAddr, VirtAddr};
 mod mapped_page_table;
 mod offset_page_table;
 
-/// An empty convencience trait that requires the `Mapper` trait for all page sizes.
-pub trait MapperAllSizes: Mapper<Size4KiB> + Mapper<Size2MiB> + Mapper<Size1GiB> {}
-
-impl<T> MapperAllSizes for T where T: Mapper<Size4KiB> + Mapper<Size2MiB> + Mapper<Size1GiB> {}
-
 /// Provides methods for translating virtual addresses.
 pub trait Translate {
     /// Return the frame that the given virtual address is mapped to and the offset within that
@@ -28,20 +23,6 @@ pub trait Translate {
     ///
     /// This function works with huge pages of all sizes.
     fn translate(&self, addr: VirtAddr) -> TranslateResult;
-
-    /// Translates the given virtual address to the physical address that it maps to.
-    ///
-    /// Returns `None` if there is no valid mapping for the given address.
-    ///
-    /// This is a convenience method. For more information about a mapping see the
-    /// [`translate`](Translate::translate) method.
-    #[inline]
-    fn translate_addr(&self, addr: VirtAddr) -> Option<PhysAddr> {
-        match self.translate(addr) {
-            TranslateResult::NotMapped | TranslateResult::InvalidFrameAddress(_) => None,
-            TranslateResult::Mapped { frame, offset, .. } => Some(frame.start_address() + offset),
-        }
-    }
 }
 
 /// The return value of the [`Translate::translate`] function.
@@ -80,50 +61,8 @@ pub enum MappedFrame {
     Size1GiB(PhysFrame<Size1GiB>),
 }
 
-impl MappedFrame {
-    /// Returns the start address of the frame.
-    pub const fn start_address(&self) -> PhysAddr {
-        match self {
-            MappedFrame::Size4KiB(frame) => frame.start_address,
-            MappedFrame::Size2MiB(frame) => frame.start_address,
-            MappedFrame::Size1GiB(frame) => frame.start_address,
-        }
-    }
-
-    /// Returns the size the frame (4KB, 2MB or 1GB).
-    pub const fn size(&self) -> u64 {
-        match self {
-            MappedFrame::Size4KiB(_) => Size4KiB::SIZE,
-            MappedFrame::Size2MiB(_) => Size2MiB::SIZE,
-            MappedFrame::Size1GiB(_) => Size1GiB::SIZE,
-        }
-    }
-}
-
 /// A trait for common page table operations on pages of size `S`.
 pub trait Mapper<S: PageSize> {
-    #[inline]
-    unsafe fn map_to<A>(
-        &mut self,
-        page: Page<S>,
-        frame: PhysFrame<S>,
-        flags: PageTableFlags,
-        frame_allocator: &mut A,
-    ) -> Result<MapperFlush<S>, MapToError<S>>
-    where
-        Self: Sized,
-        A: FrameAllocator<Size4KiB> + ?Sized,
-    {
-        let parent_table_flags = flags
-            & (PageTableFlags::PRESENT
-                | PageTableFlags::WRITABLE
-                | PageTableFlags::USER_ACCESSIBLE);
-
-        unsafe {
-            self.map_to_with_table_flags(page, frame, flags, parent_table_flags, frame_allocator)
-        }
-    }
-
     unsafe fn map_to_with_table_flags<A>(
         &mut self,
         page: Page<S>,
@@ -208,29 +147,6 @@ pub trait Mapper<S: PageSize> {
     /// This function assumes that the page is mapped to a frame of size `S` and returns an
     /// error otherwise.
     fn translate_page(&self, page: Page<S>) -> Result<PhysFrame<S>, TranslateError>;
-
-    /// Maps the given frame to the virtual page with the same address.
-    ///
-    /// ## Safety
-    ///
-    /// This is a convencience function that invokes [`Mapper::map_to`] internally, so
-    /// all safety requirements of it also apply for this function.
-    #[inline]
-    unsafe fn identity_map<A>(
-        &mut self,
-        frame: PhysFrame<S>,
-        flags: PageTableFlags,
-        frame_allocator: &mut A,
-    ) -> Result<MapperFlush<S>, MapToError<S>>
-    where
-        Self: Sized,
-        A: FrameAllocator<Size4KiB> + ?Sized,
-        S: PageSize,
-        Self: Mapper<S>,
-    {
-        let page = Page::containing_address(VirtAddr::new(frame.start_address().as_u64()));
-        unsafe { self.map_to(page, frame, flags, frame_allocator) }
-    }
 }
 
 /// This type represents a page whose mapping has changed in the page table.
