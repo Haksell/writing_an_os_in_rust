@@ -69,9 +69,6 @@ pub struct Page<S: PageSize = Size4KiB> {
 }
 
 impl<S: PageSize> Page<S> {
-    /// The page size in bytes.
-    pub const SIZE: u64 = S::SIZE;
-
     /// Returns the page that starts at the given virtual address.
     ///
     /// Returns an error if the address is not correctly aligned (i.e. is not a valid page start).
@@ -81,19 +78,6 @@ impl<S: PageSize> Page<S> {
             return Err(AddressNotAligned);
         }
         Ok(Page::containing_address(address))
-    }
-
-    /// Returns the page that starts at the given virtual address.
-    ///
-    /// ## Safety
-    ///
-    /// The address must be correctly aligned.
-    #[inline]
-    pub unsafe fn from_start_address_unchecked(start_address: VirtAddr) -> Self {
-        Page {
-            start_address,
-            size: PhantomData,
-        }
     }
 
     /// Returns the page that contains the given virtual address.
@@ -109,12 +93,6 @@ impl<S: PageSize> Page<S> {
     #[inline]
     pub fn start_address(self) -> VirtAddr {
         self.start_address
-    }
-
-    /// Returns the size the page (4KB, 2MB or 1GB).
-    #[inline]
-    pub fn size(self) -> u64 {
-        S::SIZE
     }
 
     /// Returns the level 4 page table index of this page.
@@ -133,12 +111,6 @@ impl<S: PageSize> Page<S> {
     #[inline]
     pub fn page_table_index(self, level: PageTableLevel) -> PageTableIndex {
         self.start_address().page_table_index(level)
-    }
-
-    /// Returns a range of pages, exclusive `end`.
-    #[inline]
-    pub fn range(start: Self, end: Self) -> PageRange<S> {
-        PageRange { start, end }
     }
 
     /// Returns a range of pages, inclusive `end`.
@@ -170,53 +142,7 @@ impl<S: NotGiantPageSize> Page<S> {
     }
 }
 
-impl Page<Size1GiB> {
-    /// Returns the 1GiB memory page with the specified page table indices.
-    #[inline]
-    pub fn from_page_table_indices_1gib(
-        p4_index: PageTableIndex,
-        p3_index: PageTableIndex,
-    ) -> Self {
-        let mut addr = 0;
-        addr |= p4_index.into_u64() << 39;
-        addr |= p3_index.into_u64() << 30;
-        Page::containing_address(VirtAddr::new_truncate(addr))
-    }
-}
-
-impl Page<Size2MiB> {
-    /// Returns the 2MiB memory page with the specified page table indices.
-    #[inline]
-    pub fn from_page_table_indices_2mib(
-        p4_index: PageTableIndex,
-        p3_index: PageTableIndex,
-        p2_index: PageTableIndex,
-    ) -> Self {
-        let mut addr = 0;
-        addr |= p4_index.into_u64() << 39;
-        addr |= p3_index.into_u64() << 30;
-        addr |= p2_index.into_u64() << 21;
-        Page::containing_address(VirtAddr::new_truncate(addr))
-    }
-}
-
 impl Page<Size4KiB> {
-    /// Returns the 4KiB memory page with the specified page table indices.
-    #[inline]
-    pub fn from_page_table_indices(
-        p4_index: PageTableIndex,
-        p3_index: PageTableIndex,
-        p2_index: PageTableIndex,
-        p1_index: PageTableIndex,
-    ) -> Self {
-        let mut addr = 0;
-        addr |= p4_index.into_u64() << 39;
-        addr |= p3_index.into_u64() << 30;
-        addr |= p2_index.into_u64() << 21;
-        addr |= p1_index.into_u64() << 12;
-        Page::containing_address(VirtAddr::new_truncate(addr))
-    }
-
     /// Returns the level 1 page table index of this page.
     #[inline]
     pub const fn p1_index(self) -> PageTableIndex {
@@ -320,17 +246,6 @@ impl<S: PageSize> Iterator for PageRange<S> {
             Some(page)
         } else {
             None
-        }
-    }
-}
-
-impl PageRange<Size2MiB> {
-    /// Converts the range of 2MiB pages to a range of 4KiB pages.
-    #[inline]
-    pub fn as_4kib_page_range(self) -> PageRange<Size4KiB> {
-        PageRange {
-            start: Page::containing_address(self.start.start_address()),
-            end: Page::containing_address(self.end.start_address()),
         }
     }
 }
