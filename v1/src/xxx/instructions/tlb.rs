@@ -1,9 +1,4 @@
-//! Functions to flush the translation lookaside buffer (TLB).
-
-use bit_field::BitField;
-
-use crate::xxx::structures::paging::{page::NotGiantPageSize, Page, PageSize, Size2MiB};
-use core::{arch::asm, fmt};
+use core::fmt;
 
 /// Structure of a PCID. A PCID has to be <= 4096 for x86_64.
 #[repr(transparent)]
