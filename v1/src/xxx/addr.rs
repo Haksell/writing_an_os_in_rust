@@ -2,7 +2,6 @@
 
 use core::convert::TryFrom;
 use core::fmt;
-#[cfg(feature = "step_trait")]
 use core::iter::Step;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
@@ -357,7 +356,6 @@ impl Sub<VirtAddr> for VirtAddr {
     }
 }
 
-#[cfg(feature = "step_trait")]
 impl Step for VirtAddr {
     #[inline]
     fn steps_between(start: &Self, end: &Self) -> Option<usize> {

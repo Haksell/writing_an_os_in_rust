@@ -709,60 +709,13 @@ impl<T> PartialEq for Entry<T> {
     }
 }
 
-/// A handler function for an interrupt or an exception without error code.
-///
-/// This type alias is only usable with the `abi_x86_interrupt` feature enabled.
-#[cfg(feature = "abi_x86_interrupt")]
 pub type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
-/// This type is not usable without the `abi_x86_interrupt` feature.
-#[cfg(not(feature = "abi_x86_interrupt"))]
-#[derive(Copy, Clone, Debug)]
-pub struct HandlerFunc(());
-
-/// A handler function for an exception that pushes an error code.
-///
-/// This type alias is only usable with the `abi_x86_interrupt` feature enabled.
-#[cfg(feature = "abi_x86_interrupt")]
 pub type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
-/// This type is not usable without the `abi_x86_interrupt` feature.
-#[cfg(not(feature = "abi_x86_interrupt"))]
-#[derive(Copy, Clone, Debug)]
-pub struct HandlerFuncWithErrCode(());
-
-/// A page fault handler function that pushes a page fault error code.
-///
-/// This type alias is only usable with the `abi_x86_interrupt` feature enabled.
-#[cfg(feature = "abi_x86_interrupt")]
 pub type PageFaultHandlerFunc =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: PageFaultErrorCode);
-/// This type is not usable without the `abi_x86_interrupt` feature.
-#[cfg(not(feature = "abi_x86_interrupt"))]
-#[derive(Copy, Clone, Debug)]
-pub struct PageFaultHandlerFunc(());
-
-/// A handler function that must not return, e.g. for a machine check exception.
-///
-/// This type alias is only usable with the `abi_x86_interrupt` feature enabled.
-#[cfg(feature = "abi_x86_interrupt")]
 pub type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
-/// This type is not usable without the `abi_x86_interrupt` feature.
-#[cfg(not(feature = "abi_x86_interrupt"))]
-#[derive(Copy, Clone, Debug)]
-pub struct DivergingHandlerFunc(());
-
-/// A handler function with an error code that must not return, e.g. for a double fault exception.
-///
-/// This type alias is only usable with the `abi_x86_interrupt` feature enabled.
-#[cfg(feature = "abi_x86_interrupt")]
 pub type DivergingHandlerFuncWithErrCode =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
-/// This type is not usable without the `abi_x86_interrupt` feature.
-#[cfg(not(feature = "abi_x86_interrupt"))]
-#[derive(Copy, Clone, Debug)]
-pub struct DivergingHandlerFuncWithErrCode(());
-
-/// A general handler function for an interrupt or an exception with the interrupt/exceptions's index and an optional error code.
-pub type GeneralHandlerFunc = fn(InterruptStackFrame, index: u8, error_code: Option<u64>);
 
 impl<F> Entry<F> {
     /// Creates a non-present IDT entry (but sets the must-be-one bits).
@@ -1000,25 +953,6 @@ impl InterruptStackFrame {
             stack_pointer,
             stack_segment,
         ))
-    }
-
-    /// Gives mutable access to the contents of the interrupt stack frame.
-    ///
-    /// The `Volatile` wrapper is used because LLVM optimizations remove non-volatile
-    /// modifications of the interrupt stack frame.
-    ///
-    /// ## Safety
-    ///
-    /// This function is unsafe since modifying the content of the interrupt stack frame
-    /// can easily lead to undefined behavior. For example, by writing an invalid value to
-    /// the instruction pointer field, the CPU can jump to arbitrary code at the end of the
-    /// interrupt.
-    ///
-    /// Also, it is not fully clear yet whether modifications of the interrupt stack frame are
-    /// officially supported by LLVM's x86 interrupt calling convention.
-    #[inline]
-    pub unsafe fn as_mut(&mut self) -> Volatile<InterruptStackFrameValue> {
-        Volatile::new(self.0)
     }
 }
 
