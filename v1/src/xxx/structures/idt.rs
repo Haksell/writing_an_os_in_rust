@@ -132,13 +132,6 @@ impl InterruptDescriptorTable {
     }
 }
 
-impl Default for InterruptDescriptorTable {
-    #[inline]
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
 impl Index<u8> for InterruptDescriptorTable {
     type Output = Entry<HandlerFunc>;
 

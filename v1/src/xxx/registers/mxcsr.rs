@@ -23,15 +23,3 @@ bitflags! {
         const FLUSH_TO_ZERO = 1 << 15;
     }
 }
-
-impl Default for MxCsr {
-    #[inline]
-    fn default() -> Self {
-        MxCsr::INVALID_OPERATION_MASK
-            | MxCsr::DENORMAL_MASK
-            | MxCsr::DIVIDE_BY_ZERO_MASK
-            | MxCsr::OVERFLOW_MASK
-            | MxCsr::UNDERFLOW_MASK
-            | MxCsr::PRECISION_MASK
-    }
-}
