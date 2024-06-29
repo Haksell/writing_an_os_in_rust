@@ -2,25 +2,23 @@
 #[repr(transparent)]
 pub struct VirtAddr(u64);
 
-pub struct VirtAddrNotValid;
-
 impl VirtAddr {
     #[inline]
     pub const fn new(addr: u64) -> VirtAddr {
-        // TODO: Replace with .ok().expect(msg) when that works on stable.
+        // TODO: fix addresses that should be sign-extended with 1
         match Self::try_new(addr) {
-            Ok(v) => v,
-            Err(_) => panic!("virtual address must be sign extended in bits 48 to 64"),
+            Some(v) => v,
+            None => panic!("virtual address must be sign extended in bits 48 to 64"),
         }
     }
 
     #[inline]
-    pub const fn try_new(addr: u64) -> Result<VirtAddr, VirtAddrNotValid> {
+    pub const fn try_new(addr: u64) -> Option<VirtAddr> {
         let v = Self::new_truncate(addr);
         if v.0 == addr {
-            Ok(v)
+            Some(v)
         } else {
-            Err(VirtAddrNotValid)
+            None
         }
     }
 
