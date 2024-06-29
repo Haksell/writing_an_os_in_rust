@@ -5,7 +5,6 @@ use crate::xxx::structures::paging::page_table::PageTableLevel;
 use crate::xxx::structures::paging::PageTableIndex;
 use crate::xxx::VirtAddr;
 use core::fmt;
-#[cfg(feature = "step_trait")]
 use core::iter::Step;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
@@ -158,15 +157,11 @@ impl<S: PageSize> Page<S> {
         PageRangeInclusive { start, end }
     }
 
-    // FIXME: Move this into the `Step` impl, once `Step` is stabilized.
-    #[cfg(any(feature = "instructions", feature = "step_trait"))]
     pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
         VirtAddr::steps_between_impl(&start.start_address, &end.start_address)
             .map(|steps| steps / S::SIZE as usize)
     }
 
-    // FIXME: Move this into the `Step` impl, once `Step` is stabilized.
-    #[cfg(any(feature = "instructions", feature = "step_trait"))]
     pub(crate) fn forward_checked_impl(start: Self, count: usize) -> Option<Self> {
         let count = count.checked_mul(S::SIZE as usize)?;
         let start_address = VirtAddr::forward_checked_impl(start.start_address, count)?;
@@ -291,7 +286,6 @@ impl<S: PageSize> Sub<Self> for Page<S> {
     }
 }
 
-#[cfg(feature = "step_trait")]
 impl<S: PageSize> Step for Page<S> {
     fn steps_between(start: &Self, end: &Self) -> Option<usize> {
         Self::steps_between_impl(start, end)

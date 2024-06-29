@@ -1,7 +1,6 @@
 //! Abstractions for page tables and page table entries.
 
 use core::fmt;
-#[cfg(feature = "step_trait")]
 use core::iter::Step;
 use core::ops::{Index, IndexMut};
 
@@ -330,7 +329,6 @@ impl From<PageTableIndex> for usize {
     }
 }
 
-#[cfg(feature = "step_trait")]
 impl Step for PageTableIndex {
     #[inline]
     fn steps_between(start: &Self, end: &Self) -> Option<usize> {

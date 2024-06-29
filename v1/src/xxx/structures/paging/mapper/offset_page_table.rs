@@ -1,5 +1,3 @@
-#![cfg(target_pointer_width = "64")]
-
 use crate::xxx::structures::paging::{mapper::*, page_table::PageTable};
 
 /// A Mapper implementation that requires that the complete physically memory is mapped at some
