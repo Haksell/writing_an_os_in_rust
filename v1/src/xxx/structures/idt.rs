@@ -1,6 +1,5 @@
 use crate::asm::cs_get_reg;
 use crate::xxx::addr::VirtAddr;
-use crate::xxx::registers::rflags::RFlags;
 use crate::xxx::registers::SegmentSelector;
 use bit_field::BitField;
 use bitflags::bitflags;
@@ -213,7 +212,7 @@ pub struct InterruptStackFrameValue {
     instruction_pointer: VirtAddr,
     code_segment: SegmentSelector,
     _reserved1: [u8; 6],
-    cpu_flags: RFlags, // TODO: placeholder
+    _cpu_flags: u64,
     stack_pointer: VirtAddr,
     stack_segment: SegmentSelector,
     _reserved2: [u8; 6],

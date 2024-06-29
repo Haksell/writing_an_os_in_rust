@@ -1,5 +1,3 @@
-pub mod rflags; // TODO: remove
-
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
 pub struct SegmentSelector(pub u16);
