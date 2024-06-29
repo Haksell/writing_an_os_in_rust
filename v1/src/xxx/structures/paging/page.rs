@@ -41,7 +41,6 @@ pub struct Page<S: PageSize = Size4KiB> {
 }
 
 impl<S: PageSize> Page<S> {
-    /// Returns the page that contains the given virtual address.
     #[inline]
     pub fn containing_address(address: VirtAddr) -> Self {
         Page {
@@ -50,7 +49,6 @@ impl<S: PageSize> Page<S> {
         }
     }
 
-    /// Returns the start address of the page.
     #[inline]
     pub fn start_address(self) -> VirtAddr {
         self.start_address
@@ -128,13 +126,10 @@ impl<S: PageSize> Step for Page<S> {
     }
 }
 
-/// A range of pages with exclusive upper bound.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(C)]
 pub struct PageRange<S: PageSize = Size4KiB> {
-    /// The start of the range, inclusive.
     pub start: Page<S>,
-    /// The end of the range, exclusive.
     pub end: Page<S>,
 }
 
@@ -153,13 +148,10 @@ impl<S: PageSize> Iterator for PageRange<S> {
     }
 }
 
-/// A range of pages with inclusive upper bound.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(C)]
 pub struct PageRangeInclusive<S: PageSize = Size4KiB> {
-    /// The start of the range, inclusive.
     pub start: Page<S>,
-    /// The end of the range, inclusive.
     pub end: Page<S>,
 }
 
@@ -187,7 +179,6 @@ impl<S: PageSize> Iterator for PageRangeInclusive<S> {
     }
 }
 
-/// The given address was not sufficiently aligned.
 #[derive(Debug)]
 pub struct AddressNotAligned;
 

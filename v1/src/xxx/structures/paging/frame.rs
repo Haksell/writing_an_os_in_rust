@@ -4,17 +4,14 @@ use core::fmt;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
-/// A physical memory frame.
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(C)]
 pub struct PhysFrame<S: PageSize = Size4KiB> {
-    // TODO: Make private when our minimum supported stable Rust version is 1.61
     pub(crate) start_address: PhysAddr,
     size: PhantomData<S>,
 }
 
 impl<S: PageSize> PhysFrame<S> {
-    /// Returns the frame that contains the given physical address.
     #[inline]
     pub fn containing_address(address: PhysAddr) -> Self {
         PhysFrame {
@@ -23,7 +20,6 @@ impl<S: PageSize> PhysFrame<S> {
         }
     }
 
-    /// Returns the start address of the frame.
     #[inline]
     pub fn start_address(self) -> PhysAddr {
         self.start_address
@@ -78,13 +74,10 @@ impl<S: PageSize> Sub<PhysFrame<S>> for PhysFrame<S> {
     }
 }
 
-/// An range of physical memory frames, exclusive the upper bound.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(C)]
 pub struct PhysFrameRange<S: PageSize = Size4KiB> {
-    /// The start of the range, inclusive.
     pub start: PhysFrame<S>,
-    /// The end of the range, exclusive.
     pub end: PhysFrame<S>,
 }
 
@@ -112,13 +105,10 @@ impl<S: PageSize> fmt::Debug for PhysFrameRange<S> {
     }
 }
 
-/// An range of physical memory frames, inclusive the upper bound.
 #[derive(Clone, Copy, PartialEq, Eq, Hash)]
 #[repr(C)]
 pub struct PhysFrameRangeInclusive<S: PageSize = Size4KiB> {
-    /// The start of the range, inclusive.
     pub start: PhysFrame<S>,
-    /// The start of the range, inclusive.
     pub end: PhysFrame<S>,
 }
 

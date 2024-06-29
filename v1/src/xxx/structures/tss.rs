@@ -3,32 +3,19 @@
 use crate::xxx::VirtAddr;
 use core::mem::size_of;
 
-/// In 64-bit mode the TSS holds information that is not
-/// directly related to the task-switch mechanism,
-/// but is used for finding kernel level stack
-/// if interrupts arrive while in kernel mode.
 #[derive(Debug, Clone, Copy)]
 #[repr(C, packed(4))]
 pub struct TaskStateSegment {
     reserved_1: u32,
-    /// The full 64-bit canonical forms of the stack pointers (RSP) for privilege levels 0-2.
     pub privilege_stack_table: [VirtAddr; 3],
     reserved_2: u64,
-    /// The full 64-bit canonical forms of the interrupt stack table (IST) pointers.
     pub interrupt_stack_table: [VirtAddr; 7],
     reserved_3: u64,
     reserved_4: u16,
-    /// The 16-bit offset to the I/O permission bit map from the 64-bit TSS base.
     pub iomap_base: u16,
 }
 
 impl TaskStateSegment {
-    /// Creates a new TSS with zeroed privilege and interrupt stack table and an
-    /// empty I/O-Permission Bitmap.
-    ///
-    /// As we always set the TSS segment limit to
-    /// `size_of::<TaskStateSegment>() - 1`, this means that `iomap_base` is
-    /// initialized to `size_of::<TaskStateSegment>()`.
     #[inline]
     pub const fn new() -> TaskStateSegment {
         TaskStateSegment {
