@@ -8,67 +8,67 @@ use core::marker::PhantomData;
 #[repr(C)]
 #[repr(align(16))]
 pub struct InterruptDescriptorTable {
-    divide_error: Entry<HandlerFunc>,
-    debug: Entry<HandlerFunc>,
-    non_maskable_interrupt: Entry<HandlerFunc>,
-    pub breakpoint: Entry<HandlerFunc>,
-    overflow: Entry<HandlerFunc>,
-    bound_range_exceeded: Entry<HandlerFunc>,
-    invalid_opcode: Entry<HandlerFunc>,
-    device_not_available: Entry<HandlerFunc>,
-    pub double_fault: Entry<DivergingHandlerFuncWithErrCode>,
-    coprocessor_segment_overrun: Entry<HandlerFunc>,
-    invalid_tss: Entry<HandlerFuncWithErrCode>,
-    segment_not_present: Entry<HandlerFuncWithErrCode>,
-    stack_segment_fault: Entry<HandlerFuncWithErrCode>,
-    general_protection_fault: Entry<HandlerFuncWithErrCode>,
-    page_fault: Entry<HandlerFuncWithErrCode>,
-    reserved_1: Entry<HandlerFunc>,
-    x87_floating_point: Entry<HandlerFunc>,
-    alignment_check: Entry<HandlerFuncWithErrCode>,
-    machine_check: Entry<DivergingHandlerFunc>,
-    simd_floating_point: Entry<HandlerFunc>,
-    virtualization: Entry<HandlerFunc>,
-    cp_protection_exception: Entry<HandlerFuncWithErrCode>,
-    reserved_2: [Entry<HandlerFunc>; 6],
-    hv_injection_exception: Entry<HandlerFunc>,
-    vmm_communication_exception: Entry<HandlerFuncWithErrCode>,
-    security_exception: Entry<HandlerFuncWithErrCode>,
-    reserved_3: Entry<HandlerFunc>,
-    interrupts: [Entry<HandlerFunc>; 256 - 32],
+    divide_error: IdtEntry<HandlerFunc>,
+    debug: IdtEntry<HandlerFunc>,
+    non_maskable_interrupt: IdtEntry<HandlerFunc>,
+    pub breakpoint: IdtEntry<HandlerFunc>,
+    overflow: IdtEntry<HandlerFunc>,
+    bound_range_exceeded: IdtEntry<HandlerFunc>,
+    invalid_opcode: IdtEntry<HandlerFunc>,
+    device_not_available: IdtEntry<HandlerFunc>,
+    pub double_fault: IdtEntry<DivergingHandlerFuncWithErrCode>,
+    coprocessor_segment_overrun: IdtEntry<HandlerFunc>,
+    invalid_tss: IdtEntry<HandlerFuncWithErrCode>,
+    segment_not_present: IdtEntry<HandlerFuncWithErrCode>,
+    stack_segment_fault: IdtEntry<HandlerFuncWithErrCode>,
+    general_protection_fault: IdtEntry<HandlerFuncWithErrCode>,
+    page_fault: IdtEntry<HandlerFuncWithErrCode>,
+    reserved_1: IdtEntry<HandlerFunc>,
+    x87_floating_point: IdtEntry<HandlerFunc>,
+    alignment_check: IdtEntry<HandlerFuncWithErrCode>,
+    machine_check: IdtEntry<DivergingHandlerFunc>,
+    simd_floating_point: IdtEntry<HandlerFunc>,
+    virtualization: IdtEntry<HandlerFunc>,
+    cp_protection_exception: IdtEntry<HandlerFuncWithErrCode>,
+    reserved_2: [IdtEntry<HandlerFunc>; 6],
+    hv_injection_exception: IdtEntry<HandlerFunc>,
+    vmm_communication_exception: IdtEntry<HandlerFuncWithErrCode>,
+    security_exception: IdtEntry<HandlerFuncWithErrCode>,
+    reserved_3: IdtEntry<HandlerFunc>,
+    interrupts: [IdtEntry<HandlerFunc>; 256 - 32],
 }
 
 impl InterruptDescriptorTable {
     pub fn new() -> Self {
         Self {
-            divide_error: Entry::missing(),
-            debug: Entry::missing(),
-            non_maskable_interrupt: Entry::missing(),
-            breakpoint: Entry::missing(),
-            overflow: Entry::missing(),
-            bound_range_exceeded: Entry::missing(),
-            invalid_opcode: Entry::missing(),
-            device_not_available: Entry::missing(),
-            double_fault: Entry::missing(),
-            coprocessor_segment_overrun: Entry::missing(),
-            invalid_tss: Entry::missing(),
-            segment_not_present: Entry::missing(),
-            stack_segment_fault: Entry::missing(),
-            general_protection_fault: Entry::missing(),
-            page_fault: Entry::missing(),
-            reserved_1: Entry::missing(),
-            x87_floating_point: Entry::missing(),
-            alignment_check: Entry::missing(),
-            machine_check: Entry::missing(),
-            simd_floating_point: Entry::missing(),
-            virtualization: Entry::missing(),
-            cp_protection_exception: Entry::missing(),
-            reserved_2: [Entry::missing(); 6],
-            hv_injection_exception: Entry::missing(),
-            vmm_communication_exception: Entry::missing(),
-            security_exception: Entry::missing(),
-            reserved_3: Entry::missing(),
-            interrupts: [Entry::missing(); 256 - 32],
+            divide_error: IdtEntry::missing(),
+            debug: IdtEntry::missing(),
+            non_maskable_interrupt: IdtEntry::missing(),
+            breakpoint: IdtEntry::missing(),
+            overflow: IdtEntry::missing(),
+            bound_range_exceeded: IdtEntry::missing(),
+            invalid_opcode: IdtEntry::missing(),
+            device_not_available: IdtEntry::missing(),
+            double_fault: IdtEntry::missing(),
+            coprocessor_segment_overrun: IdtEntry::missing(),
+            invalid_tss: IdtEntry::missing(),
+            segment_not_present: IdtEntry::missing(),
+            stack_segment_fault: IdtEntry::missing(),
+            general_protection_fault: IdtEntry::missing(),
+            page_fault: IdtEntry::missing(),
+            reserved_1: IdtEntry::missing(),
+            x87_floating_point: IdtEntry::missing(),
+            alignment_check: IdtEntry::missing(),
+            machine_check: IdtEntry::missing(),
+            simd_floating_point: IdtEntry::missing(),
+            virtualization: IdtEntry::missing(),
+            cp_protection_exception: IdtEntry::missing(),
+            reserved_2: [IdtEntry::missing(); 6],
+            hv_injection_exception: IdtEntry::missing(),
+            vmm_communication_exception: IdtEntry::missing(),
+            security_exception: IdtEntry::missing(),
+            reserved_3: IdtEntry::missing(),
+            interrupts: [IdtEntry::missing(); 256 - 32],
         }
     }
 
@@ -89,7 +89,7 @@ impl InterruptDescriptorTable {
 
 #[derive(Clone, Copy)]
 #[repr(C)]
-pub struct Entry<F> {
+pub struct IdtEntry<F> {
     pointer_low: u16,
     options: EntryOptions,
     pointer_middle: u16,
@@ -104,10 +104,10 @@ pub type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -
 pub type DivergingHandlerFuncWithErrCode =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
 
-impl<F> Entry<F> {
+impl<F> IdtEntry<F> {
     #[inline]
     pub const fn missing() -> Self {
-        Entry {
+        IdtEntry {
             pointer_low: 0,
             pointer_middle: 0,
             pointer_high: 0,
@@ -118,7 +118,7 @@ impl<F> Entry<F> {
     }
 }
 
-impl<F: HandlerFuncType> Entry<F> {
+impl<F: HandlerFuncType> IdtEntry<F> {
     pub fn set_handler_fn(&mut self, handler: F) -> &mut EntryOptions {
         const PRESENT_BIT: usize = 15;
         let addr = handler.to_virt_addr().as_u64();
