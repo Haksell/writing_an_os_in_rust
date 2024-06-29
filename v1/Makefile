@@ -1,10 +1,11 @@
+NAME := blog_v1
 ARCH := x86_64
-BUILD := build/$(ARCH)/debug
+BUILD := build
 ISOFILES := $(BUILD)/isofiles
 KERNEL := $(BUILD)/kernel-$(ARCH).bin
 ISO := $(BUILD)/os-$(ARCH).iso
-TARGET := arch/$(ARCH)/blog_v1
-RUST_OS := target/$(TARGET)/debug/libblog_v1.a
+TARGET := arch/$(ARCH)/$(NAME)
+RUST_OS := target/$(TARGET)/debug/lib$(NAME).a
 LINKER_SCRIPT := arch/linker.ld
 GRUB_CFG := arch/grub.cfg
 ASM_SRCS := $(wildcard arch/$(ARCH)/*.asm)
