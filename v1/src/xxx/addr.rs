@@ -98,38 +98,10 @@ impl fmt::Debug for VirtAddr {
     }
 }
 
-impl fmt::Binary for VirtAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Binary::fmt(&self.0, f)
-    }
-}
-
 impl fmt::LowerHex for VirtAddr {
     #[inline]
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         fmt::LowerHex::fmt(&self.0, f)
-    }
-}
-
-impl fmt::Octal for VirtAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Octal::fmt(&self.0, f)
-    }
-}
-
-impl fmt::UpperHex for VirtAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::UpperHex::fmt(&self.0, f)
-    }
-}
-
-impl fmt::Pointer for VirtAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::Pointer::fmt(&(self.0 as *const ()), f)
     }
 }
 
