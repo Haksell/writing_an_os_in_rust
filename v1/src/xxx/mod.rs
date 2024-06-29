@@ -1,7 +1,6 @@
 //! This crate provides x86_64 specific functions and data structures,
 //! and access to various system registers.
 
-#![cfg_attr(not(test), no_std)]
 #![cfg_attr(feature = "const_fn", feature(const_mut_refs))] // GDT::append()
 #![cfg_attr(feature = "asm_const", feature(asm_const))]
 #![cfg_attr(feature = "abi_x86_interrupt", feature(abi_x86_interrupt))]
