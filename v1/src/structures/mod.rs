@@ -1,8 +1,8 @@
-use crate::virt_addr::VirtAddr;
-
 pub mod gdt;
 pub mod idt;
 pub mod tss;
+
+use crate::virt_addr::VirtAddr;
 
 #[derive(Clone, Copy)]
 #[repr(C, packed(2))]

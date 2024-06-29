@@ -9,8 +9,8 @@ mod asm;
 mod interrupts;
 mod memory;
 mod multiboot;
+mod structures;
 mod virt_addr;
-mod xxx; // TODO: better name
 
 extern crate alloc;
 

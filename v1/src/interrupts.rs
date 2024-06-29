@@ -1,10 +1,10 @@
 use crate::asm::{cs_set_reg, load_tss};
 use crate::memory::MemoryController;
+use crate::structures::gdt::{Descriptor, Gdt};
+use crate::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use crate::structures::tss::TaskStateSegment;
+use crate::structures::SegmentSelector;
 use crate::virt_addr::VirtAddr;
-use crate::xxx::structures::gdt::{Descriptor, Gdt};
-use crate::xxx::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
-use crate::xxx::structures::tss::TaskStateSegment;
-use crate::xxx::structures::SegmentSelector;
 use lazy_static::lazy_static;
 use spin::Once;
 

@@ -1,6 +1,6 @@
 use crate::asm::cs_get_reg;
+use crate::structures::SegmentSelector;
 use crate::virt_addr::VirtAddr;
-use crate::xxx::structures::SegmentSelector;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
@@ -86,9 +86,9 @@ impl InterruptDescriptorTable {
         }
     }
 
-    fn pointer(&self) -> crate::xxx::structures::DescriptorTablePointer {
+    fn pointer(&self) -> crate::structures::DescriptorTablePointer {
         use core::mem::size_of;
-        crate::xxx::structures::DescriptorTablePointer {
+        crate::structures::DescriptorTablePointer {
             base: VirtAddr::new(self as *const _ as u64),
             limit: (size_of::<Self>() - 1) as u16,
         }
