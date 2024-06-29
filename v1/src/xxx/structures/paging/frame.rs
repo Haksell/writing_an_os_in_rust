@@ -117,14 +117,6 @@ pub struct PhysFrameRange<S: PageSize = Size4KiB> {
     pub end: PhysFrame<S>,
 }
 
-impl<S: PageSize> PhysFrameRange<S> {
-    /// Returns whether the range contains no frames.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.start >= self.end
-    }
-}
-
 impl<S: PageSize> Iterator for PhysFrameRange<S> {
     type Item = PhysFrame<S>;
 
@@ -157,14 +149,6 @@ pub struct PhysFrameRangeInclusive<S: PageSize = Size4KiB> {
     pub start: PhysFrame<S>,
     /// The start of the range, inclusive.
     pub end: PhysFrame<S>,
-}
-
-impl<S: PageSize> PhysFrameRangeInclusive<S> {
-    /// Returns whether the range contains no frames.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.start > self.end
-    }
 }
 
 impl<S: PageSize> Iterator for PhysFrameRangeInclusive<S> {
