@@ -97,6 +97,10 @@ pub struct IdtEntry<F> {
     phantom: PhantomData<F>,
 }
 
+pub unsafe trait HandlerFuncType {
+    fn to_virt_addr(self) -> VirtAddr;
+}
+
 type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
 type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
 type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
@@ -143,10 +147,6 @@ impl<F: HandlerFuncType> IdtEntry<F> {
         self.options.bits.set_bit(PRESENT_BIT, true);
         &mut self.options
     }
-}
-
-pub unsafe trait HandlerFuncType {
-    fn to_virt_addr(self) -> VirtAddr;
 }
 
 #[repr(C)]
