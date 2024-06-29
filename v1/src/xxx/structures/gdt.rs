@@ -6,11 +6,6 @@ use bit_field::BitField as _;
 use bitflags::bitflags;
 use core::mem::size_of;
 
-pub enum Descriptor {
-    UserSegment(u64),
-    SystemSegment(u64, u64),
-}
-
 bitflags! {
     struct DescriptorFlags: u64 {
         const CONFORMING   = 1 << 42;
@@ -19,6 +14,11 @@ bitflags! {
         const PRESENT      = 1 << 47;
         const LONG_MODE    = 1 << 53;
     }
+}
+
+pub enum Descriptor {
+    UserSegment(u64),
+    SystemSegment(u64, u64),
 }
 
 impl Descriptor {

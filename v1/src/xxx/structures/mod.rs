@@ -1,5 +1,6 @@
 use crate::xxx::virt_addr::VirtAddr;
 
+pub mod gdt;
 pub mod idt;
 pub mod tss;
 
