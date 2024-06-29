@@ -14,12 +14,11 @@ pub struct TaskStateSegment {
 }
 
 impl TaskStateSegment {
-    #[inline]
-    pub const fn new() -> TaskStateSegment {
-        TaskStateSegment {
+    pub const fn new() -> Self {
+        Self {
             privilege_stack_table: [VirtAddr::zero(); 3],
             interrupt_stack_table: [VirtAddr::zero(); 7],
-            iomap_base: size_of::<TaskStateSegment>() as u16,
+            iomap_base: size_of::<Self>() as u16,
             reserved_1: 0,
             reserved_2: 0,
             reserved_3: 0,

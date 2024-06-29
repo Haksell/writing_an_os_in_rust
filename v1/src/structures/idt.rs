@@ -40,9 +40,8 @@ pub struct InterruptDescriptorTable {
 }
 
 impl InterruptDescriptorTable {
-    #[inline]
-    pub fn new() -> InterruptDescriptorTable {
-        InterruptDescriptorTable {
+    pub fn new() -> Self {
+        Self {
             divide_error: Entry::missing(),
             debug: Entry::missing(),
             non_maskable_interrupt: Entry::missing(),
@@ -76,11 +75,6 @@ impl InterruptDescriptorTable {
 
     #[inline]
     pub fn load(&'static self) {
-        unsafe { self.load_unsafe() }
-    }
-
-    #[inline]
-    pub unsafe fn load_unsafe(&self) {
         unsafe {
             crate::asm::lidt(&self.pointer());
         }
