@@ -5,7 +5,7 @@ ISOFILES := $(BUILD)/isofiles
 KERNEL := $(BUILD)/kernel-$(ARCH).bin
 ISO := $(BUILD)/os-$(ARCH).iso
 TARGET := arch/$(ARCH)/$(NAME)
-RUST_OS := target/$(TARGET)/debug/lib$(NAME).a
+RUST_OS := target/$(NAME)/debug/lib$(NAME).a
 LINKER_SCRIPT := linker.ld
 GRUB_CFG := grub.cfg
 ASM_SRCS := $(wildcard arch/$(ARCH)/*.asm)
@@ -26,7 +26,7 @@ clean:
 	rm -rf build rust_analyzer target || true
 	mv build rust_analyzer target $$HOME/.local/share/Trash/files/ || true
 
-$(ISO): $(KERNEL) $(GRUB_CFG) $(ASM_SRCS) $(TARGET).json
+$(ISO): $(KERNEL) $(GRUB_CFG) $(ASM_SRCS) $(NAME).json
 	@mkdir -p $(ISOFILES)/boot/grub
 	@cp $(KERNEL) $(ISOFILES)/boot/kernel.bin
 	@cp $(GRUB_CFG) $(ISOFILES)/boot/grub
@@ -37,7 +37,7 @@ $(KERNEL): $(RUST_OS) $(ASM_OBJS) $(LINKER_SCRIPT)
 	@ld $(LD_FLAGS) -n --gc-sections -T $(LINKER_SCRIPT) -o $(KERNEL) $(ASM_OBJS) $(RUST_OS)
 
 $(RUST_OS):
-	@export RUST_TARGET_PATH=$(shell pwd) ; cargo build --target $(TARGET) $(CARGO_FLAGS)
+	@export RUST_TARGET_PATH=$(shell pwd) ; cargo build --target $(NAME) $(CARGO_FLAGS)
 
 $(ASM_OBJS): $(BUILD)/arch/$(ARCH)/%.o: arch/$(ARCH)/%.asm
 	@mkdir -p $(shell dirname $@)
