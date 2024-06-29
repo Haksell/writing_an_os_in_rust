@@ -1,6 +1,7 @@
 use super::entry::EntryFlags;
 use super::table::{Level4, Table, P4};
 use super::{Page, PhysicalAddress, VirtualAddress};
+use crate::asm::tlb_flush;
 use crate::memory::{paging::ENTRY_COUNT, Frame, FrameAllocator, PAGE_SIZE};
 use core::ptr::Unique;
 
@@ -107,7 +108,7 @@ impl Mapper {
             .expect("mapping code does not support huge pages");
         // let frame = p1[page.p1_index()].pointed_frame().unwrap();
         p1[page.p1_index()].set_unused();
-        x86_64::instructions::tlb::flush(x86_64::VirtAddr::new(page.start_address() as u64));
+        tlb_flush(page.start_address() as u64);
         // TODO: free p1, p2, p3 tables if empty
         // allocator.deallocate_frame(frame)
     }

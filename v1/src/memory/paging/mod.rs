@@ -7,12 +7,12 @@ pub use self::{entry::EntryFlags, mapper::Mapper};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::{vga_buffer::VGA_ADDRESS, MULTIBOOT};
-use core::{
-    arch::asm,
-    ops::{Add, Deref, DerefMut},
+use crate::{
+    asm::{cr3_read, cr3_write, tlb_flush_all},
+    vga_buffer::VGA_ADDRESS,
+    MULTIBOOT,
 };
-use x86_64::instructions::tlb;
+use core::ops::{Add, Deref, DerefMut};
 
 const ENTRY_COUNT: usize = 512;
 
@@ -109,21 +109,6 @@ impl DerefMut for ActivePageTable {
     }
 }
 
-fn cr3_read() -> usize {
-    let cr3: usize;
-    unsafe {
-        asm!("mov {}, cr3", out(reg) cr3, options(nomem, nostack, preserves_flags));
-    }
-    cr3
-}
-
-unsafe fn cr3_write(addr: PhysicalAddress) {
-    let value = addr as u64;
-    unsafe {
-        asm!("mov cr3, {}", in(reg) value, options(nostack, preserves_flags));
-    }
-}
-
 impl ActivePageTable {
     unsafe fn new() -> Self {
         Self {
@@ -144,10 +129,10 @@ impl ActivePageTable {
                 table.p4_frame.clone(),
                 EntryFlags::PRESENT | EntryFlags::WRITABLE,
             );
-            tlb::flush_all();
+            tlb_flush_all();
             f(self);
             p4_table[511].set(backup, EntryFlags::PRESENT | EntryFlags::WRITABLE);
-            tlb::flush_all();
+            tlb_flush_all();
         }
         temporary_page.unmap(self);
     }
@@ -194,7 +179,7 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
                 continue;
             }
             println!(
-                "mapping section from {:#x} to {:#x}",
+                "Mapping section from {:#x} to {:#x}",
                 section.start_address(),
                 section.end_address()
             );
@@ -225,6 +210,6 @@ pub fn remap_the_kernel<A: FrameAllocator>(allocator: &mut A) -> ActivePageTable
     // TODO: stack probes (https://github.com/rust-lang/rust/issues/16012)
     let old_p4_page = Page::containing_address(old_table.p4_frame.start_address());
     active_table.unmap(old_p4_page, allocator);
-    println!("guard page at {:#x}", old_p4_page.start_address());
+    println!("Guard page at {:#x}", old_p4_page.start_address());
     active_table
 }

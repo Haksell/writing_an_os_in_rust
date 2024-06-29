@@ -1,19 +1,12 @@
-mod gdt;
-
-use self::gdt::Gdt;
+use crate::asm::{cs_set_reg, load_tss};
 use crate::memory::MemoryController;
+use crate::structures::gdt::{Descriptor, Gdt};
+use crate::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use crate::structures::tss::TaskStateSegment;
+use crate::structures::SegmentSelector;
+use crate::virt_addr::VirtAddr;
 use lazy_static::lazy_static;
 use spin::Once;
-use x86_64::{
-    instructions::tables::load_tss,
-    registers::segmentation::{Segment as _, CS},
-    structures::{
-        gdt::SegmentSelector,
-        idt::{InterruptDescriptorTable, InterruptStackFrame},
-        tss::TaskStateSegment,
-    },
-    VirtAddr,
-};
 
 const DOUBLE_FAULT_IST_INDEX: usize = 0;
 
@@ -46,13 +39,13 @@ pub fn init(memory_controller: &mut MemoryController) {
 
     let (gdt, code_selector, tss_selector) = GDT.call_once(|| {
         let mut gdt = Gdt::new();
-        let code_selector = gdt.add_entry(gdt::Descriptor::kernel_code_segment());
-        let tss_selector = gdt.add_entry(gdt::Descriptor::tss_segment(&tss));
+        let code_selector = gdt.add_entry(Descriptor::kernel_code_segment());
+        let tss_selector = gdt.add_entry(Descriptor::tss_segment(&tss));
         (gdt, code_selector, tss_selector)
     });
     gdt.load();
     unsafe {
-        CS::set_reg(*code_selector);
+        cs_set_reg(*code_selector);
         load_tss(*tss_selector);
     }
     println!("GDT loaded.");
@@ -61,12 +54,13 @@ pub fn init(memory_controller: &mut MemoryController) {
     println!("IDT loaded.");
 }
 
-extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
-    println!("EXCEPTION: BREAKPOINT\n{:?}", stack_frame);
+// TODO: reimplement Debug for InterruptStackFrame
+
+extern "x86-interrupt" fn breakpoint_handler(_: InterruptStackFrame) {
+    println!("EXCEPTION: BREAKPOINT");
 }
 
-extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _: u64) -> ! {
-    // TODO: fix bug where it only shows the first line of the stack frame
-    println!("EXCEPTION: DOUBLE FAULT\n{:?}", stack_frame);
+extern "x86-interrupt" fn double_fault_handler(_: InterruptStackFrame, _: u64) -> ! {
+    println!("EXCEPTION: DOUBLE FAULT");
     loop {}
 }

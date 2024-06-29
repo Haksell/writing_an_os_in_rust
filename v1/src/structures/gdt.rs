@@ -1,15 +1,10 @@
+use crate::structures::tss::TaskStateSegment;
+use crate::structures::DescriptorTablePointer;
+use crate::structures::SegmentSelector;
+use crate::virt_addr::VirtAddr;
 use bit_field::BitField as _;
 use bitflags::bitflags;
 use core::mem::size_of;
-use x86_64::{
-    structures::{gdt::SegmentSelector, tss::TaskStateSegment, DescriptorTablePointer},
-    PrivilegeLevel, VirtAddr,
-};
-
-pub enum Descriptor {
-    UserSegment(u64),
-    SystemSegment(u64, u64),
-}
 
 bitflags! {
     struct DescriptorFlags: u64 {
@@ -19,6 +14,11 @@ bitflags! {
         const PRESENT      = 1 << 47;
         const LONG_MODE    = 1 << 53;
     }
+}
+
+pub enum Descriptor {
+    UserSegment(u64),
+    SystemSegment(u64, u64),
 }
 
 impl Descriptor {
@@ -66,7 +66,7 @@ impl Gdt {
                 index
             }
         };
-        SegmentSelector::new(index as u16, PrivilegeLevel::Ring0)
+        SegmentSelector::new(index as u16, 0)
     }
 
     fn push(&mut self, value: u64) -> usize {
@@ -82,6 +82,6 @@ impl Gdt {
             limit: (self.table.len() * size_of::<u64>() - 1) as u16,
             base: VirtAddr::new(self.table.as_ptr() as u64),
         };
-        unsafe { x86_64::instructions::tables::lgdt(&ptr) };
+        unsafe { crate::asm::lgdt(&ptr) };
     }
 }
