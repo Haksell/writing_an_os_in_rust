@@ -97,11 +97,26 @@ pub struct IdtEntry<F> {
     phantom: PhantomData<F>,
 }
 
-pub type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
-pub type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
-pub type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
-pub type DivergingHandlerFuncWithErrCode =
+type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
+type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
+type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
+type DivergingHandlerFuncWithErrCode =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
+
+macro_rules! impl_handler_func_type {
+    ($f:ty) => {
+        unsafe impl HandlerFuncType for $f {
+            fn to_virt_addr(self) -> VirtAddr {
+                VirtAddr::new(self as u64)
+            }
+        }
+    };
+}
+
+impl_handler_func_type!(HandlerFunc);
+impl_handler_func_type!(HandlerFuncWithErrCode);
+impl_handler_func_type!(DivergingHandlerFunc);
+impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
 impl<F> IdtEntry<F> {
     pub const fn missing() -> Self {
@@ -133,21 +148,6 @@ impl<F: HandlerFuncType> IdtEntry<F> {
 pub unsafe trait HandlerFuncType {
     fn to_virt_addr(self) -> VirtAddr;
 }
-
-macro_rules! impl_handler_func_type {
-    ($f:ty) => {
-        unsafe impl HandlerFuncType for $f {
-            fn to_virt_addr(self) -> VirtAddr {
-                VirtAddr::new(self as u64)
-            }
-        }
-    };
-}
-
-impl_handler_func_type!(HandlerFunc);
-impl_handler_func_type!(HandlerFuncWithErrCode);
-impl_handler_func_type!(DivergingHandlerFunc);
-impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq)]
