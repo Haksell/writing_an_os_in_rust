@@ -3,6 +3,13 @@ use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
 
 #[inline]
+pub unsafe fn lidt(idt: &DescriptorTablePointer) {
+    unsafe {
+        asm!("lidt [{}]", in(reg) idt, options(readonly, nostack, preserves_flags));
+    }
+}
+
+#[inline]
 pub unsafe fn lgdt(gdt: &DescriptorTablePointer) {
     unsafe {
         asm!("lgdt [{}]", in(reg) gdt, options(readonly, nostack, preserves_flags));

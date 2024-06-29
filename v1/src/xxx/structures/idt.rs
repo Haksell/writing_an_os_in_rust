@@ -1,6 +1,6 @@
 use crate::asm::cs_get_reg;
-use crate::xxx::virt_addr::VirtAddr;
 use crate::xxx::segment_selector::SegmentSelector;
+use crate::xxx::virt_addr::VirtAddr;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
@@ -82,7 +82,7 @@ impl InterruptDescriptorTable {
     #[inline]
     pub unsafe fn load_unsafe(&self) {
         unsafe {
-            super::super::instructions::tables::lidt(&self.pointer());
+            crate::asm::lidt(&self.pointer());
         }
     }
 
