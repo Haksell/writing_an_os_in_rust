@@ -1,5 +1,5 @@
+use crate::xxx::segment_selector::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
-use crate::xxx::SegmentSelector;
 use core::arch::asm;
 
 #[inline]

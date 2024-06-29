@@ -5,7 +5,7 @@ use crate::xxx::structures::idt::InterruptDescriptorTable;
 use crate::xxx::structures::idt::InterruptStackFrame;
 use crate::xxx::structures::tss::TaskStateSegment;
 use crate::xxx::virt_addr::VirtAddr;
-use crate::xxx::SegmentSelector;
+use crate::xxx::segment_selector::SegmentSelector;
 use crate::{
     asm::{cs_set_reg, load_tss},
     memory::MemoryController,
