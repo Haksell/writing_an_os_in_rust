@@ -1,7 +1,6 @@
-use super::gdt::SegmentSelector;
 use crate::xxx::addr::VirtAddr;
 use crate::xxx::registers::rflags::RFlags;
-use crate::xxx::registers::segmentation::{Segment as _, CS};
+use crate::xxx::registers::segmentation::{Segment as _, SegmentSelector, CS};
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;

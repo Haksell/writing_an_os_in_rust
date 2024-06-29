@@ -1,5 +1,4 @@
-use crate::xxx::registers::segmentation::{Segment, CS};
-use crate::xxx::structures::gdt::SegmentSelector;
+use crate::xxx::registers::segmentation::{Segment, SegmentSelector, CS};
 use core::arch::asm;
 
 macro_rules! segment_impl {

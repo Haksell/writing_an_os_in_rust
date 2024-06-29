@@ -1,7 +1,7 @@
-use crate::xxx::structures::gdt::SegmentSelector;
+use crate::xxx::addr::VirtAddr;
+use crate::xxx::registers::segmentation::SegmentSelector;
 use crate::xxx::structures::tss::TaskStateSegment;
 use crate::xxx::structures::DescriptorTablePointer;
-use crate::xxx::addr::VirtAddr;
 use bit_field::BitField as _;
 use bitflags::bitflags;
 use core::mem::size_of;

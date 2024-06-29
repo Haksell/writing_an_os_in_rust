@@ -2,7 +2,7 @@ use crate::xxx::registers::control::Cr0;
 use crate::xxx::registers::control::Cr0Flags;
 use crate::xxx::registers::control::Cr3;
 use crate::xxx::registers::model_specific::Msr;
-use crate::xxx::structures::gdt::SegmentSelector;
+use crate::xxx::registers::segmentation::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
 
