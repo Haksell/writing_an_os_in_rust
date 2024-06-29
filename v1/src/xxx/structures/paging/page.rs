@@ -1,5 +1,4 @@
 use crate::xxx::VirtAddr;
-use core::iter::Step;
 use core::marker::PhantomData;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
@@ -52,20 +51,6 @@ impl<S: PageSize> Page<S> {
     pub fn start_address(self) -> VirtAddr {
         self.start_address
     }
-
-    pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
-        VirtAddr::steps_between_impl(&start.start_address, &end.start_address)
-            .map(|steps| steps / S::SIZE as usize)
-    }
-
-    pub(crate) fn forward_checked_impl(start: Self, count: usize) -> Option<Self> {
-        let count = count.checked_mul(S::SIZE as usize)?;
-        let start_address = VirtAddr::forward_checked_impl(start.start_address, count)?;
-        Some(Self {
-            start_address,
-            size: PhantomData,
-        })
-    }
 }
 
 impl<S: PageSize> Add<u64> for Page<S> {
@@ -103,25 +88,6 @@ impl<S: PageSize> Sub<Self> for Page<S> {
     #[inline]
     fn sub(self, rhs: Self) -> Self::Output {
         (self.start_address - rhs.start_address) / S::SIZE
-    }
-}
-
-impl<S: PageSize> Step for Page<S> {
-    fn steps_between(start: &Self, end: &Self) -> Option<usize> {
-        Self::steps_between_impl(start, end)
-    }
-
-    fn forward_checked(start: Self, count: usize) -> Option<Self> {
-        Self::forward_checked_impl(start, count)
-    }
-
-    fn backward_checked(start: Self, count: usize) -> Option<Self> {
-        let count = count.checked_mul(S::SIZE as usize)?;
-        let start_address = Step::backward_checked(start.start_address, count)?;
-        Some(Self {
-            start_address,
-            size: PhantomData,
-        })
     }
 }
 

@@ -1,10 +1,5 @@
-use bit_field::BitField;
-use core::convert::TryFrom;
 use core::fmt;
-use core::iter::Step;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
-
-const ADDRESS_SPACE_SIZE: u64 = 0x1_0000_0000_0000;
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
 #[repr(transparent)]
@@ -42,11 +37,6 @@ impl VirtAddr {
     }
 
     #[inline]
-    pub const unsafe fn new_unsafe(addr: u64) -> VirtAddr {
-        VirtAddr(addr)
-    }
-
-    #[inline]
     pub const fn zero() -> VirtAddr {
         VirtAddr(0)
     }
@@ -59,34 +49,6 @@ impl VirtAddr {
     #[inline]
     pub(crate) const fn align_down_u64(self, align: u64) -> Self {
         VirtAddr::new_truncate(align_down(self.0, align))
-    }
-
-    pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
-        let mut steps = end.0.checked_sub(start.0)?;
-        steps &= 0xffff_ffff_ffff;
-        usize::try_from(steps).ok()
-    }
-
-    #[inline]
-    pub(crate) fn forward_checked_impl(start: Self, count: usize) -> Option<Self> {
-        let offset = u64::try_from(count).ok()?;
-        if offset > ADDRESS_SPACE_SIZE {
-            return None;
-        }
-
-        let mut addr = start.0.checked_add(offset)?;
-
-        match addr.get_bits(47..) {
-            0x1 => {
-                addr.set_bits(47.., 0x1ffff);
-            }
-            0x2 => {
-                return None;
-            }
-            _ => {}
-        }
-
-        Some(unsafe { Self::new_unsafe(addr) })
     }
 }
 
@@ -140,42 +102,6 @@ impl Sub<VirtAddr> for VirtAddr {
     #[inline]
     fn sub(self, rhs: VirtAddr) -> Self::Output {
         self.as_u64().checked_sub(rhs.as_u64()).unwrap()
-    }
-}
-
-impl Step for VirtAddr {
-    #[inline]
-    fn steps_between(start: &Self, end: &Self) -> Option<usize> {
-        Self::steps_between_impl(start, end)
-    }
-
-    #[inline]
-    fn forward_checked(start: Self, count: usize) -> Option<Self> {
-        Self::forward_checked_impl(start, count)
-    }
-
-    #[inline]
-    fn backward_checked(start: Self, count: usize) -> Option<Self> {
-        let offset = u64::try_from(count).ok()?;
-        if offset > ADDRESS_SPACE_SIZE {
-            return None;
-        }
-
-        let mut addr = start.0.checked_sub(offset)?;
-
-        match addr.get_bits(47..) {
-            0x1fffe => {
-                // Jump the gap by sign extending the 47th bit.
-                addr.set_bits(47.., 0);
-            }
-            0x1fffd => {
-                // Address underflow
-                return None;
-            }
-            _ => {}
-        }
-
-        Some(unsafe { Self::new_unsafe(addr) })
     }
 }
 
