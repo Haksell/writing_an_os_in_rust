@@ -7,14 +7,11 @@ use crate::{
 };
 use lazy_static::lazy_static;
 use spin::Once;
-use x86_64::{
-    structures::{
-        gdt::SegmentSelector,
-        idt::{InterruptDescriptorTable, InterruptStackFrame},
-        tss::TaskStateSegment,
-    },
-    VirtAddr,
-};
+use x86_64::structures::gdt::SegmentSelector;
+use x86_64::structures::idt::InterruptDescriptorTable;
+use x86_64::structures::idt::InterruptStackFrame;
+use x86_64::structures::tss::TaskStateSegment;
+use x86_64::VirtAddr;
 
 const DOUBLE_FAULT_IST_INDEX: usize = 0;
 
