@@ -1,7 +1,6 @@
 //! Abstractions for default-sized and huge virtual memory pages.
 
 use crate::xxx::sealed::Sealed;
-use crate::xxx::structures::paging::page_table::PageTableLevel;
 use crate::xxx::structures::paging::PageTableIndex;
 use crate::xxx::VirtAddr;
 use core::fmt;
@@ -105,12 +104,6 @@ impl<S: PageSize> Page<S> {
     #[inline]
     pub fn p3_index(self) -> PageTableIndex {
         self.start_address().p3_index()
-    }
-
-    /// Returns the table index of this page at the specified level.
-    #[inline]
-    pub fn page_table_index(self, level: PageTableLevel) -> PageTableIndex {
-        self.start_address().page_table_index(level)
     }
 
     /// Returns a range of pages, inclusive `end`.

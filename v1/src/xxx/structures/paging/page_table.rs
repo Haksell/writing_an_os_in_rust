@@ -1,13 +1,10 @@
 //! Abstractions for page tables and page table entries.
 
+use crate::xxx::addr::PhysAddr;
+use bitflags::bitflags;
 use core::fmt;
 use core::iter::Step;
 use core::ops::{Index, IndexMut};
-
-use super::{PageSize, PhysFrame, Size4KiB};
-use crate::xxx::addr::PhysAddr;
-
-use bitflags::bitflags;
 
 /// A 64-bit page table entry.
 #[derive(Clone)]
@@ -21,18 +18,6 @@ impl PageTableEntry {
     #[inline]
     pub const fn new() -> Self {
         PageTableEntry { entry: 0 }
-    }
-
-    /// Returns whether this entry is zero.
-    #[inline]
-    pub const fn is_unused(&self) -> bool {
-        self.entry == 0
-    }
-
-    /// Sets this entry to zero.
-    #[inline]
-    pub fn set_unused(&mut self) {
-        self.entry = 0;
     }
 
     /// Returns the flags of this entry.
@@ -156,27 +141,6 @@ impl PageTable {
         PageTable {
             entries: [EMPTY; ENTRY_COUNT],
         }
-    }
-
-    /// Clears all entries.
-    #[inline]
-    pub fn zero(&mut self) {
-        for entry in self.iter_mut() {
-            entry.set_unused();
-        }
-    }
-
-    /// Returns an iterator over the entries of the page table.
-    #[inline]
-    pub fn iter(&self) -> impl Iterator<Item = &PageTableEntry> {
-        (0..512).map(move |i| &self.entries[i])
-    }
-
-    /// Returns an iterator that allows modifying the entries of the page table.
-    #[inline]
-    pub fn iter_mut(&mut self) -> impl Iterator<Item = &mut PageTableEntry> {
-        let ptr = self.entries.as_mut_ptr();
-        (0..512).map(move |i| unsafe { &mut *ptr.add(i) })
     }
 }
 
@@ -348,40 +312,5 @@ impl From<PageOffset> for usize {
     #[inline]
     fn from(offset: PageOffset) -> Self {
         usize::from(offset.0)
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-/// A value between 1 and 4.
-pub enum PageTableLevel {
-    /// Represents the level for a page table.
-    One = 1,
-    /// Represents the level for a page directory.
-    Two,
-    /// Represents the level for a page-directory pointer.
-    Three,
-    /// Represents the level for a page-map level-4.
-    Four,
-}
-
-impl PageTableLevel {
-    /// Returns the next lower level or `None` for level 1
-    pub const fn next_lower_level(self) -> Option<Self> {
-        match self {
-            PageTableLevel::Four => Some(PageTableLevel::Three),
-            PageTableLevel::Three => Some(PageTableLevel::Two),
-            PageTableLevel::Two => Some(PageTableLevel::One),
-            PageTableLevel::One => None,
-        }
-    }
-
-    /// Returns the alignment for the address space described by a table of this level.
-    pub const fn table_address_space_alignment(self) -> u64 {
-        1u64 << (self as u8 * 9 + 12)
-    }
-
-    /// Returns the alignment for the address space described by an entry in a table of this level.
-    pub const fn entry_address_space_alignment(self) -> u64 {
-        1u64 << (((self as u8 - 1) * 9) + 12)
     }
 }

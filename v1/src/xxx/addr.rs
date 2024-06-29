@@ -5,7 +5,6 @@ use core::fmt;
 use core::iter::Step;
 use core::ops::{Add, AddAssign, Sub, SubAssign};
 
-use crate::xxx::structures::paging::page_table::PageTableLevel;
 use crate::xxx::structures::paging::{PageOffset, PageTableIndex};
 use bit_field::BitField;
 
@@ -177,12 +176,6 @@ impl VirtAddr {
     #[inline]
     pub const fn p4_index(self) -> PageTableIndex {
         PageTableIndex::new_truncate((self.0 >> 12 >> 9 >> 9 >> 9) as u16)
-    }
-
-    /// Returns the 9-bit level page table index.
-    #[inline]
-    pub const fn page_table_index(self, level: PageTableLevel) -> PageTableIndex {
-        PageTableIndex::new_truncate((self.0 >> 12 >> ((level as u8 - 1) * 9)) as u16)
     }
 
     pub(crate) fn steps_between_impl(start: &Self, end: &Self) -> Option<usize> {
