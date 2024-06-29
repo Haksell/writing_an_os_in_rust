@@ -1,4 +1,3 @@
-use core::fmt;
 use core::ops::{Add, Sub};
 
 #[derive(Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
@@ -49,21 +48,6 @@ impl VirtAddr {
     #[inline]
     pub(crate) const fn align_down_u64(self, align: u64) -> Self {
         VirtAddr::new_truncate(align_down(self.0, align))
-    }
-}
-
-impl fmt::Debug for VirtAddr {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("VirtAddr")
-            .field(&format_args!("{:#x}", self.0))
-            .finish()
-    }
-}
-
-impl fmt::LowerHex for VirtAddr {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        fmt::LowerHex::fmt(&self.0, f)
     }
 }
 

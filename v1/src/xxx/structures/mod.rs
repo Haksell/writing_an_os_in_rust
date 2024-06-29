@@ -5,7 +5,7 @@ pub mod idt;
 pub mod paging;
 pub mod tss;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 #[repr(C, packed(2))]
 pub struct DescriptorTablePointer {
     pub limit: u16,

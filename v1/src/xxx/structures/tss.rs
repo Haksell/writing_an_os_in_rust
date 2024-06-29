@@ -1,7 +1,7 @@
 use crate::xxx::VirtAddr;
 use core::mem::size_of;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Clone, Copy)]
 #[repr(C, packed(4))]
 pub struct TaskStateSegment {
     reserved_1: u32,

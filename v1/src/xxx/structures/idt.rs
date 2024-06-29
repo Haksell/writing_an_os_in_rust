@@ -3,7 +3,6 @@ use crate::xxx::registers::rflags::RFlags;
 use crate::xxx::VirtAddr;
 use bit_field::BitField;
 use bitflags::bitflags;
-use core::fmt;
 use core::marker::PhantomData;
 use core::ops::Deref;
 
@@ -219,13 +218,6 @@ impl Deref for InterruptStackFrame {
     }
 }
 
-impl fmt::Debug for InterruptStackFrame {
-    #[inline]
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
 #[derive(Clone, Copy)]
 #[repr(C)]
 pub struct InterruptStackFrameValue {
@@ -236,18 +228,6 @@ pub struct InterruptStackFrameValue {
     pub stack_pointer: VirtAddr,
     pub stack_segment: SegmentSelector,
     _reserved2: [u8; 6],
-}
-
-impl fmt::Debug for InterruptStackFrameValue {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let mut s = f.debug_struct("InterruptStackFrame");
-        s.field("instruction_pointer", &self.instruction_pointer);
-        s.field("code_segment", &self.code_segment);
-        s.field("cpu_flags", &self.cpu_flags);
-        s.field("stack_pointer", &self.stack_pointer);
-        s.field("stack_segment", &self.stack_segment);
-        s.finish()
-    }
 }
 
 bitflags! {

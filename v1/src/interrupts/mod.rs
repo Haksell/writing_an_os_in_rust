@@ -59,12 +59,13 @@ pub fn init(memory_controller: &mut MemoryController) {
     println!("IDT loaded.");
 }
 
-extern "x86-interrupt" fn breakpoint_handler(stack_frame: InterruptStackFrame) {
-    println!("EXCEPTION: BREAKPOINT\n{:?}", stack_frame);
+// TODO: reimplement Debug for InterruptStackFrame
+
+extern "x86-interrupt" fn breakpoint_handler(_: InterruptStackFrame) {
+    println!("EXCEPTION: BREAKPOINT");
 }
 
-extern "x86-interrupt" fn double_fault_handler(stack_frame: InterruptStackFrame, _: u64) -> ! {
-    // TODO: fix bug where it only shows the first line of the stack frame
-    println!("EXCEPTION: DOUBLE FAULT\n{:?}", stack_frame);
+extern "x86-interrupt" fn double_fault_handler(_: InterruptStackFrame, _: u64) -> ! {
+    println!("EXCEPTION: DOUBLE FAULT");
     loop {}
 }
