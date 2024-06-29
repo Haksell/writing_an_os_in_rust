@@ -1,7 +1,12 @@
 #![no_std]
 #![allow(internal_features)]
-#![feature(abi_x86_interrupt, allocator_api, ptr_internals, ptr_metadata)]
-#![feature(asm_const, const_mut_refs, step_trait)] // TODO: remove?
+#![feature(
+    abi_x86_interrupt,
+    allocator_api,
+    ptr_internals,
+    ptr_metadata,
+    step_trait
+)] // TODO: remove unused
 
 #[macro_use]
 mod vga_buffer;
