@@ -125,13 +125,6 @@ impl VirtAddr {
         self.0
     }
 
-    /// Creates a virtual address from the given pointer
-    #[cfg(target_pointer_width = "64")]
-    #[inline]
-    pub fn from_ptr<T: ?Sized>(ptr: *const T) -> Self {
-        Self::new(ptr as *const () as u64)
-    }
-
     /// Converts the address to a raw pointer.
     #[cfg(target_pointer_width = "64")]
     #[inline]
@@ -144,28 +137,6 @@ impl VirtAddr {
     #[inline]
     pub const fn as_mut_ptr<T>(self) -> *mut T {
         self.as_ptr::<T>() as *mut T
-    }
-
-    /// Convenience method for checking if a virtual address is null.
-    #[inline]
-    pub const fn is_null(self) -> bool {
-        self.0 == 0
-    }
-
-    /// Aligns the virtual address upwards to the given alignment.
-    ///
-    /// See the `align_up` function for more information.
-    ///
-    /// # Panics
-    ///
-    /// This function panics if the resulting address is higher than
-    /// `0xffff_ffff_ffff_ffff`.
-    #[inline]
-    pub fn align_up<U>(self, align: U) -> Self
-    where
-        U: Into<u64>,
-    {
-        VirtAddr::new_truncate(align_up(self.0, align.into()))
     }
 
     /// Aligns the virtual address downwards to the given alignment.
@@ -185,15 +156,6 @@ impl VirtAddr {
     #[inline]
     pub(crate) const fn align_down_u64(self, align: u64) -> Self {
         VirtAddr::new_truncate(align_down(self.0, align))
-    }
-
-    /// Checks whether the virtual address has the demanded alignment.
-    #[inline]
-    pub fn is_aligned<U>(self, align: U) -> bool
-    where
-        U: Into<u64>,
-    {
-        self.is_aligned_u64(align.into())
     }
 
     /// Checks whether the virtual address has the demanded alignment.
@@ -428,16 +390,6 @@ impl PhysAddr {
         PhysAddr(addr % (1 << 52))
     }
 
-    /// Creates a new physical address, without any checks.
-    ///
-    /// ## Safety
-    ///
-    /// You must make sure bits 52..64 are zero. This is not checked.
-    #[inline]
-    pub const unsafe fn new_unsafe(addr: u64) -> PhysAddr {
-        PhysAddr(addr)
-    }
-
     /// Tries to create a new physical address.
     ///
     /// Fails if any bits in the range 52 to 64 are set.
@@ -451,49 +403,10 @@ impl PhysAddr {
         }
     }
 
-    /// Creates a physical address that points to `0`.
-    #[inline]
-    pub const fn zero() -> PhysAddr {
-        PhysAddr(0)
-    }
-
     /// Converts the address to an `u64`.
     #[inline]
     pub const fn as_u64(self) -> u64 {
         self.0
-    }
-
-    /// Convenience method for checking if a physical address is null.
-    #[inline]
-    pub const fn is_null(self) -> bool {
-        self.0 == 0
-    }
-
-    /// Aligns the physical address upwards to the given alignment.
-    ///
-    /// See the `align_up` function for more information.
-    ///
-    /// # Panics
-    ///
-    /// This function panics if the resulting address has a bit in the range 52
-    /// to 64 set.
-    #[inline]
-    pub fn align_up<U>(self, align: U) -> Self
-    where
-        U: Into<u64>,
-    {
-        PhysAddr::new(align_up(self.0, align.into()))
-    }
-
-    /// Aligns the physical address downwards to the given alignment.
-    ///
-    /// See the `align_down` function for more information.
-    #[inline]
-    pub fn align_down<U>(self, align: U) -> Self
-    where
-        U: Into<u64>,
-    {
-        self.align_down_u64(align.into())
     }
 
     /// Aligns the physical address downwards to the given alignment.
@@ -605,25 +518,4 @@ impl Sub<PhysAddr> for PhysAddr {
 pub const fn align_down(addr: u64, align: u64) -> u64 {
     assert!(align.is_power_of_two(), "`align` must be a power of two");
     addr & !(align - 1)
-}
-
-/// Align address upwards.
-///
-/// Returns the smallest `x` with alignment `align` so that `x >= addr`.
-///
-/// Panics if the alignment is not a power of two or if an overflow occurs.
-#[inline]
-pub const fn align_up(addr: u64, align: u64) -> u64 {
-    assert!(align.is_power_of_two(), "`align` must be a power of two");
-    let align_mask = align - 1;
-    if addr & align_mask == 0 {
-        addr // already aligned
-    } else {
-        // FIXME: Replace with .expect, once `Option::expect` is const.
-        if let Some(aligned) = (addr | align_mask).checked_add(1) {
-            aligned
-        } else {
-            panic!("attempt to add with overflow")
-        }
-    }
 }
