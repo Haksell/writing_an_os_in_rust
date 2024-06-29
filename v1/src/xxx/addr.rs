@@ -76,11 +76,6 @@ impl PhysAddr {
     pub const fn as_u64(self) -> u64 {
         self.0
     }
-
-    #[inline]
-    pub(crate) const fn align_down_u64(self, align: u64) -> Self {
-        PhysAddr(align_down(self.0, align))
-    }
 }
 
 impl Add<u64> for PhysAddr {
@@ -105,10 +100,4 @@ impl Sub<PhysAddr> for PhysAddr {
     fn sub(self, rhs: PhysAddr) -> Self::Output {
         self.as_u64().checked_sub(rhs.as_u64()).unwrap()
     }
-}
-
-#[inline]
-pub const fn align_down(addr: u64, align: u64) -> u64 {
-    assert!(align.is_power_of_two(), "`align` must be a power of two");
-    addr & !(align - 1)
 }

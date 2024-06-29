@@ -2,7 +2,6 @@ use crate::xxx::addr::VirtAddr;
 
 pub mod gdt;
 pub mod idt;
-pub mod paging;
 pub mod tss;
 
 #[derive(Clone, Copy)]
