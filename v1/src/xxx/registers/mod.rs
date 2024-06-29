@@ -7,6 +7,3 @@ pub mod mxcsr;
 pub mod rflags;
 pub mod segmentation;
 pub mod xcontrol;
-
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
-pub use crate::xxx::instructions::read_rip;
