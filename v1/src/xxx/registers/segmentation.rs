@@ -38,18 +38,3 @@ impl fmt::Debug for SegmentSelector {
 
 #[derive(Debug)]
 pub struct CS;
-
-#[derive(Debug)]
-pub struct SS;
-
-#[derive(Debug)]
-pub struct DS;
-
-#[derive(Debug)]
-pub struct ES;
-
-#[derive(Debug)]
-pub struct FS;
-
-#[derive(Debug)]
-pub struct GS;

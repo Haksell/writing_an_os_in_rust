@@ -1,4 +1,4 @@
-pub use crate::xxx::registers::segmentation::{Segment, CS, DS, ES, FS, GS, SS};
+pub use crate::xxx::registers::segmentation::{Segment, CS};
 use crate::xxx::structures::gdt::SegmentSelector;
 use core::arch::asm;
 
@@ -18,8 +18,3 @@ macro_rules! segment_impl {
 }
 
 segment_impl!(CS, "cs");
-segment_impl!(SS, "ss");
-segment_impl!(DS, "ds");
-segment_impl!(ES, "es");
-segment_impl!(FS, "fs");
-segment_impl!(GS, "gs");

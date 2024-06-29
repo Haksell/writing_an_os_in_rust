@@ -1,8 +1,8 @@
 # todo
 
+- [ ] simplify `asm.rs`
 - [ ] remove useless fmt
 - [ ] remove x86_64 dead code
-- [ ] remove x86_64 warnings
 - [ ] remove x86_64 comments
 - [ ] simplify `Makefile`
 - [ ] fix todo
