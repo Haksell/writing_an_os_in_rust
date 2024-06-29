@@ -13,7 +13,6 @@ lazy_static = { version = "1.4.0", features = ["spin_no_std"] }
 rustversion = "1.0.5"                                           # TODO: remove
 spin = "0.9.8"
 volatile = { version = "0.3.0", default-features = false }
-x86_64 = "0.15.1"
 
 # TODO: remove
 [features]

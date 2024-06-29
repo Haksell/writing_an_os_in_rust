@@ -1,6 +1,11 @@
 # todo
 
-- [ ] remove `x86_64`
+## x86_64
+
+- [ ] remove warnings
+- [ ] remove features
+- [ ] remove dead code
+
 - [ ] simplify `Makefile`
 - [ ] fix todo
 - [ ] v1 -> v1_64

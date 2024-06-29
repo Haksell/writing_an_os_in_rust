@@ -29,8 +29,7 @@ dependencies = [
  "lazy_static",
  "rustversion",
  "spin",
- "volatile 0.3.0",
- "x86_64",
+ "volatile",
 ]
 
 [[package]]
@@ -78,21 +77,3 @@ name = "volatile"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f8e76fae08f03f96e166d2dfda232190638c10e0383841252416f9cfe2ae60e6"
-
-[[package]]
-name = "volatile"
-version = "0.4.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "442887c63f2c839b346c192d047a7c87e73d0689c9157b00b53dcc27dd5ea793"
-
-[[package]]
-name = "x86_64"
-version = "0.15.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4bc79523af8abf92fb1a970c3e086c5a343f6bcc1a0eb890f575cbb3b45743df"
-dependencies = [
- "bit_field",
- "bitflags",
- "rustversion",
- "volatile 0.4.6",
-]

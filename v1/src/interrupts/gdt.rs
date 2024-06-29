@@ -1,11 +1,11 @@
 use bit_field::BitField as _;
 use bitflags::bitflags;
 use core::mem::size_of;
-use x86_64::structures::gdt::SegmentSelector;
-use x86_64::structures::tss::TaskStateSegment;
-use x86_64::structures::DescriptorTablePointer;
-use x86_64::PrivilegeLevel;
-use x86_64::VirtAddr;
+use crate::xxx::structures::gdt::SegmentSelector;
+use crate::xxx::structures::tss::TaskStateSegment;
+use crate::xxx::structures::DescriptorTablePointer;
+use crate::xxx::PrivilegeLevel;
+use crate::xxx::VirtAddr;
 
 pub enum Descriptor {
     UserSegment(u64),

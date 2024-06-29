@@ -1,10 +1,10 @@
+use crate::xxx::registers::control::Cr0;
+use crate::xxx::registers::control::Cr0Flags;
+use crate::xxx::registers::control::Cr3;
+use crate::xxx::registers::model_specific::Msr;
+use crate::xxx::structures::gdt::SegmentSelector;
+use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
-use x86_64::registers::control::Cr0;
-use x86_64::registers::control::Cr0Flags;
-use x86_64::registers::control::Cr3;
-use x86_64::registers::model_specific::Msr;
-use x86_64::structures::gdt::SegmentSelector;
-use x86_64::structures::DescriptorTablePointer;
 
 #[inline]
 pub unsafe fn lgdt(gdt: &DescriptorTablePointer) {
