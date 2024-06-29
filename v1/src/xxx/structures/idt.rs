@@ -886,28 +886,6 @@ pub struct InterruptStackFrameValue {
     _reserved2: [u8; 6],
 }
 
-impl InterruptStackFrameValue {
-    /// Creates a new interrupt stack frame with the given values.
-    #[inline]
-    pub fn new(
-        instruction_pointer: VirtAddr,
-        code_segment: SegmentSelector,
-        cpu_flags: RFlags,
-        stack_pointer: VirtAddr,
-        stack_segment: SegmentSelector,
-    ) -> Self {
-        Self {
-            instruction_pointer,
-            code_segment,
-            _reserved1: Default::default(),
-            cpu_flags,
-            stack_pointer,
-            stack_segment,
-            _reserved2: Default::default(),
-        }
-    }
-}
-
 impl fmt::Debug for InterruptStackFrameValue {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let mut s = f.debug_struct("InterruptStackFrame");

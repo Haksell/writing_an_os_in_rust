@@ -81,9 +81,7 @@ bitflags! {
 
 mod x86_64 {
     use super::*;
-    use crate::xxx::addr::VirtAddr;
     use core::arch::asm;
-    use core::fmt;
 
     impl Msr {
         /// Read 64 bits msr register.
