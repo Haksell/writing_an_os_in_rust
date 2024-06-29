@@ -1,5 +1,5 @@
 use super::super::FrameAllocator;
-use super::entry::{Entry, EntryFlags};
+use super::table_entry::{EntryFlags, TableEntry};
 use super::ENTRY_COUNT;
 use core::marker::PhantomData;
 use core::ops::{Index, IndexMut};
@@ -33,7 +33,7 @@ impl HierachicalLevel for Level2 {
 pub const P4: *mut Table<Level4> = 0o177777_777_777_777_777_0000 as *mut _;
 
 pub struct Table<L: TableLevel> {
-    entries: [Entry; ENTRY_COUNT],
+    entries: [TableEntry; ENTRY_COUNT],
     level: PhantomData<L>,
 }
 
@@ -41,9 +41,9 @@ impl<L> Index<usize> for Table<L>
 where
     L: TableLevel,
 {
-    type Output = Entry;
+    type Output = TableEntry;
 
-    fn index(&self, index: usize) -> &Entry {
+    fn index(&self, index: usize) -> &TableEntry {
         &self.entries[index]
     }
 }
@@ -52,7 +52,7 @@ impl<L> IndexMut<usize> for Table<L>
 where
     L: TableLevel,
 {
-    fn index_mut(&mut self, index: usize) -> &mut Entry {
+    fn index_mut(&mut self, index: usize) -> &mut TableEntry {
         &mut self.entries[index]
     }
 }

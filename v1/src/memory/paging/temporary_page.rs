@@ -1,6 +1,6 @@
 use super::super::{Frame, FrameAllocator};
-use super::entry::EntryFlags;
 use super::table::{Level1, Table};
+use super::table_entry::EntryFlags;
 use super::{ActivePageTable, Page, VirtualAddress};
 
 pub struct TemporaryPage {

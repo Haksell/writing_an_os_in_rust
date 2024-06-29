@@ -2,13 +2,13 @@ use super::super::Frame;
 use crate::multiboot::{ElfSection, ElfSectionFlags};
 use bitflags::bitflags;
 
-// TODO: u64 -> usize verywhere?
+// TODO: u64 -> usize everywhere?
 
-pub struct Entry(u64);
+pub struct TableEntry(u64);
 
 const ADDRESS_MASK: usize = 0x000fffff_fffff000;
 
-impl Entry {
+impl TableEntry {
     pub fn is_unused(&self) -> bool {
         self.0 == 0
     }

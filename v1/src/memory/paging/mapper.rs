@@ -1,5 +1,5 @@
-use super::entry::EntryFlags;
 use super::table::{Level4, Table, P4};
+use super::table_entry::EntryFlags;
 use super::{Page, PhysicalAddress, VirtualAddress};
 use crate::instructions::tlb_flush;
 use crate::memory::{paging::ENTRY_COUNT, Frame, FrameAllocator, PAGE_SIZE};

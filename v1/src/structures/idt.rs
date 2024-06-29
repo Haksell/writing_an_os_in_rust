@@ -72,7 +72,6 @@ impl InterruptDescriptorTable {
         }
     }
 
-    #[inline]
     pub fn load(&'static self) {
         unsafe {
             crate::instructions::lidt(&self.pointer());
@@ -105,7 +104,6 @@ pub type DivergingHandlerFuncWithErrCode =
     extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
 
 impl<F> IdtEntry<F> {
-    #[inline]
     pub const fn missing() -> Self {
         IdtEntry {
             pointer_low: 0,
@@ -139,7 +137,6 @@ pub unsafe trait HandlerFuncType {
 macro_rules! impl_handler_func_type {
     ($f:ty) => {
         unsafe impl HandlerFuncType for $f {
-            #[inline]
             fn to_virt_addr(self) -> VirtAddr {
                 VirtAddr::new(self as u64)
             }
@@ -160,7 +157,6 @@ pub struct EntryOptions {
 }
 
 impl EntryOptions {
-    #[inline]
     const fn minimal() -> Self {
         EntryOptions {
             cs: SegmentSelector(0),
@@ -168,7 +164,6 @@ impl EntryOptions {
         }
     }
 
-    #[inline]
     pub unsafe fn set_stack_index(&mut self, index: u16) -> &mut Self {
         // The hardware IST index starts at 1, but our software IST index
         // starts at 0. Therefore we need to add 1 here.

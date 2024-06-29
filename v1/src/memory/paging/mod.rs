@@ -1,9 +1,9 @@
-mod entry;
 mod mapper;
 mod table;
+mod table_entry;
 mod temporary_page;
 
-pub use self::{entry::EntryFlags, mapper::Mapper};
+pub use self::{mapper::Mapper, table_entry::EntryFlags};
 
 use self::temporary_page::TemporaryPage;
 use super::{Frame, FrameAllocator, PAGE_SIZE};
