@@ -227,14 +227,6 @@ pub struct PageRange<S: PageSize = Size4KiB> {
     pub end: Page<S>,
 }
 
-impl<S: PageSize> PageRange<S> {
-    /// Returns wether this range contains no pages.
-    #[inline]
-    pub fn is_empty(&self) -> bool {
-        self.start >= self.end
-    }
-}
-
 impl<S: PageSize> Iterator for PageRange<S> {
     type Item = Page<S>;
 
