@@ -127,27 +127,4 @@ mod x86_64 {
             }
         }
     }
-
-    #[derive(Debug)]
-    pub enum InvalidStarSegmentSelectors {
-        SysretOffset,
-        SyscallOffset,
-        SysretPrivilegeLevel,
-        SyscallPrivilegeLevel,
-    }
-
-    impl fmt::Display for InvalidStarSegmentSelectors {
-        fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-            match self {
-                Self::SysretOffset => write!(f, "Sysret CS and SS are not offset by 8."),
-                Self::SyscallOffset => write!(f, "Syscall CS and SS are not offset by 8."),
-                Self::SysretPrivilegeLevel => {
-                    write!(f, "Sysret's segment must be a Ring3 segment.")
-                }
-                Self::SyscallPrivilegeLevel => {
-                    write!(f, "Syscall's segment must be a Ring0 segment.")
-                }
-            }
-        }
-    }
 }
