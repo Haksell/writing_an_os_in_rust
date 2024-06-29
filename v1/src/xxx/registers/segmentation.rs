@@ -4,12 +4,6 @@ use super::model_specific::Msr;
 use crate::xxx::{PrivilegeLevel, VirtAddr};
 use bit_field::BitField;
 use core::fmt;
-// imports for intra doc links
-#[cfg(doc)]
-use crate::{
-    registers::control::Cr4Flags,
-    structures::gdt::{Descriptor, DescriptorFlags, GlobalDescriptorTable},
-};
 
 /// An x86 segment
 ///

@@ -1,9 +1,6 @@
 //! Functions to read and write model specific registers.
 
 use bitflags::bitflags;
-// imports for intra doc links
-#[cfg(doc)]
-use crate::xxx::registers::segmentation::{FS, GS};
 
 /// A model specific register.
 #[cfg_attr(
@@ -171,15 +168,9 @@ mod x86_64 {
     use crate::xxx::structures::paging::Size4KiB;
     use crate::xxx::PrivilegeLevel;
     use bit_field::BitField;
+    use core::arch::asm;
     use core::convert::TryInto;
     use core::fmt;
-    // imports for intra doc links
-    #[cfg(doc)]
-    use crate::xxx::registers::{
-        control::Cr4Flags,
-        segmentation::{Segment, Segment64, CS, SS},
-    };
-    use core::arch::asm;
 
     impl Msr {
         /// Read 64 bits msr register.

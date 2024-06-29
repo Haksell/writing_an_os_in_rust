@@ -125,23 +125,16 @@ impl VirtAddr {
         self.0
     }
 
-    /// Converts the address to a raw pointer.
-    #[cfg(target_pointer_width = "64")]
     #[inline]
     pub const fn as_ptr<T>(self) -> *const T {
         self.as_u64() as *const T
     }
 
-    /// Converts the address to a mutable raw pointer.
-    #[cfg(target_pointer_width = "64")]
     #[inline]
     pub const fn as_mut_ptr<T>(self) -> *mut T {
         self.as_ptr::<T>() as *mut T
     }
 
-    /// Aligns the virtual address downwards to the given alignment.
-    ///
-    /// See the `align_down` function for more information.
     #[inline]
     pub fn align_down<U>(self, align: U) -> Self
     where

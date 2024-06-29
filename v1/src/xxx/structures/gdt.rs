@@ -6,14 +6,8 @@ use crate::xxx::PrivilegeLevel;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::fmt;
-// imports for intra-doc links
-#[cfg(doc)]
-use crate::xxx::registers::segmentation::{Segment, CS, SS};
 
-#[cfg(all(feature = "instructions", target_arch = "x86_64"))]
 use core::sync::atomic::{AtomicU64 as EntryValue, Ordering};
-#[cfg(not(all(feature = "instructions", target_arch = "x86_64")))]
-use u64 as EntryValue;
 
 /// 8-byte entry in a descriptor table.
 ///
