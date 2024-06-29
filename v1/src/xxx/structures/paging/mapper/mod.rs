@@ -13,15 +13,7 @@ use crate::xxx::{PhysAddr, VirtAddr};
 mod mapped_page_table;
 mod offset_page_table;
 
-/// Provides methods for translating virtual addresses.
 pub trait Translate {
-    /// Return the frame that the given virtual address is mapped to and the offset within that
-    /// frame.
-    ///
-    /// If the given address has a valid mapping, the mapped frame and the offset within that
-    /// frame is returned. Otherwise an error value is returned.
-    ///
-    /// This function works with huge pages of all sizes.
     fn translate(&self, addr: VirtAddr) -> TranslateResult;
 }
 
