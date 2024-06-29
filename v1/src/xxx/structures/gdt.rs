@@ -2,8 +2,6 @@
 
 pub use crate::xxx::registers::segmentation::SegmentSelector;
 use bitflags::bitflags;
-use core::fmt;
-
 use core::sync::atomic::{AtomicU64 as EntryValue, Ordering};
 
 /// 8-byte entry in a descriptor table.

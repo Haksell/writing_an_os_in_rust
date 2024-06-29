@@ -150,16 +150,6 @@ impl Page<Size4KiB> {
     }
 }
 
-impl<S: PageSize> fmt::Debug for Page<S> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_fmt(format_args!(
-            "Page[{}]({:#x})",
-            S::DEBUG_STR,
-            self.start_address().as_u64()
-        ))
-    }
-}
-
 impl<S: PageSize> Add<u64> for Page<S> {
     type Output = Self;
     #[inline]
@@ -281,15 +271,6 @@ impl<S: PageSize> Iterator for PageRangeInclusive<S> {
         } else {
             None
         }
-    }
-}
-
-impl<S: PageSize> fmt::Debug for PageRangeInclusive<S> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_struct("PageRangeInclusive")
-            .field("start", &self.start)
-            .field("end", &self.end)
-            .finish()
     }
 }
 
