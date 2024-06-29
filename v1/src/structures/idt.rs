@@ -2,7 +2,6 @@ use crate::asm::cs_get_reg;
 use crate::structures::{DescriptorTablePointer, SegmentSelector};
 use crate::virt_addr::VirtAddr;
 use bit_field::BitField;
-use bitflags::bitflags;
 use core::marker::PhantomData;
 
 #[derive(Clone)]
@@ -191,26 +190,4 @@ pub struct InterruptStackFrameValue {
     stack_pointer: VirtAddr,
     stack_segment: SegmentSelector,
     _reserved2: [u8; 6],
-}
-
-bitflags! {
-    #[repr(transparent)]
-    #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
-    pub struct PageFaultErrorCode: u64 {
-        const PROTECTION_VIOLATION = 1;
-        const CAUSED_BY_WRITE = 1 << 1;
-        const USER_MODE = 1 << 2;
-        const MALFORMED_TABLE = 1 << 3;
-        const INSTRUCTION_FETCH = 1 << 4;
-        const PROTECTION_KEY = 1 << 5;
-        const SHADOW_STACK = 1 << 6;
-        const SGX = 1 << 15;
-        const RMP = 1 << 31;
-    }
-}
-
-#[derive(Clone, Copy, PartialEq, Eq)]
-#[repr(transparent)]
-pub struct SelectorErrorCode {
-    flags: u64,
 }
