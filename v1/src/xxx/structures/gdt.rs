@@ -40,13 +40,6 @@ impl PartialEq for Entry {
 
 impl Eq for Entry {}
 
-impl fmt::Debug for Entry {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // Display inner value as hex
-        write!(f, "Entry({:#018x})", self.raw())
-    }
-}
-
 bitflags! {
     /// Flags for a GDT descriptor. Not all flags are valid for all descriptor types.
     #[derive(PartialEq, Eq, PartialOrd, Ord, Hash, Debug, Clone, Copy)]

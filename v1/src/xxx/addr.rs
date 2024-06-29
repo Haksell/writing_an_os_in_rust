@@ -340,14 +340,6 @@ impl Step for VirtAddr {
 /// Contains the invalid address.
 pub struct PhysAddrNotValid(pub u64);
 
-impl core::fmt::Debug for PhysAddrNotValid {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_tuple("PhysAddrNotValid")
-            .field(&format_args!("{:#x}", self.0))
-            .finish()
-    }
-}
-
 impl PhysAddr {
     /// Creates a new physical address.
     ///
