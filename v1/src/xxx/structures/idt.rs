@@ -1,6 +1,7 @@
+use crate::asm::cs_get_reg;
 use crate::xxx::addr::VirtAddr;
 use crate::xxx::registers::rflags::RFlags;
-use crate::xxx::registers::segmentation::{Segment as _, SegmentSelector, CS};
+use crate::xxx::registers::SegmentSelector;
 use bit_field::BitField;
 use bitflags::bitflags;
 use core::marker::PhantomData;
@@ -136,7 +137,7 @@ impl<F> Entry<F> {
 
         self.options = EntryOptions::minimal();
         // SAFETY: The current CS is a valid, long-mode code segment.
-        unsafe { self.options.set_code_selector(CS::get_reg()) };
+        unsafe { self.options.set_code_selector(cs_get_reg()) };
         self.options.set_present(true);
         &mut self.options
     }

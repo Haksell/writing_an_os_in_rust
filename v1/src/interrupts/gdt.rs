@@ -1,5 +1,5 @@
 use crate::xxx::addr::VirtAddr;
-use crate::xxx::registers::segmentation::SegmentSelector;
+use crate::xxx::registers::SegmentSelector;
 use crate::xxx::structures::tss::TaskStateSegment;
 use crate::xxx::structures::DescriptorTablePointer;
 use bit_field::BitField as _;

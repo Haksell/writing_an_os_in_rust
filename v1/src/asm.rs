@@ -1,4 +1,4 @@
-use crate::xxx::registers::segmentation::SegmentSelector;
+use crate::xxx::registers::SegmentSelector;
 use crate::xxx::structures::DescriptorTablePointer;
 use core::arch::asm;
 
@@ -93,6 +93,15 @@ pub unsafe fn load_tss(sel: SegmentSelector) {
     unsafe {
         asm!("ltr {0:x}", in(reg) sel.0, options(nostack, preserves_flags));
     }
+}
+
+#[inline]
+pub unsafe fn cs_get_reg() -> SegmentSelector {
+    let segment: u16;
+    unsafe {
+        asm!(concat!("mov {0:x}, cs"), out(reg) segment, options(nomem, nostack, preserves_flags));
+    }
+    SegmentSelector(segment)
 }
 
 #[inline]
