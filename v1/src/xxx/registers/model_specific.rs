@@ -2,11 +2,6 @@
 
 use bitflags::bitflags;
 
-/// A model specific register.
-#[cfg_attr(
-    not(all(feature = "instructions", target_arch = "x86_64")),
-    allow(dead_code)
-)] // FIXME
 #[derive(Debug)]
 pub struct Msr(u32);
 
@@ -26,21 +21,9 @@ pub struct Efer;
 #[derive(Debug)]
 pub struct FsBase;
 
-/// [GS].Base Model Specific Register.
-///
-#[cfg_attr(
-    all(feature = "instructions", target_arch = "x86_64"),
-    doc = "[`GS::swap`] swaps this register with [`KernelGsBase`]."
-)]
 #[derive(Debug)]
 pub struct GsBase;
 
-/// KernelGsBase Model Specific Register.
-///
-#[cfg_attr(
-    all(feature = "instructions", target_arch = "x86_64"),
-    doc = "[`GS::swap`] swaps this register with [`GsBase`]."
-)]
 #[derive(Debug)]
 pub struct KernelGsBase;
 
