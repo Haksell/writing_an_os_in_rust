@@ -90,7 +90,7 @@ impl InterruptDescriptorTable {
 #[repr(C)]
 pub struct IdtEntry<F> {
     pointer_low: u16,
-    options: EntryOptions,
+    options: IdtEntryOptions,
     pointer_middle: u16,
     pointer_high: u32,
     reserved: u32,
@@ -128,7 +128,7 @@ impl<F> IdtEntry<F> {
             pointer_low: 0,
             pointer_middle: 0,
             pointer_high: 0,
-            options: EntryOptions::minimal(),
+            options: IdtEntryOptions::minimal(),
             reserved: 0,
             phantom: PhantomData,
         }
@@ -136,13 +136,13 @@ impl<F> IdtEntry<F> {
 }
 
 impl<F: HandlerFuncType> IdtEntry<F> {
-    pub fn set_handler_fn(&mut self, handler: F) -> &mut EntryOptions {
+    pub fn set_handler_fn(&mut self, handler: F) -> &mut IdtEntryOptions {
         const PRESENT_BIT: usize = 15;
         let addr = handler.to_virt_addr().as_u64();
         self.pointer_low = addr as u16;
         self.pointer_middle = (addr >> 16) as u16;
         self.pointer_high = (addr >> 32) as u32;
-        self.options = EntryOptions::minimal();
+        self.options = IdtEntryOptions::minimal();
         unsafe { self.options.cs = cs_get_reg() };
         self.options.bits.set_bit(PRESENT_BIT, true);
         &mut self.options
@@ -151,14 +151,14 @@ impl<F: HandlerFuncType> IdtEntry<F> {
 
 #[repr(C)]
 #[derive(Clone, Copy, PartialEq)]
-pub struct EntryOptions {
+pub struct IdtEntryOptions {
     cs: SegmentSelector,
     bits: u16,
 }
 
-impl EntryOptions {
+impl IdtEntryOptions {
     const fn minimal() -> Self {
-        EntryOptions {
+        IdtEntryOptions {
             cs: SegmentSelector(0),
             bits: 0b1110_0000_0000, // Default to a 64-bit Interrupt Gate
         }
