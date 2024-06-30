@@ -1,6 +1,8 @@
-use crate::instructions::cs_get_reg;
-use crate::structures::{DescriptorTablePointer, SegmentSelector};
-use crate::virt_addr::VirtAddr;
+use crate::{
+    instructions::cs_get_reg,
+    structures::{DescriptorTablePointer, SegmentSelector},
+    virt_addr::VirtAddr,
+};
 use bit_field::BitField;
 use core::marker::PhantomData;
 
