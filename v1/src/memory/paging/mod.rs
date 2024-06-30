@@ -3,9 +3,9 @@ mod table;
 mod table_entry;
 mod temporary_page;
 
-pub use self::{mapper::Mapper, table_entry::EntryFlags};
+pub use self::table_entry::EntryFlags;
 
-use self::temporary_page::TemporaryPage;
+use self::{mapper::Mapper, temporary_page::TemporaryPage};
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use crate::{
     instructions::{cr3_read, cr3_write, tlb_flush_all},

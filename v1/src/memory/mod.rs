@@ -4,17 +4,14 @@ mod locked;
 mod paging;
 mod stack_allocator;
 
-pub use self::{
-    area_frame_allocator::AreaFrameAllocator, paging::remap_the_kernel, stack_allocator::Stack,
-};
-
 use self::{
+    area_frame_allocator::AreaFrameAllocator,
     heap_allocator::BumpAllocator,
     locked::Locked,
     paging::{
-        ActivePageTable, PhysicalAddress, {EntryFlags, Page},
+        remap_the_kernel, ActivePageTable, PhysicalAddress, {EntryFlags, Page},
     },
-    stack_allocator::StackAllocator,
+    stack_allocator::{Stack, StackAllocator},
 };
 use crate::MULTIBOOT;
 
