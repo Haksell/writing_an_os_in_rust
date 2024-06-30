@@ -3,9 +3,7 @@
 pub struct VirtAddr(u64);
 
 impl VirtAddr {
-    #[inline]
     pub const fn new(addr: u64) -> VirtAddr {
-        // TODO: fix for addresses that should be sign-extended with 1
         let truncated = ((addr << 16) as i64 >> 16) as u64;
         if truncated == addr {
             VirtAddr(truncated)
@@ -14,12 +12,10 @@ impl VirtAddr {
         }
     }
 
-    #[inline]
     pub const fn zero() -> VirtAddr {
         VirtAddr(0)
     }
 
-    #[inline]
     pub const fn as_u64(self) -> u64 {
         self.0
     }
