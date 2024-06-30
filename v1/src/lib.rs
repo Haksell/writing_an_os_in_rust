@@ -49,11 +49,6 @@ pub extern "C" fn kernel_main(multiboot_start: usize) {
 
     interrupts::init(&mut memory_controller);
 
-    // fn stack_overflow() {
-    //     stack_overflow();
-    // }
-    // stack_overflow();
-
     println!("No crash! \x02");
     hlt_loop()
 }
