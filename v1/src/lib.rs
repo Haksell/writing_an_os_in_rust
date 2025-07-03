@@ -32,7 +32,7 @@ lazy_static! {
 
 static MULTIBOOT_START: AtomicUsize = AtomicUsize::new(0);
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn kernel_main(multiboot_start: usize) {
     MULTIBOOT_START.store(multiboot_start, Ordering::SeqCst);
 
