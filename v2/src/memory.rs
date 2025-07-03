@@ -6,8 +6,10 @@ use x86_64::structures::paging::{
 use x86_64::{PhysAddr, VirtAddr};
 
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
-    let level_4_table = active_level_4_table(physical_memory_offset);
-    OffsetPageTable::new(level_4_table, physical_memory_offset)
+    unsafe {
+        let level_4_table = active_level_4_table(physical_memory_offset);
+        OffsetPageTable::new(level_4_table, physical_memory_offset)
+    }
 }
 
 unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut PageTable {
@@ -15,7 +17,7 @@ unsafe fn active_level_4_table(physical_memory_offset: VirtAddr) -> &'static mut
     let phys = level4_page_table.start_address();
     let virt = physical_memory_offset + phys.as_u64();
     let page_table_ptr: *mut PageTable = virt.as_mut_ptr();
-    &mut *page_table_ptr
+    unsafe { &mut *page_table_ptr }
 }
 
 pub fn create_example_mapping(
