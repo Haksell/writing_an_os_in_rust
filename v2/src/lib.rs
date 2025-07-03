@@ -4,7 +4,6 @@
 #![reexport_test_harness_main = "test_main"]
 #![feature(abi_x86_interrupt)]
 #![feature(custom_test_frameworks)]
-#![feature(const_mut_refs)]
 
 pub mod allocator;
 pub mod gdt;
