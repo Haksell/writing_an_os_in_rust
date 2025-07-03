@@ -1,0 +1,5 @@
+{
+    "rust-analyzer.cargo.target": "blog_v2.json",
+    "rust-analyzer.check.allTargets": false,
+    "rust-analyzer.showUnlinkedFileNotification": false
+}
