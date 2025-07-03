@@ -18,7 +18,7 @@ pub struct InterruptDescriptorTable {
     bound_range_exceeded: IdtEntry<HandlerFunc>,
     invalid_opcode: IdtEntry<HandlerFunc>,
     device_not_available: IdtEntry<HandlerFunc>,
-    pub double_fault: IdtEntry<DivergingHandlerFuncWithErrCode>,
+    pub double_fault: IdtEntry<HandlerFuncWithErrCode>, // should be diverging
     coprocessor_segment_overrun: IdtEntry<HandlerFunc>,
     invalid_tss: IdtEntry<HandlerFuncWithErrCode>,
     segment_not_present: IdtEntry<HandlerFuncWithErrCode>,
@@ -28,7 +28,7 @@ pub struct InterruptDescriptorTable {
     reserved_1: IdtEntry<HandlerFunc>,
     x87_floating_point: IdtEntry<HandlerFunc>,
     alignment_check: IdtEntry<HandlerFuncWithErrCode>,
-    machine_check: IdtEntry<DivergingHandlerFunc>,
+    machine_check: IdtEntry<HandlerFunc>, // should be diverging
     simd_floating_point: IdtEntry<HandlerFunc>,
     virtualization: IdtEntry<HandlerFunc>,
     cp_protection_exception: IdtEntry<HandlerFuncWithErrCode>,
@@ -105,9 +105,6 @@ pub unsafe trait HandlerFuncType {
 
 type HandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame);
 type HandlerFuncWithErrCode = extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64);
-type DivergingHandlerFunc = extern "x86-interrupt" fn(InterruptStackFrame) -> !;
-type DivergingHandlerFuncWithErrCode =
-    extern "x86-interrupt" fn(InterruptStackFrame, error_code: u64) -> !;
 
 macro_rules! impl_handler_func_type {
     ($f:ty) => {
@@ -121,8 +118,6 @@ macro_rules! impl_handler_func_type {
 
 impl_handler_func_type!(HandlerFunc);
 impl_handler_func_type!(HandlerFuncWithErrCode);
-impl_handler_func_type!(DivergingHandlerFunc);
-impl_handler_func_type!(DivergingHandlerFuncWithErrCode);
 
 impl<F> IdtEntry<F> {
     pub const fn missing() -> Self {
