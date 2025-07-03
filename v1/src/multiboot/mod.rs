@@ -20,7 +20,7 @@ pub struct MultiBoot {
 
 impl MultiBoot {
     pub unsafe fn load(multiboot_address: usize) -> Self {
-        let total_size = *(multiboot_address as *const u32) as usize;
+        let total_size = unsafe { *(multiboot_address as *const u32) } as usize;
         Self {
             start_address: multiboot_address,
             first_tag: multiboot_address + 8,

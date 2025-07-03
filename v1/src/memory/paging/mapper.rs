@@ -1,11 +1,11 @@
 use super::{
-    table::{Level4, Table, P4},
+    table::{Level4, P4, Table},
     table_entry::EntryFlags,
     {Page, PhysicalAddress, VirtualAddress},
 };
 use crate::{
     instructions::tlb_flush,
-    memory::{paging::ENTRY_COUNT, Frame, FrameAllocator, PAGE_SIZE},
+    memory::{Frame, FrameAllocator, PAGE_SIZE, paging::ENTRY_COUNT},
 };
 use core::ptr::Unique;
 
@@ -16,7 +16,7 @@ pub struct Mapper {
 impl Mapper {
     pub unsafe fn new() -> Self {
         Self {
-            p4: Unique::new_unchecked(P4),
+            p4: unsafe { Unique::new_unchecked(P4) },
         }
     }
 

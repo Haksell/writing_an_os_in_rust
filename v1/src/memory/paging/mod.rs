@@ -8,9 +8,9 @@ pub use self::table_entry::EntryFlags;
 use self::{mapper::Mapper, temporary_page::TemporaryPage};
 use super::{Frame, FrameAllocator, PAGE_SIZE};
 use crate::{
+    MULTIBOOT,
     instructions::{cr3_read, cr3_write, tlb_flush_all},
     vga_buffer::VGA_ADDRESS,
-    MULTIBOOT,
 };
 use core::ops::{Add, Deref, DerefMut};
 
@@ -112,7 +112,7 @@ impl DerefMut for ActivePageTable {
 impl ActivePageTable {
     unsafe fn new() -> Self {
         Self {
-            mapper: Mapper::new(),
+            mapper: unsafe { Mapper::new() },
         }
     }
 

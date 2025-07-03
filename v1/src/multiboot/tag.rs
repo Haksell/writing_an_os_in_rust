@@ -41,6 +41,6 @@ pub trait TagTrait: Pointee {
     fn dst_size(base_tag: &Tag) -> <Self as Pointee>::Metadata;
 
     unsafe fn from_base_tag(tag: &Tag) -> &Self {
-        &*core::ptr::from_raw_parts(tag as *const _ as *const (), Self::dst_size(tag))
+        unsafe { &*core::ptr::from_raw_parts(tag as *const _ as *const (), Self::dst_size(tag)) }
     }
 }
