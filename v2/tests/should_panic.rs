@@ -1,8 +1,10 @@
 #![no_std]
 #![no_main]
 
-use blog_v2::{exit_qemu, hlt_loop, serial_print, serial_println, QemuExitCode, TEST_OK};
-use core::panic::PanicInfo;
+use {
+    blog_v2::{QemuExitCode, TEST_OK, exit_qemu, hlt_loop, serial_print, serial_println},
+    core::panic::PanicInfo,
+};
 
 #[no_mangle]
 pub extern "C" fn _start() -> ! {

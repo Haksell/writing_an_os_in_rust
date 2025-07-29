@@ -1,7 +1,9 @@
-use super::locked::Locked;
-use core::{
-    alloc::{GlobalAlloc, Layout},
-    ptr::NonNull,
+use {
+    super::locked::Locked,
+    core::{
+        alloc::{GlobalAlloc, Layout},
+        ptr::NonNull,
+    },
 };
 
 struct ListNode {

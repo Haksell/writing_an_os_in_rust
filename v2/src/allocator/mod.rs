@@ -4,10 +4,10 @@ pub mod linked_list;
 pub mod locked;
 
 use x86_64::{
-    structures::paging::{
-        mapper::MapToError, FrameAllocator, Mapper, Page, PageTableFlags, Size4KiB,
-    },
     VirtAddr,
+    structures::paging::{
+        FrameAllocator, Mapper, Page, PageTableFlags, Size4KiB, mapper::MapToError,
+    },
 };
 
 use self::{fixed_size_block::FixedSizeBlockAllocator, locked::Locked};

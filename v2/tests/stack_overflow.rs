@@ -2,10 +2,12 @@
 #![no_std]
 #![no_main]
 
-use blog_v2::{exit_qemu, gdt, hlt_loop, serial_print, serial_println, QemuExitCode, TEST_OK};
-use core::panic::PanicInfo;
-use lazy_static::lazy_static;
-use x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame};
+use {
+    blog_v2::{QemuExitCode, TEST_OK, exit_qemu, gdt, hlt_loop, serial_print, serial_println},
+    core::panic::PanicInfo,
+    lazy_static::lazy_static,
+    x86_64::structures::idt::{InterruptDescriptorTable, InterruptStackFrame},
+};
 
 lazy_static! {
     static ref TEST_IDT: InterruptDescriptorTable = {

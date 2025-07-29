@@ -1,7 +1,8 @@
-use super::align_up;
-use super::locked::Locked;
-use alloc::alloc::{GlobalAlloc, Layout};
-use core::{mem, ptr};
+use {
+    super::{align_up, locked::Locked},
+    alloc::alloc::{GlobalAlloc, Layout},
+    core::{mem, ptr},
+};
 
 struct ListNode {
     size: usize,

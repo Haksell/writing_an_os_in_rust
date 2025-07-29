@@ -1,8 +1,10 @@
-use super::{Task, TaskId};
-use alloc::{collections::BTreeMap, sync::Arc, task::Wake};
-use core::task::{Context, Poll, Waker};
-use crossbeam_queue::ArrayQueue;
-use x86_64::instructions::interrupts;
+use {
+    super::{Task, TaskId},
+    alloc::{collections::BTreeMap, sync::Arc, task::Wake},
+    core::task::{Context, Poll, Waker},
+    crossbeam_queue::ArrayQueue,
+    x86_64::instructions::interrupts,
+};
 
 struct TaskWaker {
     task_id: TaskId,

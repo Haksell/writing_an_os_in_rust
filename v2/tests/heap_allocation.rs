@@ -6,17 +6,23 @@
 
 extern crate alloc;
 
-use alloc::{boxed::Box, vec::Vec};
-use blog_v2::allocator::HEAP_SIZE;
-use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
+use {
+    alloc::{boxed::Box, vec::Vec},
+    blog_v2::allocator::HEAP_SIZE,
+    bootloader::{BootInfo, entry_point},
+    core::panic::PanicInfo,
+};
 
 entry_point!(main);
 
 fn main(boot_info: &'static BootInfo) -> ! {
-    use blog_v2::allocator;
-    use blog_v2::memory::{self, BootInfoFrameAllocator};
-    use x86_64::VirtAddr;
+    use {
+        blog_v2::{
+            allocator,
+            memory::{self, BootInfoFrameAllocator},
+        },
+        x86_64::VirtAddr,
+    };
 
     blog_v2::init();
     let phys_mem_offset = VirtAddr::new(boot_info.physical_memory_offset);

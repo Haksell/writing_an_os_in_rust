@@ -6,15 +6,17 @@
 
 extern crate alloc;
 
-use blog_v2::{
-    allocator,
-    memory::{self, BootInfoFrameAllocator},
-    println,
-    task::{executor::Executor, keyboard, Task},
+use {
+    blog_v2::{
+        allocator,
+        memory::{self, BootInfoFrameAllocator},
+        println,
+        task::{Task, executor::Executor, keyboard},
+    },
+    bootloader::{BootInfo, entry_point},
+    core::panic::PanicInfo,
+    x86_64::VirtAddr,
 };
-use bootloader::{entry_point, BootInfo};
-use core::panic::PanicInfo;
-use x86_64::VirtAddr;
 
 entry_point!(kernel_main);
 

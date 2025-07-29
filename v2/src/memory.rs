@@ -1,9 +1,14 @@
-use bootloader::bootinfo::{MemoryMap, MemoryRegionType};
-use x86_64::registers::control::Cr3;
-use x86_64::structures::paging::{
-    FrameAllocator, Mapper, OffsetPageTable, Page, PageTable, PageTableFlags, PhysFrame, Size4KiB,
+use {
+    bootloader::bootinfo::{MemoryMap, MemoryRegionType},
+    x86_64::{
+        PhysAddr, VirtAddr,
+        registers::control::Cr3,
+        structures::paging::{
+            FrameAllocator, Mapper, OffsetPageTable, Page, PageTable, PageTableFlags, PhysFrame,
+            Size4KiB,
+        },
+    },
 };
-use x86_64::{PhysAddr, VirtAddr};
 
 pub unsafe fn init(physical_memory_offset: VirtAddr) -> OffsetPageTable<'static> {
     unsafe {
