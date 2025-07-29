@@ -1,13 +1,15 @@
-use super::{
-    table::{Level4, P4, Table},
-    table_entry::EntryFlags,
-    {Page, PhysicalAddress, VirtualAddress},
+use {
+    super::{
+        Page, PhysicalAddress, VirtualAddress,
+        table::{Level4, P4, Table},
+        table_entry::EntryFlags,
+    },
+    crate::{
+        instructions::tlb_flush,
+        memory::{Frame, FrameAllocator, PAGE_SIZE, paging::ENTRY_COUNT},
+    },
+    core::ptr::Unique,
 };
-use crate::{
-    instructions::tlb_flush,
-    memory::{Frame, FrameAllocator, PAGE_SIZE, paging::ENTRY_COUNT},
-};
-use core::ptr::Unique;
 
 pub struct Mapper {
     p4: Unique<Table<Level4>>,

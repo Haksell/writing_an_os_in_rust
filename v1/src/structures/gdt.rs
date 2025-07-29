@@ -1,10 +1,12 @@
-use crate::{
-    structures::{tss::TaskStateSegment, DescriptorTablePointer, SegmentSelector},
-    virt_addr::VirtAddr,
+use {
+    crate::{
+        structures::{DescriptorTablePointer, SegmentSelector, tss::TaskStateSegment},
+        virt_addr::VirtAddr,
+    },
+    bit_field::BitField as _,
+    bitflags::bitflags,
+    core::mem::size_of,
 };
-use bit_field::BitField as _;
-use bitflags::bitflags;
-use core::mem::size_of;
 
 bitflags! {
     struct GdtDescriptorFlags: u64 {

@@ -1,11 +1,13 @@
-use super::super::FrameAllocator;
-use super::{
-    table_entry::{EntryFlags, TableEntry},
-    ENTRY_COUNT,
-};
-use core::{
-    marker::PhantomData,
-    ops::{Index, IndexMut},
+use {
+    super::{
+        super::FrameAllocator,
+        ENTRY_COUNT,
+        table_entry::{EntryFlags, TableEntry},
+    },
+    core::{
+        marker::PhantomData,
+        ops::{Index, IndexMut},
+    },
 };
 
 pub enum Level4 {}

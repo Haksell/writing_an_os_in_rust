@@ -1,7 +1,9 @@
 // code from v2 since v1 was outdated
 
-use alloc::alloc::{GlobalAlloc, Layout};
-use core::ptr;
+use {
+    alloc::alloc::{GlobalAlloc, Layout},
+    core::ptr,
+};
 
 use super::locked::Locked;
 

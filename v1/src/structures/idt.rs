@@ -1,10 +1,12 @@
-use crate::{
-    instructions::cs_get_reg,
-    structures::{DescriptorTablePointer, SegmentSelector},
-    virt_addr::VirtAddr,
+use {
+    crate::{
+        instructions::cs_get_reg,
+        structures::{DescriptorTablePointer, SegmentSelector},
+        virt_addr::VirtAddr,
+    },
+    bit_field::BitField,
+    core::marker::PhantomData,
 };
-use bit_field::BitField;
-use core::marker::PhantomData;
 
 #[derive(Clone)]
 #[repr(C)]

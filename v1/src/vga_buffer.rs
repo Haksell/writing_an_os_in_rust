@@ -1,6 +1,8 @@
-use core::{fmt, ptr::Unique};
-use spin::Mutex;
-use volatile::Volatile;
+use {
+    core::{fmt, ptr::Unique},
+    spin::Mutex,
+    volatile::Volatile,
+};
 
 #[allow(dead_code)]
 #[derive(Debug, Clone, Copy)]

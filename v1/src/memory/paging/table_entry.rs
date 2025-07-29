@@ -1,6 +1,8 @@
-use super::super::Frame;
-use crate::multiboot::{ElfSection, ElfSectionFlags};
-use bitflags::bitflags;
+use {
+    super::super::Frame,
+    crate::multiboot::{ElfSection, ElfSectionFlags},
+    bitflags::bitflags,
+};
 
 // TODO: u64 -> usize everywhere?
 

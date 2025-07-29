@@ -1,5 +1,7 @@
-use super::{Tag, TagTrait, TagType};
-use core::mem::size_of;
+use {
+    super::{Tag, TagTrait, TagType},
+    core::mem::size_of,
+};
 
 const METADATA_SIZE: usize = 4 * size_of::<u32>();
 

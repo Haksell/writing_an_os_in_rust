@@ -5,14 +5,16 @@ mod temporary_page;
 
 pub use self::table_entry::EntryFlags;
 
-use self::{mapper::Mapper, temporary_page::TemporaryPage};
-use super::{Frame, FrameAllocator, PAGE_SIZE};
-use crate::{
-    MULTIBOOT,
-    instructions::{cr3_read, cr3_write, tlb_flush_all},
-    vga_buffer::VGA_ADDRESS,
+use {
+    self::{mapper::Mapper, temporary_page::TemporaryPage},
+    super::{Frame, FrameAllocator, PAGE_SIZE},
+    crate::{
+        MULTIBOOT,
+        instructions::{cr3_read, cr3_write, tlb_flush_all},
+        vga_buffer::VGA_ADDRESS,
+    },
+    core::ops::{Add, Deref, DerefMut},
 };
-use core::ops::{Add, Deref, DerefMut};
 
 const ENTRY_COUNT: usize = 512;
 

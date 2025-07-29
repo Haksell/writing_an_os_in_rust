@@ -14,16 +14,18 @@ mod virt_addr;
 
 extern crate alloc;
 
-use self::{
-    instructions::{enable_nxe_bit, enable_write_protect_bit, hlt_loop},
-    multiboot::MultiBoot,
+use {
+    self::{
+        instructions::{enable_nxe_bit, enable_write_protect_bit, hlt_loop},
+        multiboot::MultiBoot,
+    },
+    alloc::{string::String, vec},
+    core::{
+        panic::PanicInfo,
+        sync::atomic::{AtomicUsize, Ordering},
+    },
+    lazy_static::lazy_static,
 };
-use alloc::{string::String, vec};
-use core::{
-    panic::PanicInfo,
-    sync::atomic::{AtomicUsize, Ordering},
-};
-use lazy_static::lazy_static;
 
 lazy_static! {
     static ref MULTIBOOT: MultiBoot =

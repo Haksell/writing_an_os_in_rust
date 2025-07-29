@@ -1,5 +1,7 @@
-use crate::structures::{DescriptorTablePointer, SegmentSelector};
-use core::arch::asm;
+use {
+    crate::structures::{DescriptorTablePointer, SegmentSelector},
+    core::arch::asm,
+};
 
 #[inline]
 pub unsafe fn lidt(idt: &DescriptorTablePointer) {

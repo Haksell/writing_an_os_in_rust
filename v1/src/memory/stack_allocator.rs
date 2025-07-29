@@ -1,6 +1,6 @@
 use super::{
-    paging::{ActivePageTable, EntryFlags, Page, PageIter},
     FrameAllocator, PAGE_SIZE,
+    paging::{ActivePageTable, EntryFlags, Page, PageIter},
 };
 
 #[derive(Debug)]

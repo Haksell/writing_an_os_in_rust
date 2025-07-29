@@ -1,14 +1,16 @@
-use crate::{
-    instructions::{cs_set_reg, load_tss},
-    memory::MemoryController,
-    structures::{
-        Gdt, GdtDescriptor, InterruptDescriptorTable, InterruptStackFrame, SegmentSelector,
-        TaskStateSegment,
+use {
+    crate::{
+        instructions::{cs_set_reg, load_tss},
+        memory::MemoryController,
+        structures::{
+            Gdt, GdtDescriptor, InterruptDescriptorTable, InterruptStackFrame, SegmentSelector,
+            TaskStateSegment,
+        },
+        virt_addr::VirtAddr,
     },
-    virt_addr::VirtAddr,
+    lazy_static::lazy_static,
+    spin::Once,
 };
-use lazy_static::lazy_static;
-use spin::Once;
 
 const DOUBLE_FAULT_IST_INDEX: usize = 0;
 

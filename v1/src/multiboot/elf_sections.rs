@@ -1,6 +1,8 @@
-use super::{Tag, TagTrait, TagType};
-use bitflags::bitflags;
-use core::mem::size_of;
+use {
+    super::{Tag, TagTrait, TagType},
+    bitflags::bitflags,
+    core::mem::size_of,
+};
 
 const METADATA_SIZE: usize = 5 * size_of::<u32>();
 
