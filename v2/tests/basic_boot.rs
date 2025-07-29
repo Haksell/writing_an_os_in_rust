@@ -9,7 +9,7 @@ use {
     core::panic::PanicInfo,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     test_main();
     hlt_loop();

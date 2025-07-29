@@ -6,7 +6,7 @@ use {
     core::panic::PanicInfo,
 };
 
-#[no_mangle]
+#[unsafe(no_mangle)]
 pub extern "C" fn _start() -> ! {
     serial_print!("should_panic ");
     assert_eq!(0, 1);
